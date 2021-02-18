@@ -3,6 +3,37 @@ var fm_chfila = {
     vpp_id: '#fm_chfila',
     rulepack: null,
 
+    hosts: {
+        localtest: {
+            name: 'Localhost Test Server',
+            host: 'http://localhost:8080'
+        },
+        ohnlp4covid_dev: {
+            name: 'OHNLP COVID Dev Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        ohnlp_az_dev: {
+            name: 'OHNLP Azure Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        current: {
+            name: 'Current UI Server',
+            host: ''
+        }
+    },
+
+    static_url: {
+        sample: '/static/data/covid19.json'
+    },
+
+    url: {
+        get_rulepack_list: '/get_rulepack_list',
+        get_rulepack: '/get_rulepack',
+        del_rulepack: '/del_rulepack',
+        save_rulepack: '/save_rulepack',
+        ie_editor_test: '/ie_editor_test'
+    },
+
     rp: {
         state: {
             NEW: 'new',
@@ -46,6 +77,10 @@ var fm_chfila = {
     },
 
     init: function () {
+        // update the current host
+        this.hosts.current.host = location.protocol + '//' + location.hostname;
+
+        // init the vpp
         this.vpp = new Vue({
             el: this.vpp_id,
             data: {
@@ -87,7 +122,12 @@ var fm_chfila = {
                 },
 
                 del_rulepack: function(rulepack_id, rulepack_title) {
-                    fm_chfila.del_rulepack(rulepack_id, rulepack_title);
+                    var ret = window.confirm('Are you sure to delete this rule package [' + rulepack_title + ']?');
+                    if (ret) {
+                        fm_chfila.del_rulepack(rulepack_id);
+                    } else {
+
+                    }
                 },
 
                 open_sample: function () {
@@ -95,7 +135,15 @@ var fm_chfila = {
                 },
 
                 create_pack: function () {
-                    fm_chfila.create_pack();
+                    if (this.rulepack_state != fm_chfila.rp.state.SAVED) {
+                        var ret = window.confirm('Current rule pack is NOT saved. Are you sure to continue?');
+                        if (ret) {
+            
+                        } else {
+                            return;
+                        }
+                    }
+                    fm_chfila.set_new_rulepack();
                 },
 
                 download_pack: function () {
@@ -107,11 +155,18 @@ var fm_chfila = {
                 },
 
                 save_rulepack: function() {
-                    fm_chfila.save_rulepack();
+                    fm_chfila.save_rulepack(
+                        this.rulepack_id,
+                        this.rulepack
+                    );
                 },
 
                 savecopy_rulepack: function() {
-                    fm_chfila.savecopy_rulepack();
+
+                    this.rulepack_id = null;
+                    this.rulepack.name = this.rulepack.name + ' - copy';
+
+                    fm_chfila.savecopy_rulepack(this.rulepack);
                 },
 
                 add_rule: function () {
@@ -201,87 +256,68 @@ var fm_chfila = {
         });
     },
 
-    open_prdialog: function() {
-        // first, show the panel with a loading animation
-        Metro.infobox.open('#infobox-select-project-rulepack');
-
-        // second, load latest data
-        $.get(
-            '/get_rulepack_list',
-            { ver: Math.random(), project_id: '_default' },
-            function(data) {
-                // show the rulepack list
-                fm_chfila._show_rulepack_list_in_prdialog(data.data);
-            }
-        );
-    },
-
-    create_pack: function() {
-
-        if (fm_chfila.vpp.rulepack_state != fm_chfila.rp.state.SAVED) {
-            var ret = window.confirm('Current rule pack is NOT saved. Are you sure to continue?');
-            if (ret) {
-
-            } else {
-                return;
-            }
-        }
-        fm_chfila.vpp.rulepack_id = null;
-        fm_chfila.vpp.rulepack_state = fm_chfila.rp.state.NEW;
-        fm_chfila.vpp.rulepack = fm_chfila.create_new_rulepack();
-    },
-
-    open_rulepack: function(rulepack_id) {
-        // load data from server
-        $.get(
-            '/get_rulepack',
-            { ver: Math.random(), rulepack_id: rulepack_id },
-            function(data) {
-                fm_chfila.vpp.rulepack_id = data.r.id;
-                fm_chfila.vpp.rulepack_state = fm_chfila.rp.state.NEW;
-                fm_chfila.vpp.rulepack = data.r.data;
-                
-                jarvis.msg('Loaded rule package [' + data.r.data.name + '].');
-                // close the modal
-                Metro.infobox.close('#infobox-select-project-rulepack');
-
-            }, 'json'
-        );
-    },
-
-    del_rulepack: function(rulepack_id, rulepack_title) {
-        var ret = window.confirm('Are you sure to delete this rule package [' + rulepack_title + ']?');
-        if (ret) {
-            $.post(
-                '/del_rulepack',
-                { rulepack_id: rulepack_id },
-                function(data) {
-                    jarvis.msg('Deleted rule package.');
-
-                    // reload the list
-                    fm_chfila.open_prdialog();
-                }, 'json'
-            )
-        } else {
-
-        }
-    },
-
-    open_sample: function () {
-        $.get(
-            './static/data/covid19.json',
-            { ver: Math.random() },
-            function (data) {
-                fm_chfila.vpp.rulepack_id = null;
-                fm_chfila.vpp.rulepack_state = fm_chfila.rp.state.UNSAVED;
-                fm_chfila.vpp.rulepack = data;
-            }, 'json'
-        )
-    },
-
     _show_rulepack_list_in_prdialog: function(data) {
         this.vpp.rulepacks = data;
         jarvis.msg('Found [' + data.length + '] rule packages.');
+    },
+
+    download_pack: function () {
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.vpp.rulepack, null, 2));
+        var dlAnchorElem = document.getElementById('downloadAnchorElem');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", this.vpp.rulepack.name + ".json");
+        dlAnchorElem.click();
+    },
+
+    download_mtrs: function () {
+        var zip = new JSZip();
+
+        // create the file list of regexp
+        var txt_fns = '';
+        for (var i = 0; i < this.vpp.rulepack.rsregexps.length; i++) {
+            var rsregexp = this.vpp.rulepack.rsregexps[i];
+            var ffn = 'regexp/' + this.rp.prefix.rsregexp + rsregexp.name + '.txt';
+            var txt = rsregexp.text;
+            txt_fns += './' + ffn + '\n';
+            // add to zip
+            zip.file(ffn, txt);
+            console.log('* add ' + ffn);
+        }
+        
+        // create the context rules
+        for (var i = 0; i < this.vpp.rulepack.contexts.length; i++) {
+            var context = this.vpp.rulepack.contexts[i];
+            var ffn = 'context/' + context.name + '.txt';
+            var txt = context.text;
+            txt_fns += './' + ffn + '\n';
+            // add to zip
+            zip.file(ffn, txt);
+            console.log('* add ' + ffn);
+        }
+
+        // create the rule file
+        var rules = '// ' + this.vpp.rulepack.name + '\n';
+        for (let i = 0; i < this.vpp.rulepack.matchrules.length; i++) {
+            const matchrule = this.vpp.rulepack.matchrules[i];
+            rules += 'RULENAME="' + matchrule.rule_name + '",';
+            rules += 'REGEXP="' + matchrule.regexp + '",';
+            rules += 'LOCATION="' + matchrule.location + '",';
+            rules += 'NORM="' + matchrule.norm + '"\n';
+        }
+        var rule_fn = 'rules/' + this.vpp.rulepack.fns.resources_rules_matchrules;
+        txt_fns += './' + rule_fn + '\n';
+
+        zip.file(rule_fn, rules);
+        console.log('* add ' + rule_fn);
+
+        // create the used_resources.txt
+        txt_fns += './' + this.vpp.rulepack.fns.used_resources + '\n';
+        zip.file(this.vpp.rulepack.fns.used_resources, txt_fns)
+
+        // download this zip
+        zip.generateAsync({ type: "blob" }).then(function (content) {
+            saveAs(content, fm_chfila.vpp.rulepack.name + ".zip");
+        });
     },
 
     /**************************************************************************
@@ -440,7 +476,7 @@ var fm_chfila = {
             norm: 'NAME_'+seq,
             rule_type: 'cm',
             location: 'NA',
-            text: ''
+            text: 'fever\nfebris\nfebrile'
         };
     },
 
@@ -460,6 +496,24 @@ var fm_chfila = {
     /**************************************************************************
      * Rule Pack Functions
      *************************************************************************/
+
+    set_rulepack: function(id, state, rulepack) {
+        fm_chfila.vpp.rulepack_id = id;
+        fm_chfila.vpp.rulepack_state = state;
+        fm_chfila.vpp.rulepack = rulepack;
+
+        // then update the easy pack
+        this.vpp.$data.easypack = fm_chfila.rulepack2easypack(rulepack);
+    },
+
+    set_new_rulepack: function() {
+        this.set_rulepack(
+            null, 
+            this.rp.state.NEW, 
+            this.create_new_rulepack()
+        );
+    },
+
     create_new_rulepack: function () {
         return {
             name: 'rule_pack_name',
@@ -475,17 +529,17 @@ var fm_chfila = {
 
     create_new_matchrule: function () {
         return {
-            rule_name: 'cm_r00',
-            regexp: '\\b(?:%reNAME)\\b',
+            rule_name: 'cm_fever',
+            regexp: '\\b(?:%reFEVER)\\b',
             location: 'NA',
-            norm: 'NAME'
+            norm: 'FEVER'
         };
     },
 
     create_new_rsregexp: function () {
         return {
-            name: 'NAME',
-            text: 'myname\nyourname\nothername'
+            name: 'FEVER',
+            text: 'fever\nfebris\nfebrile'
         };
     },
 
@@ -543,8 +597,75 @@ var fm_chfila = {
         this.vpp.rulepack.contexts = new_contexts;
     },
 
-    save_rulepack: function () {
-        var rulepack_id = this.vpp.rulepack_id;
+
+    /**************************************************************************
+     * Rule Pack Server Functions
+     *************************************************************************/
+
+
+    open_sample: function () {
+        $.get(
+            fm_chfila.static_url.sample,
+            { ver: Math.random() },
+            function (data) {
+                fm_chfila.set_rulepack(
+                    null,
+                    fm_chfila.rp.state.UNSAVED,
+                    data
+                );
+            }, 'json'
+        )
+    },
+
+    open_prdialog: function() {
+        // first, show the panel with a loading animation
+        Metro.infobox.open('#infobox-select-project-rulepack');
+
+        // second, load latest data
+        $.get(
+            '/get_rulepack_list',
+            { ver: Math.random(), project_id: '_default' },
+            function(data) {
+                // show the rulepack list
+                fm_chfila._show_rulepack_list_in_prdialog(data.data);
+            }
+        );
+    },
+
+    open_rulepack: function(rulepack_id) {
+        // load data from server
+        $.get(
+            '/get_rulepack',
+            { ver: Math.random(), rulepack_id: rulepack_id },
+            function(data) {
+                fm_chfila.set_rulepack(
+                    data.r.id,
+                    fm_chfila.rp.state.NEW,
+                    data.r.dat
+                );
+                
+                jarvis.msg('Loaded rule package [' + data.r.data.name + '].');
+                // close the modal
+                Metro.infobox.close('#infobox-select-project-rulepack');
+
+            }, 'json'
+        );
+    },
+
+    del_rulepack: function(rulepack_id) {
+        $.post(
+            '/del_rulepack',
+            { rulepack_id: rulepack_id },
+            function(data) {
+                jarvis.msg('Deleted rule package.');
+
+                // reload the list
+                fm_chfila.open_prdialog();
+            }, 'json'
+        );
+    },
+
+    save_rulepack: function (rulepack_id, rulepack) {
         if (rulepack_id == null) {
             rulepack_id = -1;
         }
@@ -554,8 +675,8 @@ var fm_chfila = {
             { 
                 rulepack_id: rulepack_id,
                 project_id: project_id,
-                title: this.vpp.rulepack.name,
-                data: JSON.stringify(this.vpp.rulepack)
+                title: rulepack.name,
+                data: JSON.stringify(rulepack)
             },
             function (data) {
                 console.log('* save rulepack: ', data.r);
@@ -569,18 +690,16 @@ var fm_chfila = {
         );
     },
 
-    savecopy_rulepack: function () {
+    savecopy_rulepack: function (rulepack) {
         var rulepack_id = -1;
-        this.vpp.rulepack_id = null;
-        this.vpp.rulepack.name = this.vpp.rulepack.name + ' - copy'
         var project_id = 0;
         $.post(
             './save_rulepack',
             { 
                 rulepack_id: rulepack_id,
                 project_id: project_id,
-                title: this.vpp.rulepack.name,
-                data: JSON.stringify(this.vpp.rulepack)
+                title: rulepack.name,
+                data: JSON.stringify(rulepack)
             },
             function (data) {
                 console.log('* save rulepack: ', data.r);
@@ -592,65 +711,6 @@ var fm_chfila = {
                 jarvis.msg('Rule Package is copied and saved.');
             }, 'json'
         );
-    },
-
-    download_pack: function () {
-        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.vpp.rulepack, null, 2));
-        var dlAnchorElem = document.getElementById('downloadAnchorElem');
-        dlAnchorElem.setAttribute("href", dataStr);
-        dlAnchorElem.setAttribute("download", this.vpp.rulepack.name + ".json");
-        dlAnchorElem.click();
-    },
-
-    download_mtrs: function () {
-        var zip = new JSZip();
-
-        // create the file list of regexp
-        var txt_fns = '';
-        for (var i = 0; i < this.vpp.rulepack.rsregexps.length; i++) {
-            var rsregexp = this.vpp.rulepack.rsregexps[i];
-            var ffn = 'regexp/' + this.rp.prefix.rsregexp + rsregexp.name + '.txt';
-            var txt = rsregexp.text;
-            txt_fns += './' + ffn + '\n';
-            // add to zip
-            zip.file(ffn, txt);
-            console.log('* add ' + ffn);
-        }
-        
-        // create the context rules
-        for (var i = 0; i < this.vpp.rulepack.contexts.length; i++) {
-            var context = this.vpp.rulepack.contexts[i];
-            var ffn = 'context/' + context.name + '.txt';
-            var txt = context.text;
-            txt_fns += './' + ffn + '\n';
-            // add to zip
-            zip.file(ffn, txt);
-            console.log('* add ' + ffn);
-        }
-
-        // create the rule file
-        var rules = '// ' + this.vpp.rulepack.name + '\n';
-        for (let i = 0; i < this.vpp.rulepack.matchrules.length; i++) {
-            const matchrule = this.vpp.rulepack.matchrules[i];
-            rules += 'RULENAME="' + matchrule.rule_name + '",';
-            rules += 'REGEXP="' + matchrule.regexp + '",';
-            rules += 'LOCATION="' + matchrule.location + '",';
-            rules += 'NORM="' + matchrule.norm + '"\n';
-        }
-        var rule_fn = 'rules/' + this.vpp.rulepack.fns.resources_rules_matchrules;
-        txt_fns += './' + rule_fn + '\n';
-
-        zip.file(rule_fn, rules);
-        console.log('* add ' + rule_fn);
-
-        // create the used_resources.txt
-        txt_fns += './' + this.vpp.rulepack.fns.used_resources + '\n';
-        zip.file(this.vpp.rulepack.fns.used_resources, txt_fns)
-
-        // download this zip
-        zip.generateAsync({ type: "blob" }).then(function (content) {
-            saveAs(content, fm_chfila.vpp.rulepack.name + ".zip");
-        });
     },
 
     upload_and_test: function() {
