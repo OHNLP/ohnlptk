@@ -101,7 +101,7 @@ var fm_chfila = {
                     locations: ['NA', 'UC'],
 
                     // mode for the UI
-                    mode: 'full',
+                    mode: 'easy',
                 },
                 
                 // simple rulecard
