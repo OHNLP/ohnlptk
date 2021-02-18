@@ -101,7 +101,7 @@ var fm_chfila = {
                     locations: ['NA', 'UC'],
 
                     // mode for the UI
-                    mode: 'easy',
+                    mode: 'full',
                 },
                 
                 // simple rulecard
@@ -110,7 +110,9 @@ var fm_chfila = {
 
             methods: {
                 switch_mode: function(mode) {
-                    this.ui.mode == mode;
+                    this.ui.mode = mode;
+                    console.log('* switched mode to: ' + this.ui.mode);
+                    this.$forceUpdate();
                 },
 
                 open_prdialog: function() {
