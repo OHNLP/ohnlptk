@@ -1,0 +1,1744 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
+<link href="/static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+<!-- Font Awesome CSS -->
+<script src="https://kit.fontawesome.com/cb45cc91b0.js" crossorigin="anonymous"></script>
+
+<title>
+N3C Demo
+</title>
+<style>
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+.code {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #eeeeee;
+    font-size: 12px;
+}
+</style>
+
+<!-- jquery UI style -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+<!-- Metro UI style -->
+<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
+<meta name="metro4:init" content="false">
+<!-- Brat style -->
+<link rel="stylesheet" type="text/css" href="./static/lib/brat/css/style.css"/>
+
+<style>
+.box {
+    display: flex;
+    flex-direction: column;
+}
+
+.box-header {
+    width: 100%;
+    padding: 3px 0;
+    display: flex;
+    flex-direction: row;
+}
+
+.box-header a {
+    font-size: .8em;
+}
+
+.box-header h4 {
+    padding: 0;
+    margin: 0;
+    font-size: .95em;
+    height: 1.6em;
+    line-height: 1.6em;
+    margin: 3px 0;
+}
+
+.box-header button,
+.box-body button,
+.box-footer button {
+    height: 1.6em;
+    line-height: 1em;
+    font-size: .8em;
+    margin: 4px;
+}
+
+.box-header input,
+.box-body input {
+    height: 1.2em;
+    line-height: 1.2em;
+    font-size: 1em;
+    margin: 4px 4px 0 4px;
+    padding-bottom: 2px;
+}
+
+.box-header select {
+    height: 1.6em;
+    line-height: 1.2em;
+    font-size: .8em;
+    margin: 4px;
+}
+
+.box-header span {
+    font-size: .9em;
+}
+
+.box-header-right {
+    font-size: .95em;
+    height: 1.6em;
+    line-height: 1.6em;
+    margin: 3px 0;
+    text-align: right;
+}
+
+.box-body {
+    width: 100%;
+}
+
+.box-body-item {
+    padding: 5px 0 2px 0;
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px dotted #cccccc;
+}
+
+.box-body-item-left {
+    width: 73%;
+}
+
+.box-body-item-right {
+    width: 24%;
+    display: flex;
+    flex-direction: row;
+}
+
+.box-body-item-label {
+    width: 54%;
+    font-size: .9em;
+    line-height: 1.8em;
+}
+
+.box-body-item-value {
+    width: 45%;
+}
+
+.box-body-item select {
+    width: 100%;
+}
+
+.box-body h5 {
+    padding: 0;
+    margin: 0;
+    font-size: .95em;
+    height: 1.6em;
+    line-height: 1.6em;
+    margin: 3px 0;
+}
+
+.box-p {
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    font-size: .9em;
+}
+
+.box-p-fixlen {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+.box-footer {
+    width: 100%;
+    min-height: 20px;
+    padding: 5px 0 5px 0;
+}
+
+#fm_chfila {
+    margin-top: 70px;
+}
+
+#navi {
+    width: 120px;
+    height: 100%;
+    padding: 5px;
+    margin: 0 5px 0 0;
+    background-color: whitesmoke;
+    border-right: 1px solid #efefef;
+}
+
+#infobox-upload-and-test {
+    width: 800px !important;
+}
+
+/* for rule editor */
+#rule-editor {
+    font-size: 13px;
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#rule-pane {
+    width: 500px;
+    height: 100%;
+    padding: 5px;
+    margin: 0 5px 0 0;
+    border-right: 1px dotted whitesmoke;
+    overflow-y: auto;
+}
+
+#context-pane {
+    width: 300px;
+    height: 100%;
+    padding: 5px;
+    margin: 0 5px 0 0;
+    border-right: 1px dotted whitesmoke;
+    overflow-y: auto;
+}
+
+#rsregexp-pane {
+    width: calc(100% - 800px);
+    height: 100%;
+    padding: 5px;
+    overflow-y: auto;
+    flex-direction: row;
+    align-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.rsregexp-file {
+    width: 280px;
+    margin: 0 15px 5px 0;
+}
+
+.rsregexp-text {
+    width: calc(100% - 10px);
+    margin: 5px 0 5px 0;
+    padding: 5px;
+    border: 1px solid #CCCCCC;
+    font-size: 1em;
+}
+
+.rule-input {
+    font-size: 12px;
+    /* padding: 0 0 2px 0; */
+    border: 0 !important;
+    width: 190px;
+    border-bottom: 1px solid lightgrey !important;
+}
+
+.matchrule {
+    margin: 0 0 5px 0;
+    border: 0 !important;
+}
+
+.matchrule label {
+    color: #999999;
+}
+
+#drop_zone {
+    width: calc(100% - 10px);
+    border: 2px dashed #bbb;
+    border-radius: 5px;
+    padding: 30px 0;
+    text-align: center;
+    cursor: pointer;
+    color: #666666;
+}
+
+#drop_zone:hover {
+    background: #EAEAEA;
+    color: #000000;
+}
+
+.rulepack-line {
+    padding: 2px 0;
+    margin: 0 5px 0 0;
+    border-bottom: 1px dotted #a9a9a9;
+}
+.rulepack-line:hover {
+    background-color: #EAEAEA;
+}
+
+/* for easy editor */
+
+#easy-editor {
+    font-size: 13px;
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#er-pane {
+    width: 100%;
+}
+.er-card {
+    width: 300px;
+}
+.er-card-norm {
+    width: 130px;
+    font-size: 12px;
+    border: 0 !important;
+    border-bottom: 1px solid lightgrey !important;
+}
+.er-card-type {
+    width: 110px;
+    font-size: 12px;
+    padding: 1px 3px;
+    border: 1px solid lightgrey !important;
+}
+.er-card-text {
+    width: calc(100% - 10px);
+    margin: 5px 0 5px 0;
+    padding: 5px;
+    border: 1px solid #CCCCCC;
+    font-size: .9em;
+    font-family: 'Courier New', Courier, monospace;
+}
+</style>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <div class="container">
+
+        <div class="navbar-header">
+            <a class="navbar-brand" href="https://covid.cd2h.org/">
+                <img src="https://covid.cd2h.org/sites/default/files/n3c_logo_circle_large.png" alt="n3c_logo" style="width:40px;">
+            </a>
+            <a class="navbar-brand" href="#">N3C NLP Engine Demo</a>
+        </div>
+
+        <div>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item "><a class="nav-link" href="/">
+                    <i class="fa fa-head-side-mask"></i>
+                    COVID-19 Demo
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/dt_builder.html" >
+                    <i class="fa fa-book-medical"></i>
+                    Dictionary Builder
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="/ie_editor.html" >
+                    <i class="fa fa-edit"></i>
+                    Rule Editor <span class="sr-only">(current)</span>
+                </a></li>
+                <li class="nav-item"><a class="nav-link" href="https://github.com/OHNLP/N3C-NLP-Documentation/wiki" target="_blank">
+                    <i class="fa fa-book"></i>
+                    Wiki
+                </a></li>
+            </ul>
+        </div>
+
+        <div>
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link">
+                        <i class="fa fa-user"></i> 
+                        Guest
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="https://github.com/OHNLP/MedTagger" target="_blank"><i class="fa fa-github"></i> GitHub</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</nav>
+
+
+<div id="fm_chfila">
+
+    <div id="infobox-select-project-rulepack" class="info-box" data-role="infobox">
+        <span class="button square closer"></span>
+        <div class="info-box-content">
+            <div class="row">
+                <div class="col">
+                    <h5>Rule Package List | {{ rulepacks.length }} rule packages</h5>
+                    <div style="max-height: 500px; overflow-y: auto;">
+                        <div class="rulepack-line d-flex flex-row justify-content-between"
+                            v-for="rp in rulepacks">
+                            <div>
+                                <div style="color: #999999; font-size: 9px;">
+                                    Last update: {{ rp.date_updated }}
+                                    (Created: {{ rp.date_created }})
+                                </div>
+                                <div style="text-indent: 1em;">{{ rp.title }}</div>
+                            </div>
+                            <div>
+                                <button class="button primary mini rounded"
+                                    v-on:click="open_rulepack(rp.id)">
+                                    <i class="fa fa-book"></i>
+                                    Open
+                                </button>
+                                <button class="button danger mini rounded"
+                                    v-on:click="del_rulepack(rp.id, rp.title)">
+                                    <i class="fa fa-ban"></i>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#infobox-select-project-rulepack -->
+
+    <div class="container-fluid bg-cyan fg-white mb-1">
+        <div class="row">
+            <div class="cell">
+                <i class="fa fa-edit"></i>
+                Rule Editor
+            </div>
+        </div>
+    </div>
+
+    <nav data-role="ribbonmenu">
+        <ul class="tabs-holder">
+            <li><a href="#section-1-1">Rule Package</a></li>
+        </ul>
+
+        <div class="content-holder">
+            <div class="section" id="section-1-1">
+                <div class="group">
+
+                    <button class="ribbon-button"
+                        v-on:click="switch_mode('easy')">
+                        <span class="icon">
+                            <i class="far fa-edit"></i>
+                        </span>
+                        <span class="caption">Easy Mode</span>
+                    </button>
+
+                    <button class="ribbon-button"
+                        v-on:click="switch_mode('full')">
+                        <span class="icon">
+                            <i class="fa fa-th"></i>
+                        </span>
+                        <span class="caption">Full Mode</span>
+                    </button>
+
+                    <span class="title">UI Mode</span>
+                </div>
+
+                <div class="group">
+
+                    <button class="ribbon-button"
+                        v-on:click="create_pack">
+                        <span class="icon">
+                            <i class="far fa-file"></i>
+                        </span>
+                        <span class="caption">New</span>
+                    </button>
+
+                    <button class="ribbon-button" v-on:click="open_prdialog">
+                        <span class="icon">
+                            <i class="far fa-folder-open"></i>
+                        </span>
+                        <span class="caption">Open</span>
+                    </button>
+
+                    <button class="ribbon-button" v-on:click="open_sample">
+                        <span class="icon">
+                            <i class="far fa-file-alt"></i>
+                        </span>
+                        <span class="caption">Sample</span>
+                    </button>
+
+                    <span class="title">Rule Package</span>
+                </div>
+
+                <div class="group">
+                    <div class="form-group">
+                        <label style="font-size: .9em; margin: 0;">Package Name</label>
+                        <input v-if="ui.mode == 'full'"
+                            type="text" style="width: 200px;" placeholder="Rule package name" v-model="rulepack.name">
+                        <input v-if="ui.mode == 'easy'"
+                            type="text" style="width: 200px;" placeholder="Rule package name" v-model="easypack.name">
+                    </div>
+                    <button class="ribbon-button"
+                        v-on:click="save_rulepack">
+                        <span class="icon">
+                            <i class="far fa-save"></i>
+                        </span>
+                        <span class="caption">Save</span>
+                    </button>
+                    <button class="ribbon-button"
+                        v-on:click="savecopy_rulepack">
+                        <span class="icon">
+                            <i class="fa fa-copy"></i>
+                        </span>
+                        <span class="caption">Save a Copy</span>
+                    </button>
+
+                    <span class="title">Current Package ({{ rulepack_state }})</span>
+                </div>
+
+                <div class="group">
+                    <button class="ribbon-button"
+                        v-on:click="download_pack">
+                        <span class="icon">
+                            <i class="fa fa-file-code"></i>
+                        </span>
+                        <span class="caption">As JSON</span>
+                    </button>
+                    <a id="downloadAnchorElem" style="display:none"></a>
+
+                    <button class="ribbon-button"
+                        v-on:click="download_mtrs">
+                        <span class="icon">
+                            <i class="fa fa-file-archive"></i>
+                        </span>
+                        <span class="caption">As ZIP</span>
+                    </button>
+
+                    <span class="title">Download</span>
+                </div>
+
+                <div class="group">
+
+                    <button class="ribbon-button" v-on:click="show_upload_and_test">
+                        <span class="icon">
+                            <i class="fa fa-upload"></i>
+                        </span>
+                        <span class="caption">Test Rules</span>
+                    </button>
+
+                    <span class="title">Upload</span>
+                </div>
+
+                <div class="group">
+
+                    <button class="ribbon-button" v-on:click="show_about">
+                        <span class="icon">
+                            <i class="fa fa-book"></i>
+                        </span>
+                        <span class="caption">About</span>
+                    </button>
+
+                    <span class="title">Help</span>
+                </div>
+
+            </div>
+
+        </div>
+    </nav>
+
+    <div id="rule-editor" class="container-fluid"
+        v-if="ui.mode == 'full'">
+        <div class="row">
+            <div class="cell d-flex flex-row">              
+                <div id="context-pane">
+                    <div class="box">
+                        <div class="box-header">
+                            <h4 title="The contexts for extracting concepts">
+                                <i class="fa fa-border-all"></i>
+                                Contexts
+                            </h4>
+                            <div>
+                                <button v-on:click="add_context">
+                                    <i class="fa fa-plus-circle"></i>
+                                    Add Context
+                                </button>
+                            </div>
+                        </div><!-- box-header -->
+
+                        <div v-for="context in rulepack.contexts" class="box rsregexp-file">
+                            <div class="box-header">
+                                <h4>
+                                    <i class="far fa-file"></i>
+                                    <input class="rule-input" v-model="context.name">
+                                </h4>
+                                <div>
+                                    <button v-on:click="del_context(context.name)">
+                                        <i class="far fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </div><!-- /.box-header -->
+
+                            <div class="box-body">
+                                <textarea class="rsregexp-text" rows="12" v-model="context.text"></textarea>
+                            </div><!-- /.box-body -->
+                        </div>
+                    </div>
+                </div>
+                <!-- /#context-pane -->
+
+                <div id="rule-pane">
+
+                    <div class="box">
+                        <div class="box-header">
+                            <h4>
+                                <i class="fa fa-pencil-ruler"></i>
+                                Rules
+                            </h4>
+                            <div>
+                                <button v-on:click="add_rule">
+                                    <i class="fa fa-plus-circle"></i>
+                                    Add Rule
+                                </button>
+                            </div>
+                        </div><!-- box-header -->
+
+                        <div class="box-body">
+                            <div class="box-body-item matchrule" v-for="matchrule in rulepack.matchrules">
+                                <div class="d-flex flex-row">
+                                    <label for="rule_name">
+                                        <i class="far fa-credit-card"></i>
+                                    </label>
+                                    <input class="rule-input" style="width:100px;" name="rule_name"
+                                           v-model="matchrule.rule_name"> &nbsp;
+
+                                    <label for="location">
+                                        <i class="far fa-map"></i>
+                                    </label>
+                                    <select class="rule-input" style="width:50px; height: 20px; line-height: 20px;" type="text" name="location"
+                                            v-model="matchrule.location">
+                                        <option v-for="loc in ui.locations" v-bind:value="loc">
+                                            {{ loc }}
+                                        </option>
+                                    </select> &nbsp;
+
+                                    <label for="norm">
+                                        <i class="fa fa-key"></i>
+                                        NORM:
+                                    </label>
+                                    <input class="rule-input" style="width:170px;" type="text" name="norm"
+                                           v-model="matchrule.norm">
+
+                                    <button v-on:click="del_rule(matchrule.rule_name)">
+                                        <i class="far fa-trash-alt"></i>
+                                    </button>
+                                </div>
+
+                                <div class="d-flex flex-row">
+                                    <label for="regexp">
+                                        <i class="far fa-keyboard"></i>
+                                        RE:
+                                    </label>
+                                    <input class="rule-input" style="width:430px; font-family: monospace;"
+                                           type="text" name="regexp" v-model=matchrule.regexp>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /.box -->
+
+                </div>
+                <!-- /#rule-pane -->
+
+                <div id="rsregexp-pane" class="d-flex">
+                    <div class="box-header">
+                        <h4>
+                            <i class="far fa-folder"></i>
+                            Regular Expressions
+                        </h4>
+                        <div>
+                            <button v-on:click="add_rsregexp">
+                                <i class="far fa-file-alt"></i>
+                                Add Regexp Item
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-row flex-content-start flex-wrap">
+                        <div v-for="rsregexp in rulepack.rsregexps" class="box rsregexp-file">
+                            <div class="box-header">
+                                <h4>
+                                    <i class="far fa-file"></i>
+                                    <input class="rule-input" v-model="rsregexp.name">
+                                    &nbsp;
+                                    {{ count_lines(rsregexp.text) }}
+                                </h4>&nbsp;&nbsp;
+                                <button v-on:click="del_rsregexp(rsregexp.name)">
+                                    <i class="far fa-trash-alt"></i>
+                                </button>
+                            </div><!-- /.box-header -->
+
+                            <div class="box-body">
+                                <textarea class="rsregexp-text" rows="12" v-model="rsregexp.text"></textarea>
+                            </div><!-- /.box-body -->
+                        </div>
+
+                    </div>
+
+                </div>
+                <!-- /#regexp-pane -->
+            </div>
+        </div>
+    </div>
+
+    <div id="easy-editor" class="container-fluid"
+        v-if="ui.mode == 'easy'">
+        <div class="row">
+            <div class="cell d-flex flex-row">
+                <div id="er-pane">
+                    <div class="box">
+                        <div class="box-header">
+                            <h4>
+                                <i class="fa fa-pencil-ruler"></i>
+                                Rules
+                            </h4>
+                            <div>
+                                <button v-on:click="add_ergroup()">
+                                    <i class="fa fa-plus-circle"></i>
+                                    Add New Rule
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="box-body d-flex flex-row flex-wrap">
+                            
+                            <div class="box er-card"
+                                v-for="ergroup in easypack.ergroups">
+                                <div class="box-header">
+                                    <h4>
+                                        <input class="er-card-norm" v-model="ergroup.norm"
+                                            onkeyup="this.value=this.value.toUpperCase(); this.value=this.value.replace(/[^A-Z0-9_]/g,'');">
+                                    </h4>
+                                    <div class="d-flex flex-row">
+                                        <select class="er-card-type" v-model="ergroup.rule_type">
+                                            <option value="cm">Concept Mention</option>
+                                            <option value="rem">Remove Concept</option>
+                                        </select>
+                                        <button v-on:click="del_ergroup(ergroup.norm)">
+                                            <i class="far fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="box-body">
+                                    <textarea class="er-card-text" rows="12" v-model="ergroup.text"></textarea>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+<!-- D3.js -->
+<!-- <script src="https://d3js.org/d3.v5.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
+
+
+<!-- metro ui -->
+<script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+<!-- jquery ui -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<!-- jszip -->
+<script src="/static/lib/jszip/jszip-3.1.5.min.js"></script>
+<!-- filesaver -->
+<script src="/static/lib/filesaver/FileSaver.js"></script>
+<!-- dayjs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.8.36/dayjs.min.js"></script>
+<!-- brat -->
+<script src="./static/lib/brat/lib/head.load.min.js"></script>
+
+<script>
+
+var fm_chfila = {
+    vpp: null,
+    vpp_id: '#fm_chfila',
+    rulepack: null,
+
+    hosts: {
+        localtest: {
+            name: 'Localhost Test Server',
+            host: 'http://localhost:8080'
+        },
+        ohnlp4covid_dev: {
+            name: 'OHNLP COVID Dev Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        ohnlp_az_dev: {
+            name: 'OHNLP Azure Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        current: {
+            name: 'Current UI Server',
+            host: ''
+        }
+    },
+
+    static_url: {
+        sample: '/static/data/covid19.json'
+    },
+
+    url: {
+        get_rulepack_list: '/get_rulepack_list',
+        get_rulepack: '/get_rulepack',
+        del_rulepack: '/del_rulepack',
+        save_rulepack: '/save_rulepack',
+        ie_editor_test: '/ie_editor_test'
+    },
+
+    rp: {
+        state: {
+            NEW: 'new',
+            SAVED: 'saved',
+            SAVING: 'saving',
+            UNSAVED: 'unsaved'
+        },
+        prefix: {
+            rsregexp: 'resources_regexp_re'
+        }
+    },
+
+    sample: {
+        name: 'rule_pack_name',
+        matchrules: [{
+            rule_name: 'rule_r1a',
+            regexp: '\\b(rule|pack|name)\\b',
+            location: 'NA',
+            norm: 'ANT:group(1)'
+        }, {
+            rule_name: 'rule_r2a',
+            regexp: '\\b(rule|pack|name)\\b',
+            location: 'UC',
+            norm: 'NAT:group(1)'
+        }],
+        rsregexps: [{
+            name: 'resources_regexp_reBURG',
+            text: 'pattern(s)?\nnextline\n3rd line'
+        }, {
+            name: 'resources_regexp_reBURGAlone',
+            text: 'pattern(s)?\nnextline\n3rd line'
+        }],
+        contexts: [{
+            name: 'contextRule',
+            text: 'regex:(^|\s)\?(?=\s?\w+)~|~pre~|~poss~|~1\ndoes not demonstrate~|~pre~|~neg~|~1\ndid not demonstrate~|~pre~|~neg~|~1\ndo not demonstrate~|~pre~|~neg~|~1'
+        }],
+        fns: {
+            used_resources: 'used_resources.txt',
+            resources_rules_matchrules: 'resources_rules_matchrules.txt'
+        }
+    },
+
+    init: function () {
+        // update the current host
+        this.hosts.current.host = location.protocol + '//' + location.hostname;
+
+        // init the vpp
+        this.vpp = new Vue({
+            el: this.vpp_id,
+            data: {
+                // the current rule pack
+                rulepack: fm_chfila.create_new_rulepack(),
+
+                // for db
+                rulepack_id: null,
+
+                // status for alert user
+                rulepack_state: fm_chfila.rp.state.UNSAVED,
+
+                // the rulepacks for current project
+                rulepacks: [],
+
+                // for the UI
+                ui: {
+                    locations: ['NA', 'UC'],
+
+                    // mode for the UI
+                    mode: 'easy',
+                },
+                
+                // simple rulecard
+                easypack: fm_chfila.create_new_easypack()
+            },
+
+            methods: {
+                switch_mode: function(mode) {
+                    this.ui.mode = mode;
+                    console.log('* switched mode to: ' + this.ui.mode);
+                    this.$forceUpdate();
+                },
+
+                open_prdialog: function() {
+                    fm_chfila.open_prdialog();
+                },
+
+                open_rulepack: function(rulepack_id) {
+                    fm_chfila.open_rulepack(rulepack_id);
+                },
+
+                del_rulepack: function(rulepack_id, rulepack_title) {
+                    var ret = window.confirm('Are you sure to delete this rule package [' + rulepack_title + ']?');
+                    if (ret) {
+                        fm_chfila.del_rulepack(rulepack_id);
+                    } else {
+
+                    }
+                },
+
+                open_sample: function () {
+                    fm_chfila.open_sample();
+                },
+
+                create_pack: function () {
+                    if (this.rulepack_state != fm_chfila.rp.state.SAVED) {
+                        var ret = window.confirm('Current rule pack is NOT saved. Are you sure to continue?');
+                        if (ret) {
+            
+                        } else {
+                            return;
+                        }
+                    }
+                    fm_chfila.set_new_rulepack();
+                },
+
+                download_pack: function () {
+                    fm_chfila.download_pack();
+                },
+
+                download_mtrs: function () {
+                    fm_chfila.download_mtrs();
+                },
+
+                save_rulepack: function() {
+                    fm_chfila.save_rulepack(
+                        this.rulepack_id,
+                        this.rulepack
+                    );
+                },
+
+                savecopy_rulepack: function() {
+
+                    this.rulepack_id = null;
+                    this.rulepack.name = this.rulepack.name + ' - copy';
+
+                    fm_chfila.savecopy_rulepack(this.rulepack);
+                },
+
+                add_rule: function () {
+                    this.rulepack.matchrules.push(fm_chfila.create_new_matchrule());
+                },
+
+                del_rule: function (rule_name) {
+                    var ret = window.confirm('Are you sure?');
+                    if (ret) {
+                        fm_chfila.del_rule(rule_name);
+                        console.log('* deleted match rule' + rule_name);
+                    } else {
+                    }
+                },
+
+                add_rsregexp: function () {
+                    this.rulepack.rsregexps.push(fm_chfila.create_new_rsregexp());
+                },
+
+                del_rsregexp: function (name) {
+                    var ret = window.confirm('Are you sure to delete this regexp?');
+                    if (ret) {
+                        fm_chfila.del_rsregexp(name);
+                        console.log('* deleted rsregexp' + name);
+                    } else {
+                    }
+                },
+
+                add_context: function() {
+                    this.rulepack.contexts.push(fm_chfila.create_new_context());
+                },
+
+                del_context: function(name) {
+                    var ret = window.confirm('Are you sure to delete this context?');
+                    if (ret) {
+                        fm_chfila.del_context(name);
+                        console.log('* deleted context' + name);
+                    } else {
+                    }
+                },
+
+                add_ergroup: function() {
+                    this.easypack.ergroups.splice(0, 0, fm_chfila.create_new_ergroup());
+                },
+
+                del_ergroup: function(norm) {
+                    var ret = window.confirm('Are you sure to delete this rule ['+norm+']?');
+                    if (ret) {
+                        fm_chfila.del_ergroup(norm);
+                        console.log('* deleted ergroup ' + norm);
+                    } else {
+                    }
+                },
+
+                count_lines: function (text) {
+                    return text.split('\n').length;
+                },
+
+                valid_pack_name: function (name) {
+                    var re = /^[a-zA-z0-9_]+$/;
+                    return re.test(name);
+                },
+
+                show_upload_and_test: function() {
+                    Metro.infobox.open('#infobox-upload-and-test');
+                },
+
+                show_about: function() {
+                    window.open('https://github.com/OHNLP/N3C-NLP-Documentation', '_blank');
+                }
+            },
+
+            mounted: function () {
+                Metro.init();
+            },
+
+            watch: {
+                rulepack: {
+                    handler(nval, oval) {
+                        // rule pack is modified, update the state
+                        // whatever changes, set to unsaved
+                        this.rulepack_state = fm_chfila.rp.state.UNSAVED;
+                    },
+                    deep: true
+                }
+            }
+        });
+    },
+
+    _show_rulepack_list_in_prdialog: function(data) {
+        this.vpp.rulepacks = data;
+        jarvis.msg('Found [' + data.length + '] rule packages.');
+    },
+
+    download_pack: function () {
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.vpp.rulepack, null, 2));
+        var dlAnchorElem = document.getElementById('downloadAnchorElem');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", this.vpp.rulepack.name + ".json");
+        dlAnchorElem.click();
+    },
+
+    download_mtrs: function () {
+        var zip = new JSZip();
+
+        // create the file list of regexp
+        var txt_fns = '';
+        for (var i = 0; i < this.vpp.rulepack.rsregexps.length; i++) {
+            var rsregexp = this.vpp.rulepack.rsregexps[i];
+            var ffn = 'regexp/' + this.rp.prefix.rsregexp + rsregexp.name + '.txt';
+            var txt = rsregexp.text;
+            txt_fns += './' + ffn + '\n';
+            // add to zip
+            zip.file(ffn, txt);
+            console.log('* add ' + ffn);
+        }
+        
+        // create the context rules
+        for (var i = 0; i < this.vpp.rulepack.contexts.length; i++) {
+            var context = this.vpp.rulepack.contexts[i];
+            var ffn = 'context/' + context.name + '.txt';
+            var txt = context.text;
+            txt_fns += './' + ffn + '\n';
+            // add to zip
+            zip.file(ffn, txt);
+            console.log('* add ' + ffn);
+        }
+
+        // create the rule file
+        var rules = '// ' + this.vpp.rulepack.name + '\n';
+        for (let i = 0; i < this.vpp.rulepack.matchrules.length; i++) {
+            const matchrule = this.vpp.rulepack.matchrules[i];
+            rules += 'RULENAME="' + matchrule.rule_name + '",';
+            rules += 'REGEXP="' + matchrule.regexp + '",';
+            rules += 'LOCATION="' + matchrule.location + '",';
+            rules += 'NORM="' + matchrule.norm + '"\n';
+        }
+        var rule_fn = 'rules/' + this.vpp.rulepack.fns.resources_rules_matchrules;
+        txt_fns += './' + rule_fn + '\n';
+
+        zip.file(rule_fn, rules);
+        console.log('* add ' + rule_fn);
+
+        // create the used_resources.txt
+        txt_fns += './' + this.vpp.rulepack.fns.used_resources + '\n';
+        zip.file(this.vpp.rulepack.fns.used_resources, txt_fns)
+
+        // download this zip
+        zip.generateAsync({ type: "blob" }).then(function (content) {
+            saveAs(content, fm_chfila.vpp.rulepack.name + ".zip");
+        });
+    },
+
+    /**************************************************************************
+     * Easy Pack <-> Rule Pack Converter
+     *************************************************************************/
+
+    /**
+     * Convert the norm to a valid regexp name
+     * 
+     * @param {string} norm 
+     */
+    norm2regexp_name: function(norm) {
+        return norm.replace(/_/g, "");
+    },
+
+    regexp2regexp_name: function(regexp) {
+        return regexp.match(/[A-Z0-9]+/gm)[0];
+    },
+
+    /**
+     * Convert an Easy Pack to a Rule Pack
+     * 
+     * @param {object} easypack 
+     */
+    easypack2rulepack: function(easypack) {
+        // create an empty rule pack for converting
+        var rulepack = this.create_new_rulepack();
+
+        // clear the default data
+        rulepack.matchrules = [];
+        rulepack.rsregexps = [];
+        rulepack.contexts = [];
+    
+        // now update the simple parts according to the easypack
+        rulepack.name = easypack.name;
+        rulepack.contexts = easypack.contexts;
+
+        // now update the complex parts according to the easypack
+        for (let i = 0; i < easypack.ergroups.length; i++) {
+            const ergroup = easypack.ergroups[i];
+            var regexp_name = this.norm2regexp_name(ergroup.norm);
+            var cm_name = regexp_name.toLowerCase();
+            
+            // create a matchrule
+            var matchrule = this.create_new_matchrule();
+
+            // update the matchrule
+            // norm is just the norm
+            matchrule.norm = ergroup.norm;
+            // location is just the location
+            matchrule.location = ergroup.location;
+            // rule_name is the comb of rule_type and cm_name
+            matchrule.rule_name = ergroup.rule_type + '_' + cm_name;
+            // regexp is the comb of regexp_name according to the rule_type
+            if (ergroup.rule_type == 'cm') {
+                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+
+            } else if (ergroup.rule_type == 'rem') {
+                matchrule.regexp = '\\b%re'+regexp_name+'\\b';
+
+            } else {
+                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+            }
+
+            // create a rsregexp
+            var rsregexp = this.create_new_rsregexp();
+
+            // update the rsregexp
+            rsregexp.name = regexp_name;
+            rsregexp.text = ergroup.text;
+
+            // save the new matchrule and rsregexp
+            rulepack.matchrules.push(matchrule);
+            rulepack.rsregexps.push(rsregexp);
+        }
+
+        return rulepack;
+    },
+
+    /**
+     * Convert a Rule Pack to an Easy Pack
+     * Attention! this converting may cause loss
+     * 
+     * @param {object} rulepack 
+     */
+    rulepack2easypack: function(rulepack) {
+        // create an empty easy pack for converting
+        var easypack = this.create_new_rulepack();
+
+        // clear the content
+        easypack.contexts = [];
+        easypack.ergroups = [];
+        
+        // now update the easy part
+        easypack.contexts = rulepack.contexts;
+
+        // convert to ergroups
+        // so, basically, the converting is from the matchrules to ergroup
+        // but during the converting, need to check the content
+        for (let i = 0; i < rulepack.matchrules.length; i++) {
+            const matchrule = rulepack.matchrules[i];
+            // get the rule_type: cm or rem
+            var rule_type = matchrule.rule_name.split('_')[0];
+            // get the rsregexp_name of this matchrule
+            var rsregexp_name = this.regexp2regexp_name(matchrule.regexp);
+            
+            // create an empty ergroup
+            var ergroup = this.create_new_ergroup();
+
+            // update the attributes
+            ergroup.norm = matchrule.norm;
+            ergroup.rule_type = rule_type;
+            ergroup.location = matchrule.location;
+
+            // now come to the complex part, need to link the regexp
+            var text = '';
+            for (let j = 0; j < rulepack.rsregexps.length; j++) {
+                const rsregexp = rulepack.rsregexps[j];
+                
+                if (rsregexp.name == rsregexp_name) {
+                    // found this regexp !
+                    text = rsregexp.text;
+                    break;
+                }
+            }
+            // no matter what is found in the last, just use it
+            ergroup.text = text;
+
+            // add the the list
+            easypack.ergroups.push(ergroup);
+        }
+
+        return easypack;
+    },
+
+
+    /**************************************************************************
+     * Easy Pack Functions
+     *************************************************************************/
+    create_new_easypack: function() {
+        return {
+            name: 'rule_pack_name',
+            contexts: [ this.create_new_context() ],
+            ergroups: [ this.create_new_ergroup() ]
+        }
+    },
+
+    create_new_ergroup: function() {
+        var seq = 0;
+        try {
+            seq = this.vpp.$data.easypack.ergroups.length;
+        } catch {
+            seq = 0;
+        }
+        return {
+            norm: 'NAME_'+seq,
+            rule_type: 'cm',
+            location: 'NA',
+            text: 'fever\nfebris\nfebrile'
+        };
+    },
+
+    del_ergroup: function(norm) {
+        var new_ergroup = [];
+        for (var i = 0; i < this.vpp.easypack.ergroups.length; i++) {
+            var ergroup = this.vpp.easypack.ergroups[i];
+            if (ergroup.norm == norm) {
+
+            } else {
+                new_ergroup.push(ergroup);
+            }
+        }
+        this.vpp.easypack.ergroups = new_ergroup;
+    },
+
+    /**************************************************************************
+     * Rule Pack Functions
+     *************************************************************************/
+
+    set_rulepack: function(id, state, rulepack) {
+        fm_chfila.vpp.rulepack_id = id;
+        fm_chfila.vpp.rulepack_state = state;
+        fm_chfila.vpp.rulepack = rulepack;
+
+        // then update the easy pack
+        this.vpp.$data.easypack = fm_chfila.rulepack2easypack(rulepack);
+    },
+
+    set_new_rulepack: function() {
+        this.set_rulepack(
+            null, 
+            this.rp.state.NEW, 
+            this.create_new_rulepack()
+        );
+    },
+
+    create_new_rulepack: function () {
+        return {
+            name: 'rule_pack_name',
+            matchrules: [ this.create_new_matchrule() ],
+            rsregexps: [ this.create_new_rsregexp() ],
+            contexts: [ this.create_new_context() ],
+            fns: {
+                used_resources: 'used_resources.txt',
+                resources_rules_matchrules: 'resources_rules_matchrules.txt'
+            }
+        };
+    },
+
+    create_new_matchrule: function () {
+        return {
+            rule_name: 'cm_fever',
+            regexp: '\\b(?:%reFEVER)\\b',
+            location: 'NA',
+            norm: 'FEVER'
+        };
+    },
+
+    create_new_rsregexp: function () {
+        return {
+            name: 'FEVER',
+            text: 'fever\nfebris\nfebrile'
+        };
+    },
+
+    create_new_context: function() {
+        var num = 0;
+        if (this.vpp != null) {
+            if (typeof(this.vpp.rulepack) != 'undefined') {
+                if (typeof(this.vpp.rulepack.contexts) != 'undefined') {
+                    num = this.vpp.rulepack.contexts.length;
+                }
+            }
+        }
+        return {
+            name: 'contextRule' + num,
+            text: 'regex:(^|\s)\?(?=\s?\w+)~|~pre~|~poss~|~1\ndoes not demonstrate~|~pre~|~neg~|~1\ndid not demonstrate~|~pre~|~neg~|~1\ndo not demonstrate~|~pre~|~neg~|~1'
+        };
+    },
+
+    del_rule: function (rule_name) {
+        var new_matchrules = [];
+        for (var i = 0; i < this.vpp.rulepack.matchrules.length; i++) {
+            var matchrule = this.vpp.rulepack.matchrules[i];
+            if (matchrule.rule_name == rule_name) {
+
+            } else {
+                new_matchrules.push(matchrule);
+            }
+        }
+        this.vpp.rulepack.matchrules = new_matchrules;
+    },
+
+    del_rsregexp: function (name) {
+        var new_rsregexps = [];
+        for (var i = 0; i < this.vpp.rulepack.rsregexps.length; i++) {
+            var rsregexp = this.vpp.rulepack.rsregexps[i];
+            if (rsregexp.name == name) {
+
+            } else {
+                new_rsregexps.push(rsregexp);
+            }
+        }
+        this.vpp.rulepack.rsregexps = new_rsregexps;
+    },
+
+    del_context: function(name) {
+        var new_contexts = [];
+        for (var i = 0; i < this.vpp.rulepack.contexts.length; i++) {
+            var context = this.vpp.rulepack.contexts[i];
+            if (context.name == name) {
+
+            } else {
+                new_contexts.push(context);
+            }
+        }
+        this.vpp.rulepack.contexts = new_contexts;
+    },
+
+
+    /**************************************************************************
+     * Rule Pack Server Functions
+     *************************************************************************/
+
+
+    open_sample: function () {
+        $.get(
+            fm_chfila.static_url.sample,
+            { ver: Math.random() },
+            function (data) {
+                fm_chfila.set_rulepack(
+                    null,
+                    fm_chfila.rp.state.UNSAVED,
+                    data
+                );
+            }, 'json'
+        )
+    },
+
+    open_prdialog: function() {
+        // first, show the panel with a loading animation
+        Metro.infobox.open('#infobox-select-project-rulepack');
+
+        // second, load latest data
+        $.get(
+            '/get_rulepack_list',
+            { ver: Math.random(), project_id: '_default' },
+            function(data) {
+                // show the rulepack list
+                fm_chfila._show_rulepack_list_in_prdialog(data.data);
+            }
+        );
+    },
+
+    open_rulepack: function(rulepack_id) {
+        // load data from server
+        $.get(
+            '/get_rulepack',
+            { ver: Math.random(), rulepack_id: rulepack_id },
+            function(data) {
+                fm_chfila.set_rulepack(
+                    data.r.id,
+                    fm_chfila.rp.state.NEW,
+                    data.r.dat
+                );
+                
+                jarvis.msg('Loaded rule package [' + data.r.data.name + '].');
+                // close the modal
+                Metro.infobox.close('#infobox-select-project-rulepack');
+
+            }, 'json'
+        );
+    },
+
+    del_rulepack: function(rulepack_id) {
+        $.post(
+            '/del_rulepack',
+            { rulepack_id: rulepack_id },
+            function(data) {
+                jarvis.msg('Deleted rule package.');
+
+                // reload the list
+                fm_chfila.open_prdialog();
+            }, 'json'
+        );
+    },
+
+    save_rulepack: function (rulepack_id, rulepack) {
+        if (rulepack_id == null) {
+            rulepack_id = -1;
+        }
+        var project_id = 0;
+        $.post(
+            './save_rulepack',
+            { 
+                rulepack_id: rulepack_id,
+                project_id: project_id,
+                title: rulepack.name,
+                data: JSON.stringify(rulepack)
+            },
+            function (data) {
+                console.log('* save rulepack: ', data.r);
+                // update state
+                fm_chfila.vpp.rulepack_state = fm_chfila.rp.state.SAVED;
+                // update the id
+                fm_chfila.vpp.rulepack_id = data.r.id;
+                // show message
+                jarvis.msg('Rule Package is saved.');
+            }, 'json'
+        );
+    },
+
+    savecopy_rulepack: function (rulepack) {
+        var rulepack_id = -1;
+        var project_id = 0;
+        $.post(
+            './save_rulepack',
+            { 
+                rulepack_id: rulepack_id,
+                project_id: project_id,
+                title: rulepack.name,
+                data: JSON.stringify(rulepack)
+            },
+            function (data) {
+                console.log('* save rulepack: ', data.r);
+                // update id
+                fm_chfila.vpp.rulepack_id = data.r.id;
+                // update state
+                fm_chfila.vpp.rulepack_state = fm_chfila.rp.state.SAVED;
+                // show message
+                jarvis.msg('Rule Package is copied and saved.');
+            }, 'json'
+        );
+    },
+
+    upload_and_test: function() {
+        $('#btn-upload-and-test').attr('disabled', 'disabled');
+        // var doc_text = window.prompt('doc_text:', 'I have a dry cough and fever. No sore throat');
+        var doc_text = $('#text-for-test').val();
+        var doc_date = $('#datepicker').val().trim();
+
+        $.post(
+            '/ie_editor_test',
+            {
+                rulepack: JSON.stringify(this.vpp.rulepack), 
+                doc_text: doc_text,
+                doc_date: doc_date
+            },
+            function(data) {
+                $('#btn-upload-and-test').attr('disabled', null);
+                console.log(data);
+                if (data.success) {
+                    fig_bratvis.draw(data.data);
+                } else {
+                    $('#fig_bratvis').html('<p>' + data.msg + '<p>');
+                }
+            }, 'json'
+        )
+    }
+};
+var collData = {
+    entity_types: [{
+        type: 'Regex',
+        labels: ['Regex'],
+        bgColor: '#7fa2ff',
+        borderColor: 'darken'
+    }, {
+        type: "Dict",
+        labels: ['Dict'],
+        bgColor: '#5ea015',
+        borderColor: 'darken'
+    }, {
+        type: "Timex3",
+        labels: ['Timex3'],
+        bgColor: '#8f84ec',
+        borderColor: 'darken'
+    }],
+    entity_attribute_types: [
+        {
+            'type': 'norm',
+            /* brat supports multi-valued attributes, but in our case we will only
+                use a single value and add a glyph to the visualisation to indicate
+                that the entity carries that attribute */
+            'values': {
+            }
+        },
+        {
+            "type": "val",
+            "name": "TimexVal",
+            "values": {
+            }
+        },
+        {
+            "type": "TimexType",
+            "name": "TimexType",
+            "values": {
+                "DATE": {
+                    "glyph": "[DATE]",
+                },
+                "TIME": {
+                    "glyph": "[TIME]",
+                },
+                "DATETIME": {
+                    "glyph": "[DATETIME]",
+                },
+                "DURATION": {
+                    "glyph": "[DURATION]",
+                }
+            }
+        },
+        {
+            "values": {
+                "Positive": {
+                    // "box": "none",
+                    "glyph": "[Positive]",
+                    // "dashArray": "1,2" //Incertitude
+                },
+                "Negated": {
+                    // "box": "crossed",
+                    "glyph": "[Negated]",
+                    // "dashArray": "3,4" //Incertitude
+                }
+            },
+            "type": "certainty",
+            "name": "certainty"
+        },
+        {
+            "values": {
+                "Present": {
+                    "glyph": "[Present]",
+                },
+                "HistoryOf": {
+                    "glyph": "[HistoryOf]",
+                }
+            },
+            "type": "status",
+            "name": "status"
+        },
+        {
+            "values": {
+                "Patient": {
+                    "glyph": "[Patient]",
+                },
+                "Others": {
+                    "glyph": "[Others]",
+                }
+            },
+            "type": "experiencer",
+            "name": "experiencer"
+        }
+    ]
+};
+
+var fig_bratvis = {
+    plot_id: 'fig_bratvis',
+    bratLocation: '/static/lib/brat',
+
+    timex2date: function(v, d) {
+        // v is the TPZ#YYYY-MM-DD format date string from result
+        // d is the YYYY-MM-DD format date string of baseline date
+        var date = d;
+        if (v.substring(0, 3) == 'TPZ') {
+            var sign = v.substring(3, 4);
+            var dnum = v.substring(4, 14).split('-');
+
+            var d_year = parseInt(dnum[0]);
+            var d_month = parseInt(dnum[1]);
+            var d_day = parseInt(dnum[2]);
+
+            date = dayjs(d);
+            if (sign == '-') {
+                date = date.subtract(d_day, 'day');
+                date = date.subtract(d_month, 'month');
+                date = date.subtract(d_year, 'year');
+            } else {
+                date = date.add(d_day, 'day');
+                date = date.add(d_month, 'month');
+                date = date.add(d_year, 'year');
+            }
+        } else {
+            date = dayjs(v);
+        }
+        console.log('* date: ', date);
+        return date;
+    },
+
+    init: function () {
+
+        head.js(
+            // External libraries
+            this.bratLocation + '/lib/jquery.min.js',
+            this.bratLocation + '/lib/jquery.svg.min.js',
+            this.bratLocation + '/lib/jquery.svgdom.min.js',
+
+            // brat helper modules
+            this.bratLocation + '/src/configuration.js',
+            this.bratLocation + '/src/util.js',
+            this.bratLocation + '/src/annotation_log.js',
+            this.bratLocation + '/lib/webfont.js',
+
+            // brat modules
+            this.bratLocation + '/src/dispatcher.js',
+            this.bratLocation + '/src/url_monitor.js',
+            this.bratLocation + '/src/visualizer.js'
+        );
+
+        head.ready(function () {
+            // bind to local variable
+            fig_bratvis.Util = Util;
+        });
+    },
+
+    draw: function (data, doc_date) {
+        // update data
+        this.data = data;
+        this.doc_data = doc_date;
+
+        // $('#' + this.plot_id).html('');
+        // create a new div
+        var new_div_id = this.plot_id + '_' + (Math.random() * 100000).toFixed(0);
+
+        $('#' + this.plot_id).html(`
+        <div id="${new_div_id}" class="brat-vis" style="width:100%;">
+        </div>
+        `);
+
+        // update the collData according to data
+        for (var i = 0; i < data.attributes.length; i++) {
+            var attr = data.attributes[i];
+            var t = attr[1]; // attr type
+            var v = attr[3];
+            if (t == 'norm') {
+                if (collData.entity_attribute_types[0].values.hasOwnProperty(v)) {
+                    
+                } else {
+                    collData.entity_attribute_types[0].values[v] = {
+                        glyph: "[" + v + "]"
+                    };
+                }
+            } else if (t == 'val') {
+                var dt = this.timex2date(v, doc_date);
+                var dt_str = dt.format('YYYY-MM-DD');
+                if (collData.entity_attribute_types[1].values.hasOwnProperty(dt_str)) {
+                    
+                } else {
+                    collData.entity_attribute_types[1].values[v] = {
+                        glyph: "[" + dt_str + "]"
+                    };
+                }
+            }
+        }
+
+        this.Util.embed(
+            new_div_id,
+            $.extend({}, collData),
+            $.extend({}, data),
+            webFontURLs
+        )
+    }
+};
+
+var webFontURLs = [
+    fig_bratvis.bratLocation + '/css/fonts/Astloch-Bold.ttf',
+    fig_bratvis.bratLocation + '/css/fonts/PT_Sans-Caption-Web-Regular.ttf',
+    fig_bratvis.bratLocation + '/css/fonts/Liberation_Sans-Regular.ttf'
+];
+
+
+var jarvis = {
+    init: function() {
+        fm_chfila.init();
+        fig_bratvis.init();
+
+        $( "#datepicker" ).datepicker({
+            dateFormat: 'yy-mm-dd'
+        }).datepicker('setDate', new Date());
+    },
+
+    msg: function(s, cls) {
+        if (typeof(cls) == 'undefined') {
+            cls = 'info';
+        }
+        s = '<i class="fa fa-info-circle"></i> ' + s; 
+        var notify = Metro.notify;
+        notify.setup({
+            width: 300,
+            timeout: 8000,
+            animation: 'swing'
+        });
+        notify.create(s, null, { 
+            cls: cls
+        });
+    }
+}
+
+
+$(document).ready(function () {
+    jarvis.init();
+})
+</script>
+
+</body>
+</html>

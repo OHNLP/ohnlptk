@@ -1,6 +1,8 @@
 '''
 The Web module for the frontend
 '''
+import os
+import pathlib
 
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
@@ -38,5 +40,58 @@ def dt_builder():
     return render_template('dt_builder.html')
 
 
+def build():
+    '''
+    Build the static website
+    '''
+    with app.test_client() as client:
+        with app.app_context():
+            for url in [
+                '/index.html',
+                '/ie_editor.html']:
+                make_page(
+                    client, 
+                    url, 
+                    os.path.join(
+                        pathlib.Path(__file__).parent.absolute(),
+                        app.config['STATIC_PAGE_ROOT_PATH']
+                    )
+                )
+
+    print('* done building static pages')
+
+
+def make_page(client, url, path, param=None):
+    '''
+    Make static page from url
+    '''
+    rv = client.get(url)
+    fn = os.path.join(
+        path,
+        url[1:]
+    )
+    # print(path, fn)
+    with open(fn, 'w') as f:
+        f.write(rv.data.decode('utf8'))
+    
+    print('* made static page %s' % (fn))
+
+
 if __name__=='__main__':
-    app.run(port=app.config['DEV_PORT'])
+    import argparse
+
+    parser = argparse.ArgumentParser(description='COVID-19 Map Data Pipeline')
+
+    # add paramters
+    parser.add_argument("--mode", type=str, 
+        choices=['build', 'run'], default='run',
+        help="Which mode?")
+
+    args = parser.parse_args()
+
+    if args.mode == 'run':
+        app.run(port=app.config['DEV_PORT'])
+    elif args.mode == 'build':
+        build()
+    else:
+        parser.print_usage()
