@@ -80,7 +80,7 @@ def make_page(client, url, path, param=None):
 if __name__=='__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(description='COVID-19 Map Data Pipeline')
+    parser = argparse.ArgumentParser(description='N3C ')
 
     # add paramters
     parser.add_argument("--mode", type=str, 

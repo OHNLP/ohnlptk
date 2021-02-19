@@ -486,44 +486,107 @@ N3C Demo
         <div class="row">
             <div class="cell d-flex flex-row">
                 <div id="er-pane">
+
                     <div class="box">
                         <div class="box-header">
                             <h4>
-                                <i class="fa fa-pencil-ruler"></i>
-                                Rules
+                                <i class="far fa-edit"></i>
+                                Easy Rule Editor
                             </h4>
                             <div>
-                                <button v-on:click="add_ergroup()">
-                                    <i class="fa fa-plus-circle"></i>
-                                    Add New Rule
+                                <button v-on:click="toggle_easy_context()">
+                                    <i class="fa" v-bind:class="[ui.enable_context?'fa-toggle-on':'fa-toggle-off']"></i>
+                                    Contexts
                                 </button>
                             </div>
                         </div>
+                        
 
-                        <div class="box-body d-flex flex-row flex-wrap">
+                        <div class="box-body d-flex flex-row">
                             
-                            <div class="box er-card"
-                                v-for="ergroup in easypack.ergroups">
+                            <div class="box flex-grow-1"
+                                style="width: 300px;"
+                                v-if="ui.enable_context">
                                 <div class="box-header">
-                                    <h4>
-                                        <input class="er-card-norm" v-model="ergroup.norm"
-                                            onkeyup="this.value=this.value.toUpperCase(); this.value=this.value.replace(/[^A-Z0-9_]/g,'');">
+                                    <h4 title="The contexts for extracting concepts">
+                                        <i class="fa fa-border-all"></i>
+                                        Contexts
                                     </h4>
-                                    <div class="d-flex flex-row">
-                                        <select class="er-card-type" v-model="ergroup.rule_type">
-                                            <option value="cm">Concept Mention</option>
-                                            <option value="rem">Remove Concept</option>
-                                        </select>
-                                        <button v-on:click="del_ergroup(ergroup.norm)">
-                                            <i class="far fa-trash-alt"></i>
+                                    <div>
+                                        <button v-on:click="add_context">
+                                            <i class="fa fa-plus-circle"></i>
+                                            Add Context
                                         </button>
                                     </div>
                                 </div>
+
                                 <div class="box-body">
-                                    <textarea class="er-card-text" rows="12" v-model="ergroup.text"></textarea>
+                                    <div v-for="context in easypack.contexts" class="box rsregexp-file">
+                                        <div class="box-header">
+                                            <h4>
+                                                <i class="far fa-file"></i>
+                                                <input class="rule-input" v-model="context.name">
+                                            </h4>
+                                            <div>
+                                                <button v-on:click="del_context(context.name)">
+                                                    <i class="far fa-trash-alt"></i>
+                                                </button>
+                                            </div>
+                                        </div><!-- /.box-header -->
+            
+                                        <div class="box-body">
+                                            <textarea class="rsregexp-text" rows="12" v-model="context.text"></textarea>
+                                        </div><!-- /.box-body -->
+                                    </div>
                                 </div>
                             </div>
+                            <!-- /context panel -->
+                            
+                            <div class="er-cards flex-grow-1">
+                                <div class="box" style="width: 100%;">
+                                    
+                                <div class="box-header">
+                                    <h4>
+                                        <i class="fa fa-list"></i>
+                                        Rule List
+                                        <span class="text-sm">({{ easypack.ergroups.length }} rules)</span>
+                                    </h4>
+                                    <div>
 
+                                        <button v-on:click="add_ergroup()">
+                                            <i class="fa fa-plus-circle"></i>
+                                            Add New Rule
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="box-body d-flex flex-row flex-wrap justify-content-start">
+
+                                    <div class="box er-card"
+                                    v-for="ergroup in easypack.ergroups">
+                                    <div class="box-header">
+                                        <h4>
+                                            <input class="er-card-norm" v-model="ergroup.norm"
+                                                onkeyup="this.value=this.value.toUpperCase(); this.value=this.value.replace(/[^A-Z0-9_]/g,'');">
+                                        </h4>
+                                        <div class="d-flex flex-row">
+                                            <select class="er-card-type" v-model="ergroup.rule_type">
+                                                <option value="cm">Concept Mention</option>
+                                                <option value="rem">Remove Concept</option>
+                                            </select>
+                                            <button v-on:click="del_ergroup(ergroup.norm)">
+                                                <i class="far fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="box-body">
+                                        <textarea class="er-card-text" rows="12" v-model="ergroup.text"></textarea>
+                                    </div>
+                                </div>
+                                </div>
+
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

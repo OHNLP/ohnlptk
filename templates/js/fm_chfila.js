@@ -102,6 +102,7 @@ var fm_chfila = {
 
                     // mode for the UI
                     mode: 'easy',
+                    enable_context: false,
                 },
                 
                 // simple rulecard
@@ -221,6 +222,10 @@ var fm_chfila = {
                         console.log('* deleted ergroup ' + norm);
                     } else {
                     }
+                },
+
+                toggle_easy_context: function() {
+                    this.ui.enable_context = !this.ui.enable_context;
                 },
 
                 count_lines: function (text) {
