@@ -7,9 +7,9 @@ N3C Demo
 {% block style %}
 <!-- jquery UI style -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
-<!-- Metro UI style -->
-<link rel="stylesheet" href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
+
 <meta name="metro4:init" content="false">
+
 <!-- Brat style -->
 <link rel="stylesheet" type="text/css" href="./static/lib/brat/css/style.css"/>
 
@@ -160,6 +160,35 @@ N3C Demo
 {% endblock %}
 
 {% block main %}
+
+<div id="infobox-upload-and-test" class="info-box" data-role="infobox">
+    <span class="button square closer"></span>
+    <div class="info-box-content">
+        <h5>Rule Pack Test</h5>
+        <div class="row">
+            <div class="cell-9">
+                <textarea id="text-for-test" rows="5" style="width: 100%;">The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago. No sore throat.</textarea>
+            </div>
+            <div class="cell-3">
+                <p>Document Date: <input class="form-control" type="text" id="datepicker" size="20"></p>
+                <p><button id="btn-upload-and-test" class="button primary" onclick="fm_chfila.upload_and_test();">Test Rule Pack</button></p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="cell">
+                <div id="fig_bratvis">
+
+                </div>
+                <p style="margin-top: 1em; font-size: .8em; text-align: right;"> 
+                    Powered by <a href="https://brat.nlplab.org/embed.html" target="_blank">brat</a>. 
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /#infobox-upload-and-test -->
+
+
 <div id="fm_chfila">
 
     <div id="infobox-select-project-rulepack" class="info-box" data-role="infobox">
@@ -598,10 +627,6 @@ N3C Demo
 {% endblock %}
 
 {% block script %}
-<!-- metro ui -->
-<script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
-<!-- jquery ui -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <!-- jszip -->
 <script src="/static/lib/jszip/jszip-3.1.5.min.js"></script>
 <!-- filesaver -->

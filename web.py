@@ -90,7 +90,9 @@ if __name__=='__main__':
     args = parser.parse_args()
 
     if args.mode == 'run':
-        app.run(port=app.config['DEV_PORT'])
+        app.run(
+            host=app.config['DEV_LISTEN'],
+            port=app.config['DEV_PORT'])
     elif args.mode == 'build':
         build()
     else:

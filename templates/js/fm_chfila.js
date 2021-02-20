@@ -34,6 +34,13 @@ var fm_chfila = {
         ie_editor_test: '/ie_editor_test'
     },
 
+    get_url: function(url, host) {
+        if (typeof(host) == 'undefined') {
+            host = this.hosts.localtest.host;
+        }
+        return host + url;
+    },
+
     rp: {
         state: {
             NEW: 'new',
@@ -73,6 +80,16 @@ var fm_chfila = {
         fns: {
             used_resources: 'used_resources.txt',
             resources_rules_matchrules: 'resources_rules_matchrules.txt'
+        }
+    },
+
+    get_current_rulepack: function() {
+        if (this.vpp.$data.ui.mode == 'full') {
+            return this.vpp.$data.rulepack;
+        } else {
+            return this.easypack2rulepack(
+                this.vpp.$data.easypack
+            );
         }
     },
 
@@ -725,15 +742,20 @@ var fm_chfila = {
         // var doc_text = window.prompt('doc_text:', 'I have a dry cough and fever. No sore throat');
         var doc_text = $('#text-for-test').val();
         var doc_date = $('#datepicker').val().trim();
-
-        $.post(
-            '/ie_editor_test',
-            {
-                rulepack: JSON.stringify(this.vpp.rulepack), 
+        var url = this.get_url(this.url.ie_editor_test);
+        var rulepack = JSON.stringify(this.get_current_rulepack());
+        console.log(rulepack);
+        console.log('* send request to ' + url);
+        $.ajax({
+            url: url,
+            type: 'post',
+            dataType: 'json',
+            data: {
+                rulepack: rulepack, 
                 doc_text: doc_text,
                 doc_date: doc_date
             },
-            function(data) {
+            success: function(data) {
                 $('#btn-upload-and-test').attr('disabled', null);
                 console.log(data);
                 if (data.success) {
@@ -741,7 +763,7 @@ var fm_chfila = {
                 } else {
                     $('#fig_bratvis').html('<p>' + data.msg + '<p>');
                 }
-            }, 'json'
-        )
+            }
+        });
     }
 };
