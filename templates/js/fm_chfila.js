@@ -768,9 +768,10 @@ var fm_chfila = {
         // var doc_text = window.prompt('doc_text:', 'I have a dry cough and fever. No sore throat');
         var doc_text = $('#text-for-test').val();
         var doc_date = $('#datepicker').val().trim();
-        var url = this.get_url(this.url.ie_editor_test);
         var rulepack = JSON.stringify(this.get_current_rulepack());
+        
         // console.log(rulepack);
+        var url = this.get_url(this.url.ie_editor_test);
         console.log('* send request to ' + url);
         $.ajax({
             url: url,

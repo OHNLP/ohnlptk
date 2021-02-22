@@ -93,7 +93,7 @@ var collData = {
 
 var fig_bratvis = {
     plot_id: 'fig_bratvis',
-    bratLocation: '/static/lib/brat',
+    bratLocation: './static/lib/brat',
 
     timex2date: function(v, d) {
         // v is the TPZ#YYYY-MM-DD format date string from result
