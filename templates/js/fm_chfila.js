@@ -276,6 +276,18 @@ var fm_chfila = {
                     this.ui.enable_context = !this.ui.enable_context;
                 },
 
+                select_all_items: function() {
+                    for (let i = 0; i < this.easypack.ergroups.length; i++) {
+                        this.easypack.ergroups[i]._is_shown = true;
+                    }
+                },
+
+                unselect_all_items: function() {
+                    for (let i = 0; i < this.easypack.ergroups.length; i++) {
+                        this.easypack.ergroups[i]._is_shown = false;
+                    }
+                },
+
                 count_lines: function (text) {
                     return text.split('\n').length;
                 },
@@ -524,6 +536,7 @@ var fm_chfila = {
             seq = 0;
         }
         return {
+            _is_shown: false,
             norm: 'NAME_'+seq,
             rule_type: 'cm',
             location: 'NA',
