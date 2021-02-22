@@ -309,6 +309,23 @@ html, body {
     font-size: .9em;
     font-family: 'Courier New', Courier, monospace;
 }
+.er-list {
+    min-width: 180px;
+}
+.er-list-item {
+    height: 24px;
+    line-height: 24px;
+    border-bottom: 1px dotted #efefef;
+}
+.er-list-item:hover {
+    background-color: #e9e9e9;
+}
+.er-list-item input{
+    height: 1em;
+}
+.er-list-item label{
+    margin: 0 0 0 0;
+}
 </style>
 
 </head>
@@ -366,14 +383,17 @@ html, body {
 <div id="infobox-upload-and-test" class="info-box" data-role="infobox">
     <span class="button square closer"></span>
     <div class="info-box-content">
-        <h5>Rule Pack Test</h5>
+        <h5>Ruleset Test</h5>
+        <p class="text-sm">Due to server load and other issue, the testing may take a few minutes.</p>
         <div class="row">
             <div class="cell-9">
                 <textarea id="text-for-test" rows="5" style="width: 100%;">The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago. No sore throat.</textarea>
             </div>
             <div class="cell-3">
                 <p>Document Date: <input class="form-control" type="text" id="datepicker" size="20"></p>
-                <p><button id="btn-upload-and-test" class="button primary" onclick="fm_chfila.upload_and_test();">Test Rule Pack</button></p>
+                <p>
+                    <button id="btn-upload-and-test" class="button primary" onclick="fm_chfila.upload_and_test();">Test</button>
+                </p>
             </div>
         </div>
         <div class="row">
@@ -626,13 +646,14 @@ html, body {
                         </div><!-- box-header -->
 
                         <div class="box-body">
-                            <div class="box-body-item matchrule" v-for="matchrule in rulepack.matchrules">
+                            <div class="box-body-item matchrule" 
+                                v-for="matchrule in rulepack.matchrules">
                                 <div class="d-flex flex-row">
                                     <label for="rule_name">
                                         <i class="far fa-credit-card"></i>
                                     </label>
                                     <input class="rule-input" style="width:100px;" name="rule_name"
-                                           v-model="matchrule.rule_name"> &nbsp;
+                                            v-model="matchrule.rule_name"> &nbsp;
 
                                     <label for="location">
                                         <i class="far fa-map"></i>
@@ -649,7 +670,7 @@ html, body {
                                         NORM:
                                     </label>
                                     <input class="rule-input" style="width:170px;" type="text" name="norm"
-                                           v-model="matchrule.norm">
+                                            v-model="matchrule.norm">
 
                                     <button v-on:click="del_rule(matchrule.rule_name)">
                                         <i class="far fa-trash-alt"></i>
@@ -662,9 +683,10 @@ html, body {
                                         RE:
                                     </label>
                                     <input class="rule-input" style="width:430px; font-family: monospace;"
-                                           type="text" name="regexp" v-model=matchrule.regexp>
+                                            type="text" name="regexp" v-model=matchrule.regexp>
                                 </div>
                             </div>
+
                         </div>
                     </div><!-- /.box -->
 
@@ -783,37 +805,60 @@ html, body {
                                         <span class="text-sm">({{ easypack.ergroups.length }} rules)</span>
                                     </h4>
                                     <div>
-
                                         <button v-on:click="add_ergroup()">
                                             <i class="fa fa-plus-circle"></i>
                                             Add New Rule
                                         </button>
+
+                                        <button v-on:click="select_all_items()">
+                                            <i class="fa fa-toggle-on"></i>
+                                            Select All
+                                        </button>
+
+                                        <button v-on:click="unselect_all_items()">
+                                            <i class="fa fa-toggle-off"></i>
+                                            Unselect All
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div class="box-body d-flex flex-row flex-wrap justify-content-start">
+                                <div class="box-body d-flex flex-row  justify-content-start">
 
-                                    <div class="box er-card"
-                                    v-for="ergroup in easypack.ergroups">
-                                    <div class="box-header">
-                                        <h4>
-                                            <input class="er-card-norm" v-model="ergroup.norm"
-                                                v-on:keyup="ergroup.norm=ergroup.norm.toUpperCase(); ergroup.norm=ergroup.norm.replace(/[^A-Z0-9_]/g,'');">
-                                        </h4>
-                                        <div class="d-flex flex-row">
-                                            <select class="er-card-type" v-model="ergroup.rule_type">
-                                                <option value="cm">Concept Mention</option>
-                                                <option value="rem">Remove Concept</option>
-                                            </select>
-                                            <button v-on:click="del_ergroup(ergroup.norm)">
-                                                <i class="far fa-trash-alt"></i>
-                                            </button>
+                                    <div class="er-list" class="mr-2">
+                                        <div class="er-list-item d-flex flex-row" v-for="ergroup in easypack.ergroups">
+                                            <input type="checkbox"
+                                                v-model="ergroup._is_shown"
+                                                v-bind:id="'er-list-item-' + ergroup.norm">
+                                            <label v-bind:for="'er-list-item-' + ergroup.norm">{{ ergroup.norm }}</label>
                                         </div>
                                     </div>
-                                    <div class="box-body">
-                                        <textarea class="er-card-text" rows="12" v-model="ergroup.text"></textarea>
+
+                                    <div class="d-flex flex-row flex-wrap justify-content-start">
+
+                                        <div class="box er-card"
+                                            v-for="ergroup in easypack.ergroups"
+                                            v-show="ergroup._is_shown">
+                                            <div class="box-header">
+                                                <h4>
+                                                    <input class="er-card-norm" v-model="ergroup.norm"
+                                                        v-on:keyup="ergroup.norm=ergroup.norm.toUpperCase(); ergroup.norm=ergroup.norm.replace(/[^A-Z0-9_]/g,'');">
+                                                </h4>
+                                                <div class="d-flex flex-row">
+                                                    <select class="er-card-type" v-model="ergroup.rule_type">
+                                                        <option value="cm">Concept Mention</option>
+                                                        <option value="rem">Remove Concept</option>
+                                                    </select>
+                                                    <button v-on:click="del_ergroup(ergroup.norm)">
+                                                        <i class="far fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="box-body">
+                                                <textarea class="er-card-text" rows="12" v-model="ergroup.text"></textarea>
+                                            </div>
+                                        </div>
+
                                     </div>
-                                </div>
                                 </div>
 
                                 </div>
@@ -882,6 +927,7 @@ var fm_chfila = {
     },
 
     url: {
+        parse: '/parse',
         get_rulepack_list: '/get_rulepack_list',
         get_rulepack: '/get_rulepack',
         del_rulepack: '/del_rulepack',
@@ -891,9 +937,9 @@ var fm_chfila = {
 
     get_url: function(url, host) {
         if (typeof(host) == 'undefined') {
-            host = this.hosts.localtest.host;
+            host = 'localtest';
         }
-        return host + url;
+        return this.hosts[host].host + url;
     },
 
     rp: {
@@ -1128,6 +1174,18 @@ var fm_chfila = {
 
                 toggle_easy_context: function() {
                     this.ui.enable_context = !this.ui.enable_context;
+                },
+
+                select_all_items: function() {
+                    for (let i = 0; i < this.easypack.ergroups.length; i++) {
+                        this.easypack.ergroups[i]._is_shown = true;
+                    }
+                },
+
+                unselect_all_items: function() {
+                    for (let i = 0; i < this.easypack.ergroups.length; i++) {
+                        this.easypack.ergroups[i]._is_shown = false;
+                    }
                 },
 
                 count_lines: function (text) {
@@ -1378,6 +1436,7 @@ var fm_chfila = {
             seq = 0;
         }
         return {
+            _is_shown: false,
             norm: 'NAME_'+seq,
             rule_type: 'cm',
             location: 'NA',
@@ -1619,15 +1678,19 @@ var fm_chfila = {
     },
 
     upload_and_test: function() {
+        // show animation
         $('#btn-upload-and-test').attr('disabled', 'disabled');
+        $('#btn-upload-and-test').html('<i class="fas fa-spinner fa-pulse"></i> Parsing ...');
+
         // var doc_text = window.prompt('doc_text:', 'I have a dry cough and fever. No sore throat');
         var doc_text = $('#text-for-test').val();
         var doc_date = $('#datepicker').val().trim();
         var rulepack = JSON.stringify(this.get_current_rulepack());
 
         // console.log(rulepack);
-        var url = this.get_url(this.url.ie_editor_test);
+        var url = this.get_url(this.url.ie_editor_test, 'ohnlp4covid_dev');
         console.log('* send request to ' + url);
+
         $.ajax({
             url: url,
             type: 'post',
@@ -1638,7 +1701,7 @@ var fm_chfila = {
                 doc_date: doc_date
             },
             success: function(data) {
-                $('#btn-upload-and-test').attr('disabled', null);
+                $('#btn-upload-and-test').attr('disabled', null).html('Test');
                 console.log(data);
                 if (data.success) {
                     fig_bratvis.draw(data.data);
@@ -1647,7 +1710,7 @@ var fm_chfila = {
                 }
             },
             error: function(data, textStatus, errorThrown) {
-                $('#btn-upload-and-test').attr('disabled', null);
+                $('#btn-upload-and-test').attr('disabled', null).html('Test');
             }
         });
     }

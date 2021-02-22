@@ -35,7 +35,46 @@ html, body {
 }
 </style>
 
+
+<!-- Brat style -->
+<link rel="stylesheet" type="text/css" href="./static/lib/brat/css/style.css"/>
+
 <style>
+/* fix vuetify.js default style */
+.v-treeview--dense .v-treeview-node__root {
+    min-height: 24px;
+}
+
+.container {
+    padding: 0;
+}
+
+/* for brat visualization */
+#fig_bratvis {
+    width: 100%;
+    min-width: 500px;
+    min-height: 280px;
+}
+.brat-vis {
+    width: 100%;
+    min-width: 500px;
+    min-height: 280px;
+}
+#fig_bratvis svg {
+    border: 1px solid #efefef;
+}
+
+/* for this page */
+.pre-output {
+    font-size: 10px;
+    line-height: 12px;
+    max-height: 200px;
+    height: 280px;
+    border: 1px solid #dddddd;
+    overflow-y: auto;
+    padding: 5px;
+    background: #eeeeee;
+}
 </style>
 
 </head>
@@ -90,6 +129,149 @@ html, body {
 
 
 
+<div class="container">
+    <div class="container-fluid" style="margin-top: 70px; height: calc(100% - 70px);">
+
+        <div class="row">
+
+            <div class="col-md-5">
+                <h5 class="mt-2">Input Text
+                    <small>Maximum length: 3,000 characters</small>
+                </h5>
+                <div class="form-group">
+                    <textarea id="text" maxlength="3000" width="100%" class="form-control" rows="10">The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago.</textarea>
+                </div>
+                <div class="form-group form-inline">
+                    <p>Document Date: <input class="form-control" type="text" id="datepicker" size="30"></p>
+                    <p>
+                        <button id="btn-parse" class="btn btn-primary btn-sm" onclick="jarvis.parse();">
+                            <i class="fa fa-pencil-alt"></i>
+                            Parse the text
+                        </button>
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="col-md-7">
+
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="vis-tab" data-toggle="tab" href="#output_tab_vis" role="tab" aria-controls="output_tab_vis" aria-selected="true">Visualization</a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" id="func1-tab" data-toggle="tab" href="#output_tab_func1" role="tab" aria-controls="output_tab_func1" aria-selected="false">Funtion X</a>
+                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" id="raw-tab" data-toggle="tab" href="#output_tab_rawoutput" role="tab" aria-controls="output_tab_rawoutput" aria-selected="false">Raw Output</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="output_tab_vis" role="tabpanel" aria-labelledby="vis-tab">
+                        <p class="mt-2">Brat visualization</p>
+                        <div id="fig_bratvis">
+
+                        </div>
+                        <p class="mt-2"> Powered by <a href="https://brat.nlplab.org/embed.html" target="_blank">brat</a>. </p>
+
+                    </div>
+                    
+                    <div class="tab-pane fade" id="output_tab_func1" role="tabpanel" aria-labelledby="func1-tab">
+                        <p class="mt-2">Other output content</p>
+                        <pre id="output_func1" class="pre-output"></pre>
+                    </div>
+
+                    <div class="tab-pane fade" id="output_tab_rawoutput" role="tabpanel" aria-labelledby="raw-tab">
+                        <p id="output-msg" class="mt-2">JSON response:</p>
+                        <pre id="output_json" class="pre-output"></pre>
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+        <!-- /.row -->
+
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Concept/Term List</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul>
+                            <li>Dry cough</li>
+                            <li>Fever</li>
+                            <li>Lymphopenia</li>
+                            <li>Sore Throat</li>
+                            <li>Ground Flass Infiltrates</li>
+                            <li>Elevated LDH</li>
+                            <li>Diarrhea</li>
+                            <li>Nasal Congestion</li>
+                            <li>Loss of Appetite</li>
+                        </ul>
+                        <a class="btn btn-secondary"
+                            href="https://github.com/OHNLP/MedTagger/tree/master/src/main/resources/medtaggerieresources/covid19"
+                            target="_blank" role="button">Ruleset »</a>
+                    </div>
+                    <div class="col-md-6">
+                        <ul>
+                            <li>Fatigue</li>
+                            <li>Dyspnea</li>
+                            <li>Headache</li>
+                            <li>Myalgia</li>
+                            <li>Abdominal Pain</li>
+                            <li>Patchy Infiltrates</li>
+                            <li>Elevated PT Time</li>
+                            <li>Influenza</li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <h4>COVID-19 Severe Case </h4>
+                <p>To identify people at higher risk for severe illness using structured
+                    and unstructured data according to the
+                    <a href="https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html"
+                        target="_blank">CDC guideline</a>.</p>
+                <p><a class="btn btn-secondary"
+                        href="https://github.com/OHNLP/N3C-NLP-Documentation/wiki" target="_blank" role="button">Wiki
+                    »</a></p>
+            </div>
+        </div>
+
+        <footer class="my-5 pt-5 text-muted text-center text-small">
+            <p class="mb-1">&copy; 2020 Open Health Natural Language Processing (OHNLP) Consortium</p>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="http://184.73.168.219/index.php/OHNLP:Privacy_policy">Privacy</a>
+                </li>
+                <li class="list-inline-item"><a
+                        href="http://184.73.168.219/index.php/OHNLP:General_disclaimer">Disclaimers</a></li>
+                <li class="list-inline-item"><a href="https://github.com/OHNLP/MedTagger/issues">Support</a></li>
+                <li class="list-inline-item"><a href="http://ohnlp.org/">About</a></li>
+            </ul>
+        </footer>
+
+    </div>
+
+
+    <div id="toastmsg" class="toast" data-delay="8000" style="position: absolute; top: 20px; right: 20px;">
+        <div class="toast-header">
+            <i class="fa fa-info-circle"></i>&nbsp;&nbsp;
+            <strong class="mr-auto">System Message</strong>
+            <!-- <small>11 mins ago</small> -->
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div id="toastmsg-body" class="toast-body">
+            &nbsp;
+        </div>
+    </div>
+</div>
+
 
 
 <!-- metro ui -->
@@ -106,8 +288,1159 @@ html, body {
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
 
 
+<!-- dayjs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.8.36/dayjs.min.js"></script>
+<!-- brat -->
+<script src="./static/lib/brat/lib/head.load.min.js"></script>
+
 <script>
 
+var fm_chfila = {
+    vpp: null,
+    vpp_id: '#fm_chfila',
+    rulepack: null,
+
+    hosts: {
+        localtest: {
+            name: 'Localhost Test Server',
+            host: 'http://localhost:8080'
+        },
+        ohnlp4covid_dev: {
+            name: 'OHNLP COVID Dev Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        ohnlp_az_dev: {
+            name: 'OHNLP Azure Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        current: {
+            name: 'Current UI Server',
+            host: ''
+        }
+    },
+
+    static_url: {
+        sample: './static/data/covid19.json'
+    },
+
+    url: {
+        parse: '/parse',
+        get_rulepack_list: '/get_rulepack_list',
+        get_rulepack: '/get_rulepack',
+        del_rulepack: '/del_rulepack',
+        save_rulepack: '/save_rulepack',
+        ie_editor_test: '/ie_editor_test'
+    },
+
+    get_url: function(url, host) {
+        if (typeof(host) == 'undefined') {
+            host = 'localtest';
+        }
+        return this.hosts[host].host + url;
+    },
+
+    rp: {
+        state: {
+            NEW: 'new',
+            SAVED: 'saved',
+            SAVING: 'saving',
+            UNSAVED: 'unsaved'
+        },
+        prefix: {
+            rsregexp: 'resources_regexp_re'
+        }
+    },
+
+    sample: {
+        name: 'rule_pack_name',
+        matchrules: [{
+            rule_name: 'rule_r1a',
+            regexp: '\\b(rule|pack|name)\\b',
+            location: 'NA',
+            norm: 'ANT:group(1)'
+        }, {
+            rule_name: 'rule_r2a',
+            regexp: '\\b(rule|pack|name)\\b',
+            location: 'UC',
+            norm: 'NAT:group(1)'
+        }],
+        rsregexps: [{
+            name: 'resources_regexp_reBURG',
+            text: 'pattern(s)?\nnextline\n3rd line'
+        }, {
+            name: 'resources_regexp_reBURGAlone',
+            text: 'pattern(s)?\nnextline\n3rd line'
+        }],
+        contexts: [{
+            name: 'contextRule',
+            text: 'regex:(^|\s)\?(?=\s?\w+)~|~pre~|~poss~|~1\ndoes not demonstrate~|~pre~|~neg~|~1\ndid not demonstrate~|~pre~|~neg~|~1\ndo not demonstrate~|~pre~|~neg~|~1'
+        }],
+        fns: {
+            used_resources: 'used_resources.txt',
+            resources_rules_matchrules: 'resources_rules_matchrules.txt'
+        }
+    },
+
+    get_current_rulepack: function() {
+        if (this.vpp.$data.ui.mode == 'full') {
+            return this.vpp.$data.rulepack;
+        } else {
+            return this.easypack2rulepack(
+                this.vpp.$data.easypack
+            );
+        }
+    },
+
+    init: function () {
+        // update the current host
+        this.hosts.current.host = location.protocol + '//' + location.hostname;
+
+        // init the vpp
+        this.vpp = new Vue({
+            el: this.vpp_id,
+            data: {
+                // the current rule pack
+                rulepack: fm_chfila.create_new_rulepack(),
+
+                // for db
+                rulepack_id: null,
+
+                // status for alert user
+                rulepack_state: fm_chfila.rp.state.UNSAVED,
+
+                // the rulepacks for current project
+                rulepacks: [],
+
+                // for the UI
+                ui: {
+                    locations: ['NA', 'UC'],
+
+                    // mode for the UI
+                    mode: 'easy',
+                    enable_context: false,
+                },
+                
+                // simple rulecard
+                easypack: fm_chfila.create_new_easypack()
+            },
+
+            methods: {
+
+                ///////////////////////////////////////////////////////////////
+                // Ribbon menu functions
+                ///////////////////////////////////////////////////////////////
+
+                switch_mode: function(mode) {
+                    this.ui.mode = mode;
+                    if (mode == 'easy') {
+                        // switch to easy mode
+                        this.easypack = fm_chfila.rulepack2easypack(this.rulepack);
+                    } else if (mode == 'full') {
+                        // switch to full mode
+                        this.rulepack = fm_chfila.easypack2rulepack(this.easypack);
+                    }
+                    console.log('* switched mode to: ' + this.ui.mode);
+                    this.$forceUpdate();
+                },
+
+                open_prdialog: function() {
+                    fm_chfila.open_prdialog();
+                },
+
+                open_rulepack: function(rulepack_id) {
+                    fm_chfila.open_rulepack(rulepack_id);
+                },
+
+                open_sample: function () {
+                    fm_chfila.open_sample();
+                },
+
+                create_pack: function () {
+                    if (this.rulepack_state != fm_chfila.rp.state.SAVED) {
+                        var ret = window.confirm('Current rule pack is NOT saved. Are you sure to continue?');
+                        if (ret) {
+            
+                        } else {
+                            return;
+                        }
+                    }
+                    fm_chfila.set_new_rulepack();
+                },
+
+                download_pack: function () {
+                    if (this.ui.mode == 'easy') {
+                        // which means we are using easy mode
+                        // convert the easypack to rulepack
+                        this.rulepack = fm_chfila.easypack2rulepack(this.easypack);
+                    }
+                    fm_chfila.download_pack();
+                },
+
+                download_mtrs: function () {
+                    if (this.ui.mode == 'easy') {
+                        // which means we are using easy mode
+                        // convert the easypack to rulepack
+                        this.rulepack = fm_chfila.easypack2rulepack(this.easypack);
+                    }
+                    fm_chfila.download_mtrs();
+                },
+
+                show_upload_and_test: function() {
+                    Metro.infobox.open('#infobox-upload-and-test');
+                },
+
+                save_rulepack: function() {
+                    fm_chfila.save_rulepack(
+                        this.rulepack_id,
+                        this.rulepack
+                    );
+                },
+
+                savecopy_rulepack: function() {
+
+                    this.rulepack_id = null;
+                    this.rulepack.name = this.rulepack.name + ' - copy';
+
+                    fm_chfila.savecopy_rulepack(this.rulepack);
+                },
+
+                ///////////////////////////////////////////////////////////////
+                // Functions related to UI
+                ///////////////////////////////////////////////////////////////
+
+                del_rulepack: function(rulepack_id, rulepack_title) {
+                    var ret = window.confirm('Are you sure to delete this rule package [' + rulepack_title + ']?');
+                    if (ret) {
+                        fm_chfila.del_rulepack(rulepack_id);
+                    } else {
+
+                    }
+                },
+
+                add_rule: function () {
+                    this.rulepack.matchrules.push(fm_chfila.create_new_matchrule());
+                },
+
+                del_rule: function (rule_name) {
+                    var ret = window.confirm('Are you sure?');
+                    if (ret) {
+                        fm_chfila.del_rule(rule_name);
+                        console.log('* deleted match rule' + rule_name);
+                    } else {
+                    }
+                },
+
+                add_rsregexp: function () {
+                    this.rulepack.rsregexps.push(fm_chfila.create_new_rsregexp());
+                },
+
+                del_rsregexp: function (name) {
+                    var ret = window.confirm('Are you sure to delete this regexp?');
+                    if (ret) {
+                        fm_chfila.del_rsregexp(name);
+                        console.log('* deleted rsregexp' + name);
+                    } else {
+                    }
+                },
+
+                add_context: function() {
+                    this.rulepack.contexts.push(fm_chfila.create_new_context());
+                },
+
+                del_context: function(name) {
+                    var ret = window.confirm('Are you sure to delete this context?');
+                    if (ret) {
+                        fm_chfila.del_context(name);
+                        console.log('* deleted context' + name);
+                    } else {
+                    }
+                },
+
+                add_ergroup: function() {
+                    this.easypack.ergroups.splice(0, 0, fm_chfila.create_new_ergroup());
+                },
+
+                del_ergroup: function(norm) {
+                    var ret = window.confirm('Are you sure to delete this rule ['+norm+']?');
+                    if (ret) {
+                        fm_chfila.del_ergroup(norm);
+                        console.log('* deleted ergroup ' + norm);
+                    } else {
+                    }
+                },
+
+                toggle_easy_context: function() {
+                    this.ui.enable_context = !this.ui.enable_context;
+                },
+
+                select_all_items: function() {
+                    for (let i = 0; i < this.easypack.ergroups.length; i++) {
+                        this.easypack.ergroups[i]._is_shown = true;
+                    }
+                },
+
+                unselect_all_items: function() {
+                    for (let i = 0; i < this.easypack.ergroups.length; i++) {
+                        this.easypack.ergroups[i]._is_shown = false;
+                    }
+                },
+
+                count_lines: function (text) {
+                    return text.split('\n').length;
+                },
+
+                valid_pack_name: function (name) {
+                    var re = /^[a-zA-z0-9_]+$/;
+                    return re.test(name);
+                },
+
+                show_about: function() {
+                    window.open('https://github.com/OHNLP/N3C-NLP-Documentation', '_blank');
+                }
+            },
+
+            mounted: function () {
+                Metro.init();
+            },
+
+            watch: {
+                rulepack: {
+                    handler(nval, oval) {
+                        // rule pack is modified, update the state
+                        // whatever changes, set to unsaved
+                        this.rulepack_state = fm_chfila.rp.state.UNSAVED;
+                    },
+                    deep: true
+                }
+            }
+        });
+    },
+
+    _show_rulepack_list_in_prdialog: function(data) {
+        this.vpp.rulepacks = data;
+        jarvis.msg('Found [' + data.length + '] rule packages.');
+    },
+
+    download_pack: function () {
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.vpp.rulepack, null, 2));
+        var dlAnchorElem = document.getElementById('downloadAnchorElem');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", this.vpp.rulepack.name + ".json");
+        dlAnchorElem.click();
+    },
+
+    download_mtrs: function () {
+        var zip = new JSZip();
+
+        // create the file list of regexp
+        var txt_fns = '';
+        for (var i = 0; i < this.vpp.rulepack.rsregexps.length; i++) {
+            var rsregexp = this.vpp.rulepack.rsregexps[i];
+            var ffn = 'regexp/' + this.rp.prefix.rsregexp + rsregexp.name + '.txt';
+            var txt = rsregexp.text;
+            txt_fns += './' + ffn + '\n';
+            // add to zip
+            zip.file(ffn, txt);
+            console.log('* add ' + ffn);
+        }
+        
+        // create the context rules
+        for (var i = 0; i < this.vpp.rulepack.contexts.length; i++) {
+            var context = this.vpp.rulepack.contexts[i];
+            var ffn = 'context/' + context.name + '.txt';
+            var txt = context.text;
+            txt_fns += './' + ffn + '\n';
+            // add to zip
+            zip.file(ffn, txt);
+            console.log('* add ' + ffn);
+        }
+
+        // create the rule file
+        var rules = '// ' + this.vpp.rulepack.name + '\n';
+        for (let i = 0; i < this.vpp.rulepack.matchrules.length; i++) {
+            const matchrule = this.vpp.rulepack.matchrules[i];
+            rules += 'RULENAME="' + matchrule.rule_name + '",';
+            rules += 'REGEXP="' + matchrule.regexp + '",';
+            rules += 'LOCATION="' + matchrule.location + '",';
+            rules += 'NORM="' + matchrule.norm + '"\n';
+        }
+        var rule_fn = 'rules/' + this.vpp.rulepack.fns.resources_rules_matchrules;
+        txt_fns += './' + rule_fn + '\n';
+
+        zip.file(rule_fn, rules);
+        console.log('* add ' + rule_fn);
+
+        // create the used_resources.txt
+        txt_fns += './' + this.vpp.rulepack.fns.used_resources + '\n';
+        zip.file(this.vpp.rulepack.fns.used_resources, txt_fns)
+
+        // download this zip
+        zip.generateAsync({ type: "blob" }).then(function (content) {
+            saveAs(content, fm_chfila.vpp.rulepack.name + ".zip");
+        });
+    },
+
+    /**************************************************************************
+     * Easy Pack <-> Rule Pack Converter
+     *************************************************************************/
+
+    /**
+     * Convert the norm to a valid regexp name
+     * 
+     * @param {string} norm 
+     */
+    norm2regexp_name: function(norm) {
+        return norm.replace(/_/g, "");
+    },
+
+    regexp2regexp_name: function(regexp) {
+        return regexp.match(/[A-Z0-9]+/gm)[0];
+    },
+
+    /**
+     * Convert an Easy Pack to a Rule Pack
+     * 
+     * @param {object} easypack 
+     */
+    easypack2rulepack: function(easypack) {
+        // create an empty rule pack for converting
+        var rulepack = this.create_new_rulepack();
+
+        // clear the default data
+        rulepack.matchrules = [];
+        rulepack.rsregexps = [];
+        rulepack.contexts = [];
+    
+        // now update the simple parts according to the easypack
+        rulepack.name = easypack.name;
+        rulepack.contexts = easypack.contexts;
+
+        // now update the complex parts according to the easypack
+        for (let i = 0; i < easypack.ergroups.length; i++) {
+            const ergroup = easypack.ergroups[i];
+            var regexp_name = this.norm2regexp_name(ergroup.norm);
+            var cm_name = regexp_name.toLowerCase();
+            
+            // create a matchrule
+            var matchrule = this.create_new_matchrule();
+
+            // update the matchrule
+            // norm is just the norm
+            matchrule.norm = ergroup.norm;
+            // location is just the location
+            matchrule.location = ergroup.location;
+            // rule_name is the comb of rule_type and cm_name
+            matchrule.rule_name = ergroup.rule_type + '_' + cm_name;
+            // regexp is the comb of regexp_name according to the rule_type
+            if (ergroup.rule_type == 'cm') {
+                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+
+            } else if (ergroup.rule_type == 'rem') {
+                matchrule.regexp = '\\b%re'+regexp_name+'\\b';
+
+            } else {
+                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+            }
+
+            // create a rsregexp
+            var rsregexp = this.create_new_rsregexp();
+
+            // update the rsregexp
+            rsregexp.name = regexp_name;
+            rsregexp.text = ergroup.text;
+
+            // save the new matchrule and rsregexp
+            rulepack.matchrules.push(matchrule);
+            rulepack.rsregexps.push(rsregexp);
+        }
+
+        return rulepack;
+    },
+
+    /**
+     * Convert a Rule Pack to an Easy Pack
+     * Attention! this converting may cause loss
+     * 
+     * @param {object} rulepack 
+     */
+    rulepack2easypack: function(rulepack) {
+        // create an empty easy pack for converting
+        var easypack = this.create_new_rulepack();
+
+        // clear the content
+        easypack.contexts = [];
+        easypack.ergroups = [];
+        
+        // now update the easy part
+        easypack.contexts = rulepack.contexts;
+
+        // convert to ergroups
+        // so, basically, the converting is from the matchrules to ergroup
+        // but during the converting, need to check the content
+        for (let i = 0; i < rulepack.matchrules.length; i++) {
+            const matchrule = rulepack.matchrules[i];
+            // get the rule_type: cm or rem
+            var rule_type = matchrule.rule_name.split('_')[0];
+            // get the rsregexp_name of this matchrule
+            var rsregexp_name = this.regexp2regexp_name(matchrule.regexp);
+            
+            // create an empty ergroup
+            var ergroup = this.create_new_ergroup();
+
+            // update the attributes
+            ergroup.norm = matchrule.norm;
+            ergroup.rule_type = rule_type;
+            ergroup.location = matchrule.location;
+
+            // now come to the complex part, need to link the regexp
+            var text = '';
+            for (let j = 0; j < rulepack.rsregexps.length; j++) {
+                const rsregexp = rulepack.rsregexps[j];
+                
+                if (rsregexp.name == rsregexp_name) {
+                    // found this regexp !
+                    text = rsregexp.text;
+                    break;
+                }
+            }
+            // no matter what is found in the last, just use it
+            ergroup.text = text;
+
+            // add the the list
+            easypack.ergroups.push(ergroup);
+        }
+
+        return easypack;
+    },
+
+
+    /**************************************************************************
+     * Easy Pack Functions
+     *************************************************************************/
+    create_new_easypack: function() {
+        return {
+            name: 'rule_pack_name',
+            contexts: [ this.create_new_context() ],
+            ergroups: [ this.create_new_ergroup() ]
+        }
+    },
+
+    create_new_ergroup: function() {
+        var seq = 0;
+        try {
+            seq = this.vpp.$data.easypack.ergroups.length;
+        } catch {
+            seq = 0;
+        }
+        return {
+            _is_shown: false,
+            norm: 'NAME_'+seq,
+            rule_type: 'cm',
+            location: 'NA',
+            text: 'fever\nfebris\nfebrile'
+        };
+    },
+
+    del_ergroup: function(norm) {
+        var new_ergroup = [];
+        for (var i = 0; i < this.vpp.easypack.ergroups.length; i++) {
+            var ergroup = this.vpp.easypack.ergroups[i];
+            if (ergroup.norm == norm) {
+
+            } else {
+                new_ergroup.push(ergroup);
+            }
+        }
+        this.vpp.easypack.ergroups = new_ergroup;
+    },
+
+    /**************************************************************************
+     * Rule Pack Functions
+     *************************************************************************/
+
+    set_rulepack: function(id, state, rulepack) {
+        fm_chfila.vpp.rulepack_id = id;
+        fm_chfila.vpp.rulepack_state = state;
+        fm_chfila.vpp.rulepack = rulepack;
+
+        // then update the easy pack
+        this.vpp.$data.easypack = fm_chfila.rulepack2easypack(rulepack);
+    },
+
+    set_new_rulepack: function() {
+        this.set_rulepack(
+            null, 
+            this.rp.state.NEW, 
+            this.create_new_rulepack()
+        );
+    },
+
+    create_new_rulepack: function () {
+        return {
+            name: 'rule_pack_name',
+            matchrules: [ this.create_new_matchrule() ],
+            rsregexps: [ this.create_new_rsregexp() ],
+            contexts: [ this.create_new_context() ],
+            fns: {
+                used_resources: 'used_resources.txt',
+                resources_rules_matchrules: 'resources_rules_matchrules.txt'
+            }
+        };
+    },
+
+    create_new_matchrule: function () {
+        return {
+            rule_name: 'cm_fever',
+            regexp: '\\b(?:%reFEVER)\\b',
+            location: 'NA',
+            norm: 'FEVER'
+        };
+    },
+
+    create_new_rsregexp: function () {
+        return {
+            name: 'FEVER',
+            text: 'fever\nfebris\nfebrile'
+        };
+    },
+
+    create_new_context: function() {
+        var num = 0;
+        if (this.vpp != null) {
+            if (typeof(this.vpp.rulepack) != 'undefined') {
+                if (typeof(this.vpp.rulepack.contexts) != 'undefined') {
+                    num = this.vpp.rulepack.contexts.length;
+                }
+            }
+        }
+        return {
+            name: 'contextRule' + num,
+            text: 'regex:(^|\s)\?(?=\s?\w+)~|~pre~|~poss~|~1\ndoes not demonstrate~|~pre~|~neg~|~1\ndid not demonstrate~|~pre~|~neg~|~1\ndo not demonstrate~|~pre~|~neg~|~1'
+        };
+    },
+
+    del_rule: function (rule_name) {
+        var new_matchrules = [];
+        for (var i = 0; i < this.vpp.rulepack.matchrules.length; i++) {
+            var matchrule = this.vpp.rulepack.matchrules[i];
+            if (matchrule.rule_name == rule_name) {
+
+            } else {
+                new_matchrules.push(matchrule);
+            }
+        }
+        this.vpp.rulepack.matchrules = new_matchrules;
+    },
+
+    del_rsregexp: function (name) {
+        var new_rsregexps = [];
+        for (var i = 0; i < this.vpp.rulepack.rsregexps.length; i++) {
+            var rsregexp = this.vpp.rulepack.rsregexps[i];
+            if (rsregexp.name == name) {
+
+            } else {
+                new_rsregexps.push(rsregexp);
+            }
+        }
+        this.vpp.rulepack.rsregexps = new_rsregexps;
+    },
+
+    del_context: function(name) {
+        var new_contexts = [];
+        for (var i = 0; i < this.vpp.rulepack.contexts.length; i++) {
+            var context = this.vpp.rulepack.contexts[i];
+            if (context.name == name) {
+
+            } else {
+                new_contexts.push(context);
+            }
+        }
+        this.vpp.rulepack.contexts = new_contexts;
+    },
+
+
+    /**************************************************************************
+     * Rule Pack Server Functions
+     *************************************************************************/
+
+
+    open_sample: function () {
+        $.get(
+            fm_chfila.static_url.sample,
+            { ver: Math.random() },
+            function (data) {
+                fm_chfila.set_rulepack(
+                    null,
+                    fm_chfila.rp.state.UNSAVED,
+                    data
+                );
+            }, 'json'
+        )
+    },
+
+    open_prdialog: function() {
+        // first, show the panel with a loading animation
+        Metro.infobox.open('#infobox-select-project-rulepack');
+
+        // second, load latest data
+        $.get(
+            '/get_rulepack_list',
+            { ver: Math.random(), project_id: '_default' },
+            function(data) {
+                // show the rulepack list
+                fm_chfila._show_rulepack_list_in_prdialog(data.data);
+            }
+        );
+    },
+
+    open_rulepack: function(rulepack_id) {
+        // load data from server
+        $.get(
+            '/get_rulepack',
+            { ver: Math.random(), rulepack_id: rulepack_id },
+            function(data) {
+                fm_chfila.set_rulepack(
+                    data.r.id,
+                    fm_chfila.rp.state.NEW,
+                    data.r.dat
+                );
+                
+                jarvis.msg('Loaded rule package [' + data.r.data.name + '].');
+                // close the modal
+                Metro.infobox.close('#infobox-select-project-rulepack');
+
+            }, 'json'
+        );
+    },
+
+    del_rulepack: function(rulepack_id) {
+        $.post(
+            '/del_rulepack',
+            { rulepack_id: rulepack_id },
+            function(data) {
+                jarvis.msg('Deleted rule package.');
+
+                // reload the list
+                fm_chfila.open_prdialog();
+            }, 'json'
+        );
+    },
+
+    save_rulepack: function (rulepack_id, rulepack) {
+        if (rulepack_id == null) {
+            rulepack_id = -1;
+        }
+        var project_id = 0;
+        $.post(
+            './save_rulepack',
+            { 
+                rulepack_id: rulepack_id,
+                project_id: project_id,
+                title: rulepack.name,
+                data: JSON.stringify(rulepack)
+            },
+            function (data) {
+                console.log('* save rulepack: ', data.r);
+                // update state
+                fm_chfila.vpp.rulepack_state = fm_chfila.rp.state.SAVED;
+                // update the id
+                fm_chfila.vpp.rulepack_id = data.r.id;
+                // show message
+                jarvis.msg('Rule Package is saved.');
+            }, 'json'
+        );
+    },
+
+    savecopy_rulepack: function (rulepack) {
+        var rulepack_id = -1;
+        var project_id = 0;
+        $.post(
+            './save_rulepack',
+            { 
+                rulepack_id: rulepack_id,
+                project_id: project_id,
+                title: rulepack.name,
+                data: JSON.stringify(rulepack)
+            },
+            function (data) {
+                console.log('* save rulepack: ', data.r);
+                // update id
+                fm_chfila.vpp.rulepack_id = data.r.id;
+                // update state
+                fm_chfila.vpp.rulepack_state = fm_chfila.rp.state.SAVED;
+                // show message
+                jarvis.msg('Rule Package is copied and saved.');
+            }, 'json'
+        );
+    },
+
+    upload_and_test: function() {
+        // show animation
+        $('#btn-upload-and-test').attr('disabled', 'disabled');
+        $('#btn-upload-and-test').html('<i class="fas fa-spinner fa-pulse"></i> Parsing ...');
+
+        // var doc_text = window.prompt('doc_text:', 'I have a dry cough and fever. No sore throat');
+        var doc_text = $('#text-for-test').val();
+        var doc_date = $('#datepicker').val().trim();
+        var rulepack = JSON.stringify(this.get_current_rulepack());
+
+        // console.log(rulepack);
+        var url = this.get_url(this.url.ie_editor_test, 'ohnlp4covid_dev');
+        console.log('* send request to ' + url);
+
+        $.ajax({
+            url: url,
+            type: 'post',
+            dataType: 'json',
+            data: {
+                rulepack: rulepack, 
+                doc_text: doc_text,
+                doc_date: doc_date
+            },
+            success: function(data) {
+                $('#btn-upload-and-test').attr('disabled', null).html('Test');
+                console.log(data);
+                if (data.success) {
+                    fig_bratvis.draw(data.data);
+                } else {
+                    $('#fig_bratvis').html('<p>' + data.msg + '<p>');
+                }
+            },
+            error: function(data, textStatus, errorThrown) {
+                $('#btn-upload-and-test').attr('disabled', null).html('Test');
+            }
+        });
+    }
+};
+var collData = {
+    entity_types: [{
+        type: 'Regex',
+        labels: ['Regex'],
+        bgColor: '#7fa2ff',
+        borderColor: 'darken'
+    }, {
+        type: "Dict",
+        labels: ['Dict'],
+        bgColor: '#5ea015',
+        borderColor: 'darken'
+    }, {
+        type: "Timex3",
+        labels: ['Timex3'],
+        bgColor: '#8f84ec',
+        borderColor: 'darken'
+    }],
+    entity_attribute_types: [
+        {
+            'type': 'norm',
+            /* brat supports multi-valued attributes, but in our case we will only
+                use a single value and add a glyph to the visualisation to indicate
+                that the entity carries that attribute */
+            'values': {
+            }
+        },
+        {
+            "type": "val",
+            "name": "TimexVal",
+            "values": {
+            }
+        },
+        {
+            "type": "TimexType",
+            "name": "TimexType",
+            "values": {
+                "DATE": {
+                    "glyph": "[DATE]",
+                },
+                "TIME": {
+                    "glyph": "[TIME]",
+                },
+                "DATETIME": {
+                    "glyph": "[DATETIME]",
+                },
+                "DURATION": {
+                    "glyph": "[DURATION]",
+                }
+            }
+        },
+        {
+            "values": {
+                "Positive": {
+                    // "box": "none",
+                    "glyph": "[Positive]",
+                    // "dashArray": "1,2" //Incertitude
+                },
+                "Negated": {
+                    // "box": "crossed",
+                    "glyph": "[Negated]",
+                    // "dashArray": "3,4" //Incertitude
+                }
+            },
+            "type": "certainty",
+            "name": "certainty"
+        },
+        {
+            "values": {
+                "Present": {
+                    "glyph": "[Present]",
+                },
+                "HistoryOf": {
+                    "glyph": "[HistoryOf]",
+                }
+            },
+            "type": "status",
+            "name": "status"
+        },
+        {
+            "values": {
+                "Patient": {
+                    "glyph": "[Patient]",
+                },
+                "Others": {
+                    "glyph": "[Others]",
+                }
+            },
+            "type": "experiencer",
+            "name": "experiencer"
+        }
+    ]
+};
+
+var fig_bratvis = {
+    plot_id: 'fig_bratvis',
+    bratLocation: './static/lib/brat',
+
+    timex2date: function(v, d) {
+        // v is the TPZ#YYYY-MM-DD format date string from result
+        // d is the YYYY-MM-DD format date string of baseline date
+        var date = d;
+        if (v.substring(0, 3) == 'TPZ') {
+            var sign = v.substring(3, 4);
+            var dnum = v.substring(4, 14).split('-');
+
+            var d_year = parseInt(dnum[0]);
+            var d_month = parseInt(dnum[1]);
+            var d_day = parseInt(dnum[2]);
+
+            date = dayjs(d);
+            if (sign == '-') {
+                date = date.subtract(d_day, 'day');
+                date = date.subtract(d_month, 'month');
+                date = date.subtract(d_year, 'year');
+            } else {
+                date = date.add(d_day, 'day');
+                date = date.add(d_month, 'month');
+                date = date.add(d_year, 'year');
+            }
+        } else {
+            date = dayjs(v);
+        }
+        console.log('* date: ', date);
+        return date;
+    },
+
+    init: function () {
+
+        head.js(
+            // External libraries
+            this.bratLocation + '/lib/jquery.min.js',
+            this.bratLocation + '/lib/jquery.svg.min.js',
+            this.bratLocation + '/lib/jquery.svgdom.min.js',
+
+            // brat helper modules
+            this.bratLocation + '/src/configuration.js',
+            this.bratLocation + '/src/util.js',
+            this.bratLocation + '/src/annotation_log.js',
+            this.bratLocation + '/lib/webfont.js',
+
+            // brat modules
+            this.bratLocation + '/src/dispatcher.js',
+            this.bratLocation + '/src/url_monitor.js',
+            this.bratLocation + '/src/visualizer.js'
+        );
+
+        head.ready(function () {
+            // bind to local variable
+            fig_bratvis.Util = Util;
+        });
+    },
+
+    draw: function (data, doc_date) {
+        // update data
+        this.data = data;
+        this.doc_data = doc_date;
+
+        // $('#' + this.plot_id).html('');
+        // create a new div
+        var new_div_id = this.plot_id + '_' + (Math.random() * 100000).toFixed(0);
+
+        $('#' + this.plot_id).html(`
+        <div id="${new_div_id}" class="brat-vis" style="width:100%;">
+        </div>
+        `);
+
+        // update the collData according to data
+        for (var i = 0; i < data.attributes.length; i++) {
+            var attr = data.attributes[i];
+            var t = attr[1]; // attr type
+            var v = attr[3];
+            if (t == 'norm') {
+                if (collData.entity_attribute_types[0].values.hasOwnProperty(v)) {
+                    
+                } else {
+                    collData.entity_attribute_types[0].values[v] = {
+                        glyph: "[" + v + "]"
+                    };
+                }
+            } else if (t == 'val') {
+                var dt = this.timex2date(v, doc_date);
+                var dt_str = dt.format('YYYY-MM-DD');
+                if (collData.entity_attribute_types[1].values.hasOwnProperty(dt_str)) {
+                    
+                } else {
+                    collData.entity_attribute_types[1].values[v] = {
+                        glyph: "[" + dt_str + "]"
+                    };
+                }
+            }
+        }
+
+        this.Util.embed(
+            new_div_id,
+            $.extend({}, collData),
+            $.extend({}, data),
+            webFontURLs
+        )
+    }
+};
+
+var webFontURLs = [
+    fig_bratvis.bratLocation + '/css/fonts/Astloch-Bold.ttf',
+    fig_bratvis.bratLocation + '/css/fonts/PT_Sans-Caption-Web-Regular.ttf',
+    fig_bratvis.bratLocation + '/css/fonts/Liberation_Sans-Regular.ttf'
+];
+
+
+var jarvis = {
+    init: function() {
+        fig_bratvis.init();
+
+        $( "#datepicker" ).datepicker({
+            dateFormat: 'yy-mm-dd'
+        }).datepicker('setDate', new Date());
+    },
+
+    hosts: {
+        localtest: {
+            name: 'Localhost Test Server',
+            host: 'http://localhost:8080'
+        },
+        ohnlp4covid_dev: {
+            name: 'OHNLP COVID Dev Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        ohnlp_az_dev: {
+            name: 'OHNLP Azure Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        current: {
+            name: 'Current UI Server',
+            host: ''
+        }
+    },
+
+    url: {
+        parse: '/parse',
+    },
+
+    get_url: function(url, host) {
+        if (typeof(host) == 'undefined') {
+            host = 'ohnlp4covid_dev';
+        }
+        return this.hosts[host].host + url;
+    },
+
+    msg: function(s, cls) {
+        if (typeof(cls) == 'undefined') {
+            cls = 'info';
+        }
+        s = '<i class="fa fa-info-circle"></i> ' + s; 
+        var notify = Metro.notify;
+        notify.setup({
+            width: 300,
+            timeout: 8000,
+            animation: 'swing'
+        });
+        notify.create(s, null, { 
+            cls: cls
+        });
+    },
+    
+    parse: function () {
+        // get the text of the doc
+        var doc_text = $('#text').val().trim();
+        if (doc_text == '') {
+            return
+        }
+
+        // get the date of the doc
+        var doc_date = $('#datepicker').val().trim();
+
+        // clear the output
+        $('#output-json').html('');
+
+        // show animation
+        $('#btn-parse').attr('disabled', 'disabled');
+        $('#btn-parse').html('<i class="fas fa-spinner fa-pulse"></i> Parsing ...');
+
+        // send to backend
+        $.ajax({
+            url: this.get_url(this.url.parse),
+            type: 'post',
+            data: {
+                doc_text: doc_text, 
+                doc_date: doc_date
+            },
+            dataType: 'json',
+            timeout: 3 * 60 * 1000,
+            success: function (data) {
+                $('#btn-parse').attr('disabled', null).html('<i class="fa fa-pencil-alt"></i> Parse the text');
+                console.log(data);
+                jarvis.msg('The request text is parsed successfully.');
+
+                if (data.success) {
+                    jarvis.show(data);
+                } else {
+                    $('#output_json').html(data.msg);
+                }
+            },
+            error: function(data, textStatus, errorThrown) {
+                $('#btn-parse').attr('disabled', null).html('<i class="fa fa-pencil-alt"></i> Parse the text');
+                jarvis.msg('System error or lost connection when parsing, please try later.', 'error');
+            }
+        });
+    },
+
+    show: function (data) {
+        this.data = data;
+
+        // show return json
+        $('#output_json').html(JSON.stringify(data, null, 2));
+
+        // show the Brat visualization
+        var doc_date = $('#datepicker').val();
+        if (data.data.hasOwnProperty('doc_date')) {
+            doc_date = data.data.doc_date;
+        }
+        fig_bratvis.draw(data.data, doc_date);
+
+        // show other things
+    },
+}
+
+
+$(document).ready(function () {
+    jarvis.init();
+})
 </script>
 
 </body>
