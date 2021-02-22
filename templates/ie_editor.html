@@ -274,18 +274,18 @@ N3C Demo
                         <span class="caption">New</span>
                     </button>
 
-                    <button class="ribbon-button" v-on:click="open_prdialog">
+                    <!-- <button class="ribbon-button" v-on:click="open_prdialog">
                         <span class="icon">
                             <i class="far fa-folder-open"></i>
                         </span>
                         <span class="caption">Open</span>
-                    </button>
+                    </button> -->
 
                     <button class="ribbon-button" v-on:click="open_sample">
                         <span class="icon">
                             <i class="far fa-file-alt"></i>
                         </span>
-                        <span class="caption">Sample</span>
+                        <span class="caption">COVID-19</span>
                     </button>
 
                     <span class="title">Rule Package</span>
@@ -299,7 +299,7 @@ N3C Demo
                         <input v-if="ui.mode == 'easy'"
                             type="text" style="width: 200px;" placeholder="Rule package name" v-model="easypack.name">
                     </div>
-                    <button class="ribbon-button"
+                    <!-- <button class="ribbon-button"
                         v-on:click="save_rulepack">
                         <span class="icon">
                             <i class="far fa-save"></i>
@@ -312,7 +312,7 @@ N3C Demo
                             <i class="fa fa-copy"></i>
                         </span>
                         <span class="caption">Save a Copy</span>
-                    </button>
+                    </button> -->
 
                     <span class="title">Current Package ({{ rulepack_state }})</span>
                 </div>
@@ -596,7 +596,7 @@ N3C Demo
                                     <div class="box-header">
                                         <h4>
                                             <input class="er-card-norm" v-model="ergroup.norm"
-                                                onkeyup="this.value=this.value.toUpperCase(); this.value=this.value.replace(/[^A-Z0-9_]/g,'');">
+                                                v-on:keyup="ergroup.norm=ergroup.norm.toUpperCase(); ergroup.norm=ergroup.norm.replace(/[^A-Z0-9_]/g,'');">
                                         </h4>
                                         <div class="d-flex flex-row">
                                             <select class="er-card-type" v-model="ergroup.rule_type">

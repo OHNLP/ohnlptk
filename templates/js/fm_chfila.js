@@ -127,8 +127,20 @@ var fm_chfila = {
             },
 
             methods: {
+
+                ///////////////////////////////////////////////////////////////
+                // Ribbon menu functions
+                ///////////////////////////////////////////////////////////////
+
                 switch_mode: function(mode) {
                     this.ui.mode = mode;
+                    if (mode == 'easy') {
+                        // switch to easy mode
+                        this.easypack = fm_chfila.rulepack2easypack(this.rulepack);
+                    } else if (mode == 'full') {
+                        // switch to full mode
+                        this.rulepack = fm_chfila.easypack2rulepack(this.easypack);
+                    }
                     console.log('* switched mode to: ' + this.ui.mode);
                     this.$forceUpdate();
                 },
@@ -139,15 +151,6 @@ var fm_chfila = {
 
                 open_rulepack: function(rulepack_id) {
                     fm_chfila.open_rulepack(rulepack_id);
-                },
-
-                del_rulepack: function(rulepack_id, rulepack_title) {
-                    var ret = window.confirm('Are you sure to delete this rule package [' + rulepack_title + ']?');
-                    if (ret) {
-                        fm_chfila.del_rulepack(rulepack_id);
-                    } else {
-
-                    }
                 },
 
                 open_sample: function () {
@@ -167,11 +170,25 @@ var fm_chfila = {
                 },
 
                 download_pack: function () {
+                    if (this.ui.mode == 'easy') {
+                        // which means we are using easy mode
+                        // convert the easypack to rulepack
+                        this.rulepack = fm_chfila.easypack2rulepack(this.easypack);
+                    }
                     fm_chfila.download_pack();
                 },
 
                 download_mtrs: function () {
+                    if (this.ui.mode == 'easy') {
+                        // which means we are using easy mode
+                        // convert the easypack to rulepack
+                        this.rulepack = fm_chfila.easypack2rulepack(this.easypack);
+                    }
                     fm_chfila.download_mtrs();
+                },
+
+                show_upload_and_test: function() {
+                    Metro.infobox.open('#infobox-upload-and-test');
                 },
 
                 save_rulepack: function() {
@@ -187,6 +204,19 @@ var fm_chfila = {
                     this.rulepack.name = this.rulepack.name + ' - copy';
 
                     fm_chfila.savecopy_rulepack(this.rulepack);
+                },
+
+                ///////////////////////////////////////////////////////////////
+                // Functions related to UI
+                ///////////////////////////////////////////////////////////////
+
+                del_rulepack: function(rulepack_id, rulepack_title) {
+                    var ret = window.confirm('Are you sure to delete this rule package [' + rulepack_title + ']?');
+                    if (ret) {
+                        fm_chfila.del_rulepack(rulepack_id);
+                    } else {
+
+                    }
                 },
 
                 add_rule: function () {
@@ -252,10 +282,6 @@ var fm_chfila = {
                 valid_pack_name: function (name) {
                     var re = /^[a-zA-z0-9_]+$/;
                     return re.test(name);
-                },
-
-                show_upload_and_test: function() {
-                    Metro.infobox.open('#infobox-upload-and-test');
                 },
 
                 show_about: function() {
@@ -744,7 +770,7 @@ var fm_chfila = {
         var doc_date = $('#datepicker').val().trim();
         var url = this.get_url(this.url.ie_editor_test);
         var rulepack = JSON.stringify(this.get_current_rulepack());
-        console.log(rulepack);
+        // console.log(rulepack);
         console.log('* send request to ' + url);
         $.ajax({
             url: url,
@@ -763,6 +789,9 @@ var fm_chfila = {
                 } else {
                     $('#fig_bratvis').html('<p>' + data.msg + '<p>');
                 }
+            },
+            error: function(data, textStatus, errorThrown) {
+                $('#btn-upload-and-test').attr('disabled', null);
             }
         });
     }
