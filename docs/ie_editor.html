@@ -310,7 +310,7 @@ html, body {
     font-family: 'Courier New', Courier, monospace;
 }
 .er-list {
-    min-width: 180px;
+    min-width: 220px;
 }
 .er-list-item {
     height: 24px;
@@ -824,7 +824,7 @@ html, body {
 
                                 <div class="box-body d-flex flex-row  justify-content-start">
 
-                                    <div class="er-list" class="mr-2">
+                                    <div class="er-list" class="mr-2 d-flex flex-column">
                                         <div class="er-list-item d-flex flex-row" v-for="ergroup in easypack.ergroups">
                                             <input type="checkbox"
                                                 v-model="ergroup._is_shown"
