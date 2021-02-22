@@ -23,7 +23,7 @@ var fm_chfila = {
     },
 
     static_url: {
-        sample: '/static/data/covid19.json'
+        sample: './static/data/covid19.json'
     },
 
     url: {
@@ -769,7 +769,7 @@ var fm_chfila = {
         var doc_text = $('#text-for-test').val();
         var doc_date = $('#datepicker').val().trim();
         var rulepack = JSON.stringify(this.get_current_rulepack());
-        
+
         // console.log(rulepack);
         var url = this.get_url(this.url.ie_editor_test);
         console.log('* send request to ' + url);
