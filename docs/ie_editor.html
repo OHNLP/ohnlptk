@@ -9,7 +9,7 @@
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 
-<link href="/static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+<link href="./static/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
 <!-- Bootstrap CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
@@ -843,9 +843,9 @@ html, body {
 
 
 <!-- jszip -->
-<script src="/static/lib/jszip/jszip-3.1.5.min.js"></script>
+<script src="./static/lib/jszip/jszip-3.1.5.min.js"></script>
 <!-- filesaver -->
-<script src="/static/lib/filesaver/FileSaver.js"></script>
+<script src="./static/lib/filesaver/FileSaver.js"></script>
 <!-- dayjs -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.8.36/dayjs.min.js"></script>
 <!-- brat -->
@@ -1623,9 +1623,10 @@ var fm_chfila = {
         // var doc_text = window.prompt('doc_text:', 'I have a dry cough and fever. No sore throat');
         var doc_text = $('#text-for-test').val();
         var doc_date = $('#datepicker').val().trim();
-        var url = this.get_url(this.url.ie_editor_test);
         var rulepack = JSON.stringify(this.get_current_rulepack());
+        
         // console.log(rulepack);
+        var url = this.get_url(this.url.ie_editor_test);
         console.log('* send request to ' + url);
         $.ajax({
             url: url,
@@ -1746,7 +1747,7 @@ var collData = {
 
 var fig_bratvis = {
     plot_id: 'fig_bratvis',
-    bratLocation: '/static/lib/brat',
+    bratLocation: './static/lib/brat',
 
     timex2date: function(v, d) {
         // v is the TPZ#YYYY-MM-DD format date string from result
