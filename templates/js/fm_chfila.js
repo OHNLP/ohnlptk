@@ -27,6 +27,7 @@ var fm_chfila = {
     },
 
     url: {
+        parse: '/parse',
         get_rulepack_list: '/get_rulepack_list',
         get_rulepack: '/get_rulepack',
         del_rulepack: '/del_rulepack',
@@ -36,9 +37,9 @@ var fm_chfila = {
 
     get_url: function(url, host) {
         if (typeof(host) == 'undefined') {
-            host = this.hosts.localtest.host;
+            host = 'localtest';
         }
-        return host + url;
+        return this.hosts[host].host + url;
     },
 
     rp: {
@@ -764,15 +765,19 @@ var fm_chfila = {
     },
 
     upload_and_test: function() {
+        // show animation
         $('#btn-upload-and-test').attr('disabled', 'disabled');
+        $('#btn-upload-and-test').html('<i class="fas fa-spinner fa-pulse"></i> Parsing ...');
+
         // var doc_text = window.prompt('doc_text:', 'I have a dry cough and fever. No sore throat');
         var doc_text = $('#text-for-test').val();
         var doc_date = $('#datepicker').val().trim();
         var rulepack = JSON.stringify(this.get_current_rulepack());
 
         // console.log(rulepack);
-        var url = this.get_url(this.url.ie_editor_test);
+        var url = this.get_url(this.url.ie_editor_test, 'ohnlp4covid_dev');
         console.log('* send request to ' + url);
+
         $.ajax({
             url: url,
             type: 'post',
@@ -783,7 +788,7 @@ var fm_chfila = {
                 doc_date: doc_date
             },
             success: function(data) {
-                $('#btn-upload-and-test').attr('disabled', null);
+                $('#btn-upload-and-test').attr('disabled', null).html('Test');
                 console.log(data);
                 if (data.success) {
                     fig_bratvis.draw(data.data);
@@ -792,7 +797,7 @@ var fm_chfila = {
                 }
             },
             error: function(data, textStatus, errorThrown) {
-                $('#btn-upload-and-test').attr('disabled', null);
+                $('#btn-upload-and-test').attr('disabled', null).html('Test');
             }
         });
     }
