@@ -1,0 +1,350 @@
+{% extends '_layout.html' %}
+
+{% block title %}
+Dictionary Builder
+{% endblock %}
+
+{% block style %}
+<!-- jquery UI style -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+
+<meta name="metro4:init" content="false">
+
+<!-- Brat style -->
+<link rel="stylesheet" type="text/css" href="./static/lib/brat/css/style.css"/>
+
+<style>
+{% include 'css/box.css' %}
+
+#fm_chfila {
+    margin-top: 70px;
+}
+
+#navi {
+    width: 120px;
+    height: 100%;
+    padding: 5px;
+    margin: 0 5px 0 0;
+    background-color: whitesmoke;
+    border-right: 1px solid #efefef;
+}
+
+#infobox-upload-and-test {
+    width: 800px !important;
+}
+
+/* for rule editor */
+#rule-editor {
+    font-size: 13px;
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#rule-pane {
+    width: 500px;
+    height: 100%;
+    padding: 5px;
+    margin: 0 5px 0 0;
+    border-right: 1px dotted whitesmoke;
+    overflow-y: auto;
+}
+
+#context-pane {
+    width: 300px;
+    height: 100%;
+    padding: 5px;
+    margin: 0 5px 0 0;
+    border-right: 1px dotted whitesmoke;
+    overflow-y: auto;
+}
+
+#rsregexp-pane {
+    width: calc(100% - 800px);
+    height: 100%;
+    padding: 5px;
+    overflow-y: auto;
+    flex-direction: row;
+    align-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.rsregexp-file {
+    width: 280px;
+    margin: 0 15px 5px 0;
+}
+
+.rsregexp-text {
+    width: calc(100% - 10px);
+    margin: 5px 0 5px 0;
+    padding: 5px;
+    border: 1px solid #CCCCCC;
+    font-size: 1em;
+}
+
+.rule-input {
+    font-size: 12px;
+    /* padding: 0 0 2px 0; */
+    border: 0 !important;
+    width: 190px;
+    border-bottom: 1px solid lightgrey !important;
+}
+
+.matchrule {
+    margin: 0 0 5px 0;
+    border: 0 !important;
+}
+
+.matchrule label {
+    color: #999999;
+}
+
+#drop_zone {
+    width: calc(100% - 10px);
+    border: 2px dashed #bbb;
+    border-radius: 5px;
+    padding: 30px 0;
+    text-align: center;
+    cursor: pointer;
+    color: #666666;
+}
+
+#drop_zone:hover {
+    background: #EAEAEA;
+    color: #000000;
+}
+
+.rulepack-line {
+    padding: 2px 0;
+    margin: 0 5px 0 0;
+    border-bottom: 1px dotted #a9a9a9;
+}
+.rulepack-line:hover {
+    background-color: #EAEAEA;
+}
+
+/* for easy editor */
+
+#easy-editor {
+    font-size: 13px;
+    height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#er-pane {
+    width: 100%;
+}
+.er-card {
+    width: 300px;
+}
+.er-card-norm {
+    width: 130px;
+    font-size: 12px;
+    border: 0 !important;
+    border-bottom: 1px solid lightgrey !important;
+}
+.er-card-type {
+    width: 110px;
+    font-size: 12px;
+    padding: 1px 3px;
+    border: 1px solid lightgrey !important;
+}
+.er-card-text {
+    width: calc(100% - 10px);
+    margin: 5px 0 5px 0;
+    padding: 5px;
+    border: 1px solid #CCCCCC;
+    font-size: .9em;
+    font-family: 'Courier New', Courier, monospace;
+}
+.er-list {
+    min-width: 220px;
+}
+.er-list-item {
+    height: 24px;
+    line-height: 24px;
+    border-bottom: 1px dotted #efefef;
+}
+.er-list-item:hover {
+    background-color: #e9e9e9;
+}
+.er-list-item input{
+    height: 1em;
+}
+.er-list-item label{
+    margin: 0 0 0 0;
+}
+</style>
+{% endblock %}
+
+{% block main %}
+
+<!-- <div id="fm_dtbder">
+    <div class="container-fluid bg-darkCyan fg-white mb-1">
+        <div class="row">
+            <div class="cell">
+                <i class="fa fa-book-medical"></i>
+                Dictionary Builder
+            </div>
+        </div>
+    </div>
+
+    <nav data-role="ribbonmenu">
+        <ul class="tabs-holder">
+            <li><a href="#section-1-1">Main</a></li>
+        </ul>
+
+        <div class="content-holder">
+            <div class="section" id="section-1-1">
+
+                <div class="group">
+                    <div class="form-group">
+                        <label>Ontology</label>
+                        
+                        <select id="acronym" style="width: 150px;" data-role="select">
+                            <option value="CIDO">CIDO</option>
+                            <option value="MONDO">MONDO</option>
+                        </select>
+
+                    </div>
+                    <button id="btn_load_data" class="ribbon-button"
+                        onclick="jarvis.load_ontology_csv();">
+                        <span class="icon">
+                            <i class="fa fa-envelope-open-text"></i>
+                        </span>
+                        <span class="caption">Load Data</span>
+                    </button>
+
+                    <span class="title">Ontology Database</span>
+                </div>
+
+                <div class="group">
+
+                    <button class="ribbon-button"
+                        onclick="vw_treemap.extract_selected();">
+                        <span class="icon">
+                            <i class='fa fa-arrow-alt-circle-right'></i> 
+                        </span>
+                        <span class="caption">Extract Selection</span>
+                    </button>
+
+                    <span class="title">Build Dictionary</span>
+                </div>
+
+                <div class="group">
+                    
+                    <button class="ribbon-button">
+                        <span class="icon">
+                            <i class="fa fa-upload"></i>
+                        </span>
+                        <span class="caption">Upload to Server</span>
+                    </button>
+                    
+                    <span class="title">Deployment</span>
+                </div>
+
+            </div>
+
+        </div>
+    </nav>
+
+</div> -->
+
+
+{% endblock %}
+
+{% block script %}
+<!-- jszip -->
+<script src="./static/lib/jszip/jszip-3.1.5.min.js"></script>
+<!-- filesaver -->
+<script src="./static/lib/filesaver/FileSaver.js"></script>
+<!-- pako -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.3/pako.min.js"></script>
+<!-- dayjs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.8.36/dayjs.min.js"></script>
+<!-- brat -->
+<script src="./static/lib/brat/lib/head.load.min.js"></script>
+
+<script>
+
+{% include 'js/fig_bratvis.js' %}
+
+
+var fm_dtbder = {
+    bioportal: {
+        apikey: '8b5b7825-538d-40e0-9e9e-5ab9274a9aeb',
+        download_format: 'csv',
+
+        get_url: function(acronym) {
+            return 'https://data.bioontology.org/ontologies/'+acronym+'/download?apikey='+fm_dtbder.bioportal.apikey+'&download_format=' + fm_dtbder.bioportal.download_format;
+        }
+
+    },
+
+    load_ontology_csv: function() {
+        var acronym = $('#acronym').val();
+        // update msg
+        vw_treemap.vpp.msg = `<div data-role="activity" data-type="simple" data-style="dark"></div> loading and parsing [${acronym}] data from BioPortal ...`;
+
+        // disable the button
+        $('#btn_load_data').attr('disabled', true);
+        
+        $.ajax({
+            url: this.bioportal.get_url(acronym),
+            type: 'get',
+            dataType: 'blob',
+            success: function(data) {
+                // enable the button
+                $('#btn_load_data').attr('disabled', null);
+                
+                // update message
+                vw_treemap.vpp.msg = `<div data-role="activity" data-type="simple" data-style="color"></div> preparing data for display ...`;
+                jarvis.data = data;
+                jarvis.csvtb = Papa.parse(data, {
+                    header: true
+                });
+                console.log('* parsed into csv table!');
+
+                // build tree 
+                jarvis.make_tree();
+
+                // draw this tree 
+                vw_treemap.draw(jarvis.ontology_tree);
+            }
+        });
+    },
+};
+
+
+var jarvis = {
+    init: function() {
+        
+        fig_bratvis.init();
+
+        $( "#datepicker" ).datepicker({
+            dateFormat: 'yy-mm-dd'
+        }).datepicker('setDate', new Date());
+    },
+
+    msg: function(s, cls) {
+        if (typeof(cls) == 'undefined') {
+            cls = 'info';
+        }
+        s = '<i class="fa fa-info-circle"></i> ' + s; 
+        var notify = Metro.notify;
+        notify.setup({
+            width: 300,
+            timeout: 8000,
+            animation: 'swing'
+        });
+        notify.create(s, null, { 
+            cls: cls
+        });
+    }
+}
+
+
+$(document).ready(function () {
+    jarvis.init();
+})
+</script>
+{% endblock %}
