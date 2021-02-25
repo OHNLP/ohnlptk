@@ -20,7 +20,7 @@
 
 
 <title>
-N3C Demo
+Rule Editor
 </title>
 <style>
 html, body {
@@ -390,7 +390,7 @@ html, body {
                 <textarea id="text-for-test" rows="5" style="width: 100%;">The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago. No sore throat.</textarea>
             </div>
             <div class="cell-3">
-                <p>Document Date: <input class="form-control" type="text" id="datepicker" size="20"></p>
+                <p style="display: none;">Document Date: <input class="form-control" type="text" id="datepicker" size="20"></p>
                 <p>
                     <button id="btn-upload-and-test" class="button primary" onclick="fm_chfila.upload_and_test();">Test</button>
                 </p>
@@ -540,13 +540,13 @@ html, body {
                 </div>
 
                 <div class="group">
-                    <button class="ribbon-button"
+                    <!-- <button class="ribbon-button"
                         v-on:click="download_pack">
                         <span class="icon">
                             <i class="fa fa-file-code"></i>
                         </span>
                         <span class="caption">As JSON</span>
-                    </button>
+                    </button> -->
                     <a id="downloadAnchorElem" style="display:none"></a>
 
                     <button class="ribbon-button"
@@ -1931,6 +1931,8 @@ var jarvis = {
         $( "#datepicker" ).datepicker({
             dateFormat: 'yy-mm-dd'
         }).datepicker('setDate', new Date());
+
+        fm_chfila.open_sample();
     },
 
     msg: function(s, cls) {
