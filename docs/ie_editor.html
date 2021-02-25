@@ -20,7 +20,7 @@
 
 
 <title>
-Rule Editor
+Ruleset Editor
 </title>
 <style>
 html, body {
@@ -32,6 +32,26 @@ html, body {
     font-family: 'Courier New', Courier, monospace;
     background-color: #eeeeee;
     font-size: 12px;
+}
+
+/* a start screen for IE and hiding init */
+#start-screen {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+#ss-msg {
+    width: 100%;
+    padding: 10px 0;
+    text-align: center;
 }
 </style>
 
@@ -328,6 +348,7 @@ html, body {
     margin: 0 0 0 0;
     cursor: pointer;
 }
+
 </style>
 
 </head>
@@ -381,6 +402,14 @@ html, body {
 </nav>
 
 
+
+<div id="start-screen">
+    <h1>
+        <i class="fa fa-edit"></i>
+        Ruleset Editor
+    </h1>
+    <div id="ss-msg">Loading data and initializing GUI ...</div>
+</div>
 
 <div id="infobox-upload-and-test" class="info-box" data-role="infobox">
     <span class="button square closer"></span>
@@ -760,7 +789,7 @@ html, body {
                         <div class="box-body d-flex flex-row">
                             
                             <div class="box flex-grow-1"
-                                style="width: 300px;"
+                                style="width: 300px; max-width: 300px;"
                                 v-if="ui.enable_context">
                                 <div class="box-header">
                                     <h4 title="The contexts for extracting concepts">
@@ -892,6 +921,13 @@ html, body {
 
 <script src="https://cdn.jsdelivr.net/npm/vue@2.6.11"></script>
 
+
+<script>
+    var isIE = /*@cc_on!@*/false || !!document.documentMode;
+    if (isIE) {
+        document.getElementById('ss-msg').innerHTML = 'The visualization used in this website require advanced web technologies, which are <b>NOT</b> supported by Internet Explorer.<br>Try using Google Chrome, Apple Safari, Mozilla Firefox or other modern browsers to access:<br><span style="font-size:1.2em;">' + location.href + '</span>';
+    }
+</script>
 
 <!-- jszip -->
 <script src="./static/lib/jszip/jszip-3.1.5.min.js"></script>
@@ -1935,6 +1971,10 @@ var webFontURLs = [
 
 var jarvis = {
     init: function() {
+
+        // too bad ...
+        if (isIE) { return 0; }
+
         fm_chfila.init();
         fig_bratvis.init();
 
@@ -1943,6 +1983,9 @@ var jarvis = {
         }).datepicker('setDate', new Date());
 
         fm_chfila.open_sample();
+
+        jarvis.ssmsg('Initializated')
+        setTimeout('jarvis.ssclose();', 1000);
     },
 
     msg: function(s, cls) {
@@ -1959,7 +2002,15 @@ var jarvis = {
         notify.create(s, null, { 
             cls: cls
         });
-    }
+    },
+
+    ssmsg: function(msg) {
+        $('#ss-msg').html(msg);
+    },
+
+    ssclose: function() {
+        $('#start-screen').hide();
+    },
 }
 
 
