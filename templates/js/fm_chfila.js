@@ -276,6 +276,10 @@ var fm_chfila = {
                     this.ui.enable_context = !this.ui.enable_context;
                 },
 
+                toggle_easy_rule: function(ergroup) {
+                    ergroup._is_shown = !ergroup._is_shown;
+                },
+
                 select_all_items: function() {
                     for (let i = 0; i < this.easypack.ergroups.length; i++) {
                         this.easypack.ergroups[i]._is_shown = true;

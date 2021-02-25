@@ -316,6 +316,7 @@ html, body {
     height: 24px;
     line-height: 24px;
     border-bottom: 1px dotted #efefef;
+    cursor: pointer;
 }
 .er-list-item:hover {
     background-color: #e9e9e9;
@@ -325,6 +326,7 @@ html, body {
 }
 .er-list-item label{
     margin: 0 0 0 0;
+    cursor: pointer;
 }
 </style>
 
@@ -825,11 +827,15 @@ html, body {
                                 <div class="box-body d-flex flex-row  justify-content-start">
 
                                     <div class="er-list" class="mr-2 d-flex flex-column">
-                                        <div class="er-list-item d-flex flex-row" v-for="ergroup in easypack.ergroups">
+                                        <div class="er-list-item d-flex flex-row" 
+                                            v-for="ergroup in easypack.ergroups"
+                                            v-on:click="toggle_easy_rule(ergroup)">
                                             <input type="checkbox"
                                                 v-model="ergroup._is_shown"
                                                 v-bind:id="'er-list-item-' + ergroup.norm">
-                                            <label v-bind:for="'er-list-item-' + ergroup.norm">{{ ergroup.norm }}</label>
+                                            <label>
+                                                {{ ergroup.norm }}
+                                            </label>
                                         </div>
                                     </div>
 
@@ -1174,6 +1180,10 @@ var fm_chfila = {
 
                 toggle_easy_context: function() {
                     this.ui.enable_context = !this.ui.enable_context;
+                },
+
+                toggle_easy_rule: function(ergroup) {
+                    ergroup._is_shown = !ergroup._is_shown;
                 },
 
                 select_all_items: function() {
