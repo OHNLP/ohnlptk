@@ -290,20 +290,22 @@ Ruleset Editor
                         Local Ruleset
                     </h5>
                     <p>
-                        Choose the folder
+                        Drop the ruleset folder or zip file to the following box.
                     </p>
                     
                     <div>
                         <div id="dropzone">
                             <div id="boxtitle" txt="Click or drop the folder here">
-                              Click or drop the folder here
+                              Drop the folder / zip file here
                             </div>
                         </div>
 
                         <input type="file" id="local_ruleset_folder" style="border: 0; height: 45px; display: none;" webkitdirectory directory>
 
-                        <button class="button primary" onclick="fm_chfila.import_local_files();">
-                            Import
+                        <input type="file" id="local_ruleset_zip" style="border: 0; height: 45px; display: none;">
+
+                        <button class="button primary" onclick="fm_chfila.import_ruleset_from_local();">
+                            Import Ruleset
                         </button>
                     </div>
                 </div>
@@ -752,7 +754,7 @@ Ruleset Editor
 </script>
 
 <!-- jszip -->
-<script src="./static/lib/jszip/jszip-3.1.5.min.js"></script>
+<script src="https://stuk.github.io/jszip/dist/jszip.js"></script>
 <!-- filesaver -->
 <script src="./static/lib/filesaver/FileSaver.js"></script>
 <!-- dayjs -->

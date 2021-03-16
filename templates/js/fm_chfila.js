@@ -494,10 +494,17 @@ var fm_chfila = {
         // but during the converting, need to check the content
         for (let i = 0; i < rulepack.matchrules.length; i++) {
             const matchrule = rulepack.matchrules[i];
+
             // get the rule_type: cm or rem
             var rule_type = matchrule.rule_name.split('_')[0];
+
             // get the rsregexp_name of this matchrule
-            var rsregexp_name = this.regexp2regexp_name(matchrule.regexp);
+            var rsregexp_name = null;
+            try {
+                rsregexp_name = this.regexp2regexp_name(matchrule.regexp);
+            } catch(err) {
+                console.log("* couldn't get rsregexp_name in " + matchrule.regexp);
+            }
             
             // create an empty ergroup
             var ergroup = this.create_new_ergroup();
@@ -692,7 +699,6 @@ var fm_chfila = {
      * Rule Pack Server Functions
      *************************************************************************/
 
-
     open_sample: function () {
         $.get(
             fm_chfila.static_url.sample,
@@ -723,7 +729,7 @@ var fm_chfila = {
     },
 
     open_select_local_dialog: function() {
-
+        // show the panel of local folder / zip
         Metro.infobox.open('#infobox-select-local-rulepack');
     },
 
@@ -888,34 +894,63 @@ var fm_chfila = {
                     // ok, user select a folder
                     if (item.isDirectory) {
                         fm_chfila.upload_folder_name = item.name;
-                        fm_chfila.scan_item(item);
+                        fm_chfila.parse_drop_dir(item);
                     } else {
                         // should be a zip file
+                        fm_chfila.parse_drop_zip(item);
                     }
                 }
+
+                // just detect one item, folder or zip
+                break;
             }
 
         }, false);
     },
 
     bind_fileinput_click: function() {
-        let dropzone = document.getElementById("dropzone");
-        dropzone.addEventListener("click", function(event) {
-            var input_elem = document.getElementById('local_ruleset_folder');
+        // let dropzone = document.getElementById("dropzone");
+        // dropzone.addEventListener("click", function(event) {
+        //     var input_elem = document.getElementById('local_ruleset_folder');
             
-            // trigger the event
-            input_elem.click();
+        //     // trigger the event
+        //     input_elem.click();
 
+        // });
+
+        // let input_elem = document.getElementById('local_ruleset_folder');
+
+        // input_elem.addEventListener('change', function(event) {
+        //     let input_elem = document.getElementById('local_ruleset_folder');
+        //     var files = input_elem.files;
+        //     fm_chfila.upload_files = [];
+        //     fm_chfila.scan_files(files);
+        // })
+        
+        let input_local_ruleset_zip = $("#local_ruleset_zip");
+        input_local_ruleset_zip.on("change", function(event) {
+            var files = event.target.files;
+
+            fm_chfila.read_local_zip(files[0]);
         });
 
-        let input_elem = document.getElementById('local_ruleset_folder');
+    },
 
-        input_elem.addEventListener('change', function(event) {
-            let input_elem = document.getElementById('local_ruleset_folder');
-            var files = input_elem.files;
-            fm_chfila.upload_files = [];
-            fm_chfila.scan_files(files);
-        })
+    parse_drop_zip: function(item) {
+        // the item is just a FileEntry, convert it to File Object
+        item.file(function(file) {
+            fm_chfila.read_local_zip(file);
+        });
+    },
+
+    parse_drop_dir: function(item) {
+        fm_chfila.scan_item(item);
+        this.read_scan_files();
+    },
+
+    parse_input_files: function(files) {
+        fm_chfila.scan_files(files);
+        this.read_scan_files();
     },
 
     scan_item: function (item) {
@@ -1012,7 +1047,125 @@ var fm_chfila = {
         });
     },
 
-    import_local_files: function() {        
+
+    read_local_zip: function(file) {
+        console.log(file)
+        var rulepack = this.create_empty_rulepack();
+        fm_chfila.rulepack = rulepack;
+
+        // set the rulepack name as the upload folder / zip name
+        fm_chfila.rulepack.name = file.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+        JSZip.loadAsync(file).then(function(zip) {
+            zip.forEach(
+                function(relativePath, zipEntry) {
+                    // console.log(zipEntry);
+
+                    if (zipEntry.dir) {
+                        return;
+                    }
+
+                    fm_chfila.upload_files.push(zipEntry);
+                    $('#boxtitle').html(
+                        'Found <b>' + fm_chfila.upload_files.length + '</b> files in zip'
+                    );
+
+                    var callback = function(zipobj) {
+                        return function(text) {
+                            let path = zipobj.name.split('/')
+                            let fn = path[path.length - 1];
+                            console.log(fn);
+                            // console.log(text)
+
+                            if (fn.startsWith('used_resources')) {
+
+                            } else if (fn.startsWith('contextRule')) {
+                                fm_chfila.__add_context_rule(text);
+
+                            } else if (fn.startsWith('resources_rules_matchrules')) {
+                                fm_chfila.__add_matchrules(text);
+
+                            } else if (fn.startsWith('resources_regexp_re')) {
+                                var norm = fm_chfila.extract_rsregexp_name(fn);
+                                fm_chfila.__add_regexp(norm, text);
+
+                            } else {
+                                console.log('* unknown file', fn);
+                            }
+                        }
+                    }(zipEntry);
+
+                    zipEntry.async("text").then(callback);
+                }
+            );
+
+        }, function(e) {
+            console.log('* something wrong when unzipping')
+            console.log(e);
+        });
+
+        
+    },
+
+    __add_context_rule: function(text) {
+        // create a new context rule obj
+        var context = fm_chfila.create_new_context();
+        context.text = text;
+
+        // add to rulepack
+        fm_chfila.rulepack.contexts.push(context);
+    },
+
+    __add_matchrules: function(text) {
+        // split the text into lines
+        var lines = text.split('\n');
+
+        // loop on line
+        for (let i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            console.log(line);
+
+            line = line.trim();
+
+            if (line == '') { continue }
+
+            var enabled = true;
+            if (line.startsWith('//')) {
+                // comment?
+                enabled = false;
+            }
+
+            // now try to extract the content
+            var rule_name = fm_chfila.extract_matchrule_rule_name(line);
+            var regexp = fm_chfila.extract_matchrule_regexp(line);
+            var location = fm_chfila.extract_matchrule_location(line);
+            var norm = fm_chfila.extract_matchrule_norm(line);
+
+            var matchrule = fm_chfila.create_new_matchrule();
+            matchrule.rule_name = rule_name;
+            matchrule.regexp = regexp;
+            matchrule.location = location;
+            matchrule.norm = norm;
+            matchrule.enabled = enabled;
+
+            // add to rulepack
+            fm_chfila.rulepack.matchrules.push(matchrule);
+        }
+    },
+
+    __add_regexp: function(norm, text) {
+        console.log('* regexp norm', norm)
+
+        // create a new rsregexps
+        var rsregexp = fm_chfila.create_new_rsregexp();
+        rsregexp.name = norm;
+        rsregexp.text = text;
+
+        // add to current
+        fm_chfila.rulepack.rsregexps.push(rsregexp);
+    },
+
+    read_scan_files: function() {        
         // folder check first, if something wrong, skip
 
         // then create an empty rulepack
@@ -1034,51 +1187,16 @@ var fm_chfila = {
             } else if (fn.startsWith('contextRule')) {
                 var callback = function(ctx) {
                     return function(event) {
-                        var context = fm_chfila.create_new_context();
                         var text = event.target.result;
-
-                        context.text = text;
-
-                        // add to rulepack
-                        fm_chfila.rulepack.contexts.push(context);
+                        fm_chfila.__add_context_rule(text);
                     }
                 }('ctx');
 
             } else if (fn.startsWith('resources_rules_matchrules')) {
                 // the match rule file
                 var callback = function(event) {
-                    var content = event.target.result;
-                    var lines = content.split('\n');
-                    for (let i = 0; i < lines.length; i++) {
-                        var line = lines[i];
-                        console.log(line);
-
-                        line = line.trim();
-
-                        if (line == '') { continue }
-
-                        var enabled = true;
-                        if (line.startsWith('//')) {
-                            // comment?
-                            enabled = false;
-                        }
-
-                        // now try to extract the content
-                        var rule_name = fm_chfila.extract_matchrule_rule_name(line);
-                        var regexp = fm_chfila.extract_matchrule_regexp(line);
-                        var location = fm_chfila.extract_matchrule_location(line);
-                        var norm = fm_chfila.extract_matchrule_norm(line);
-
-                        var matchrule = fm_chfila.create_new_matchrule();
-                        matchrule.rule_name = rule_name;
-                        matchrule.regexp = regexp;
-                        matchrule.location = location;
-                        matchrule.norm = norm;
-                        matchrule.enabled = enabled;
-
-                        // add to rulepack
-                        fm_chfila.rulepack.matchrules.push(matchrule);
-                    }
+                    var text = event.target.result;
+                    fm_chfila.__add_matchrules(text);
                 };
 
                 fm_chfila.read_file_async(file, callback);
@@ -1088,52 +1206,35 @@ var fm_chfila = {
 
                 // get the norm name
                 var name = fm_chfila.extract_rsregexp_name(fn);
-                var callback = function(n) {
+                var callback = function(norm) {
                     return function(event) {
-                        var name = n;
                         var text = event.target.result;
-                        console.log('* ', name)
-                        // create a new rsregexps
-                        var rsregexp = fm_chfila.create_new_rsregexp();
-                        rsregexp.name = name;
-                        rsregexp.text = text;
-
-                        // add to current
-                        fm_chfila.rulepack.rsregexps.push(rsregexp);
+                        fm_chfila.__add_regexp(norm, text);
                     }
                 }(name);
                 fm_chfila.read_file_async(file, callback);
             }
         }
-        // then loop on each file
-        // for (let i = 0; i < files.length; i++) {
-        //     const file = files[i];
-        //     console.log('* found file ' + file.webkitRelativePath);
+  
+    },
 
-        //     // the path should be the following format
-        //     var fn = file.name;
-        //     // ruleset / folder / filename
-        //     var path = file.webkitRelativePath.split('/');
+    /**
+     * Import the fm_chfila.rulepack to vpp
+     * 
+     */
+    import_ruleset_from_local: function() {
+        // make a copy and put in the vpp
+        fm_chfila.set_rulepack(
+            null,
+            fm_chfila.rp.state.NEW,
+            JSON.parse(JSON.stringify(fm_chfila.rulepack))
+        )
 
-        //     if (path[1] == 'rules') {
-        //         // this resType is rule
+        // clear the current upload environment
+        fm_chfila.rulepack = null;
+        fm_chfila.upload_files = null;
 
-        //     } else if (path[1] == 'regexp') {
-        //         // this resType is regexp
-        //         if (fn.startsWith('resources_regexp_re')) {
-        //             // which means this is a regexp file
-        //         } else {
-        //             // something wrong, the name should be 
-        //             // startswith resources_regexp_re
-        //         }
-
-        //     } else if (path[1] == 'norm') {
-        //         // this resType is norm
-
-        //     } else if (path[1] == 'context') {
-        //         // this resType is context
-
-        //     }
-        // }
+        // finally, close the infobox
+        Metro.infobox.close('#infobox-select-local-rulepack');
     }
 };
