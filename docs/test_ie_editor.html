@@ -536,6 +536,28 @@ html, body {
     </div>
     <!-- /#infobox-select-local-rulepack -->
 
+    <div id="infobox-select-remote-rulepack" class="info-box" data-role="infobox">
+        <span class="button square closer"></span>
+        <div class="info-box-content">
+            <div class="row">
+                <div class="col">
+                    <h5>
+                        Ruleset Repository
+                    </h5>
+                    <p>
+                        Drop the ruleset folder or zip file to the following box.
+                    </p>
+                    
+                    <button class="button primary" 
+                        onclick="fm_chfila.import_ruleset_from_remote();">
+                        Import Ruleset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#infobox-select-local-rulepack -->
+
 
     <div class="container-fluid bg-cyan fg-white mb-1">
         <div class="row">
@@ -583,6 +605,14 @@ html, body {
                         </span>
                         <span class="caption">Local</span>
                     </button>
+
+                    <!-- <button class="ribbon-button" 
+                        v-on:click="open_select_remote_dialog">
+                        <span class="icon">
+                            <i class="fa fa-cloudversify"></i>
+                        </span>
+                        <span class="caption">Remote</span>
+                    </button> -->
 
                     <button class="ribbon-button"
                         v-on:click="create_pack">
@@ -1155,6 +1185,10 @@ var fm_chfila = {
                     fm_chfila.open_select_local_dialog();
                 },
 
+                open_select_remote_dialog: function() {
+                    fm_chfila.open_select_remote_dialog();
+                },
+
                 open_rulepack: function(rulepack_id) {
                     fm_chfila.open_rulepack(rulepack_id);
                 },
@@ -1449,16 +1483,16 @@ var fm_chfila = {
             matchrule.rule_name = ergroup.rule_type + '_' + cm_name;
             // regexp is the comb of regexp_name according to the rule_type
             if (ergroup.rule_type == 'cm') {
-                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+                matchrule.regexp = '\\b(?i)(?:%re'+regexp_name+')\\b';
 
             } else if (ergroup.rule_type == 'rem') {
-                matchrule.regexp = '\\b%re'+regexp_name+'\\b';
+                matchrule.regexp = '\\b(?i)%re'+regexp_name+'\\b';
 
             } else {
-                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+                matchrule.regexp = '\\b(?i)(?:%re'+regexp_name+')\\b';
             }
 
-            // create a rsregexp
+            // create a rsregexp(?i)
             var rsregexp = this.create_new_rsregexp();
 
             // update the rsregexp
@@ -1627,9 +1661,10 @@ var fm_chfila = {
     create_new_matchrule: function () {
         return {
             rule_name: 'cm_fever',
-            regexp: '\\b(?:%reFEVER)\\b',
+            regexp: '\\b(?i)(?:%reFEVER)\\b',
             location: 'NA',
             enabled: true,
+            ignore_case: true,
             norm: 'FEVER'
         };
     },
@@ -1735,6 +1770,10 @@ var fm_chfila = {
         // show the panel of local folder / zip
         $('#boxtitle').text($('#boxtitle').attr('txt'));
         Metro.infobox.open('#infobox-select-local-rulepack');
+    },
+
+    open_select_remote_dialog: function() {
+        Metro.infobox.open('#infobox-select-remote-rulepack');
     },
 
     open_rulepack: function(rulepack_id) {
