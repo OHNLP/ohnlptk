@@ -348,7 +348,29 @@ html, body {
     margin: 0 0 0 0;
     cursor: pointer;
 }
+#dropzone {
+  text-align: center;
+  width: 100%;
+  height: 100px;
+  margin: 10px 0;
+  padding: 10px;
+  border: 3px dashed rgb(0, 162, 255);
+  border-radius: 10px;
+}
+#dropzone:hover {
+  border-color: rgb(0, 89, 255);
+}
 
+#boxtitle {
+  vertical-align: middle;
+  text-align: center;
+  color: black;
+  font: bold 1.5em "Arial", sans-serif;
+  width: 100%;
+  height: 100px;
+  line-height: 75px;
+  text-align: center;
+}
 </style>
 
 </head>
@@ -410,6 +432,7 @@ html, body {
     </h1>
     <div id="ss-msg">Loading data and initializing GUI ...</div>
 </div>
+
 
 <div id="infobox-upload-and-test" class="info-box" data-role="infobox">
     <span class="button square closer"></span>
@@ -480,6 +503,62 @@ html, body {
     </div>
     <!-- /#infobox-select-project-rulepack -->
 
+    <div id="infobox-select-local-rulepack" class="info-box" data-role="infobox">
+        <span class="button square closer"></span>
+        <div class="info-box-content">
+            <div class="row">
+                <div class="col">
+                    <h5>
+                        Local Ruleset
+                    </h5>
+                    <p>
+                        Drop the ruleset folder or zip file to the following box.
+                    </p>
+                    
+                    <div>
+                        <div id="dropzone">
+                            <div id="boxtitle" txt="Drop the folder / zip file here">
+                              Drop the folder / zip file here
+                            </div>
+                        </div>
+
+                        <input type="file" id="local_ruleset_folder" style="border: 0; height: 45px; display: none;" webkitdirectory directory>
+
+                        <input type="file" id="local_ruleset_zip" style="border: 0; height: 45px; display: none;">
+
+                        <button class="button primary" onclick="fm_chfila.import_ruleset_from_local();">
+                            Import Ruleset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#infobox-select-local-rulepack -->
+
+    <div id="infobox-select-remote-rulepack" class="info-box" data-role="infobox">
+        <span class="button square closer"></span>
+        <div class="info-box-content">
+            <div class="row">
+                <div class="col">
+                    <h5>
+                        Ruleset Repository
+                    </h5>
+                    <p>
+                        Drop the ruleset folder or zip file to the following box.
+                    </p>
+                    
+                    <button class="button primary" 
+                        onclick="fm_chfila.import_ruleset_from_remote();">
+                        Import Ruleset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#infobox-select-local-rulepack -->
+
+
     <div class="container-fluid bg-cyan fg-white mb-1">
         <div class="row">
             <div class="cell">
@@ -519,6 +598,22 @@ html, body {
 
                 <div class="group">
 
+                    <button class="ribbon-button" 
+                        v-on:click="open_select_local_dialog">
+                        <span class="icon">
+                            <i class="far fa-folder-open"></i>
+                        </span>
+                        <span class="caption">Local</span>
+                    </button>
+
+                    <!-- <button class="ribbon-button" 
+                        v-on:click="open_select_remote_dialog">
+                        <span class="icon">
+                            <i class="fa fa-cloudversify"></i>
+                        </span>
+                        <span class="caption">Remote</span>
+                    </button> -->
+
                     <button class="ribbon-button"
                         v-on:click="create_pack">
                         <span class="icon">
@@ -527,26 +622,20 @@ html, body {
                         <span class="caption">New</span>
                     </button>
 
-                    <!-- <button class="ribbon-button" v-on:click="open_prdialog">
-                        <span class="icon">
-                            <i class="far fa-folder-open"></i>
-                        </span>
-                        <span class="caption">Open</span>
-                    </button> -->
-
-                    <button class="ribbon-button" v-on:click="open_sample">
+                    <button class="ribbon-button"
+                        v-on:click="open_sample">
                         <span class="icon">
                             <i class="far fa-file-alt"></i>
                         </span>
                         <span class="caption">COVID-19</span>
                     </button>
 
-                    <span class="title">Rule Package</span>
+                    <span class="title">Ruleset</span>
                 </div>
 
                 <div class="group">
                     <div class="form-group">
-                        <label style="font-size: .9em; margin: 0;">Package Name</label>
+                        <label style="font-size: .9em; margin: 0;">Ruleset Name</label>
                         <input v-if="ui.mode == 'full'"
                             type="text" style="width: 200px;" placeholder="Rule package name" v-model="rulepack.name">
                         <input v-if="ui.mode == 'easy'"
@@ -567,7 +656,7 @@ html, body {
                         <span class="caption">Save a Copy</span>
                     </button> -->
 
-                    <span class="title">Current Package ({{ rulepack_state }})</span>
+                    <span class="title">Current Ruleset ({{ rulepack_state }})</span>
                 </div>
 
                 <div class="group">
@@ -930,7 +1019,7 @@ html, body {
 </script>
 
 <!-- jszip -->
-<script src="./static/lib/jszip/jszip-3.1.5.min.js"></script>
+<script src="https://stuk.github.io/jszip/dist/jszip.js"></script>
 <!-- filesaver -->
 <script src="./static/lib/filesaver/FileSaver.js"></script>
 <!-- dayjs -->
@@ -1090,6 +1179,14 @@ var fm_chfila = {
 
                 open_prdialog: function() {
                     fm_chfila.open_prdialog();
+                },
+
+                open_select_local_dialog: function() {
+                    fm_chfila.open_select_local_dialog();
+                },
+
+                open_select_remote_dialog: function() {
+                    fm_chfila.open_select_remote_dialog();
                 },
 
                 open_rulepack: function(rulepack_id) {
@@ -1263,6 +1360,10 @@ var fm_chfila = {
                 }
             }
         });
+
+        // bind the event
+        this.bind_fileinput_drag_drop();
+        this.bind_fileinput_click();
     },
 
     _show_rulepack_list_in_prdialog: function(data) {
@@ -1382,16 +1483,16 @@ var fm_chfila = {
             matchrule.rule_name = ergroup.rule_type + '_' + cm_name;
             // regexp is the comb of regexp_name according to the rule_type
             if (ergroup.rule_type == 'cm') {
-                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+                matchrule.regexp = '\\b(?i)(?:%re'+regexp_name+')\\b';
 
             } else if (ergroup.rule_type == 'rem') {
-                matchrule.regexp = '\\b%re'+regexp_name+'\\b';
+                matchrule.regexp = '\\b(?i)%re'+regexp_name+'\\b';
 
             } else {
-                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+                matchrule.regexp = '\\b(?i)(?:%re'+regexp_name+')\\b';
             }
 
-            // create a rsregexp
+            // create a rsregexp(?i)
             var rsregexp = this.create_new_rsregexp();
 
             // update the rsregexp
@@ -1428,10 +1529,17 @@ var fm_chfila = {
         // but during the converting, need to check the content
         for (let i = 0; i < rulepack.matchrules.length; i++) {
             const matchrule = rulepack.matchrules[i];
+
             // get the rule_type: cm or rem
             var rule_type = matchrule.rule_name.split('_')[0];
+
             // get the rsregexp_name of this matchrule
-            var rsregexp_name = this.regexp2regexp_name(matchrule.regexp);
+            var rsregexp_name = null;
+            try {
+                rsregexp_name = this.regexp2regexp_name(matchrule.regexp);
+            } catch(err) {
+                console.log("* couldn't get rsregexp_name in " + matchrule.regexp);
+            }
             
             // create an empty ergroup
             var ergroup = this.create_new_ergroup();
@@ -1524,6 +1632,19 @@ var fm_chfila = {
         );
     },
 
+    create_empty_rulepack: function () {
+        return {
+            name: '',
+            matchrules: [ ],
+            rsregexps: [ ],
+            contexts: [ ],
+            fns: {
+                used_resources: 'used_resources.txt',
+                resources_rules_matchrules: 'resources_rules_matchrules.txt'
+            }
+        };
+    },
+
     create_new_rulepack: function () {
         return {
             name: 'rule_pack_name',
@@ -1540,8 +1661,10 @@ var fm_chfila = {
     create_new_matchrule: function () {
         return {
             rule_name: 'cm_fever',
-            regexp: '\\b(?:%reFEVER)\\b',
+            regexp: '\\b(?i)(?:%reFEVER)\\b',
             location: 'NA',
+            enabled: true,
+            ignore_case: true,
             norm: 'FEVER'
         };
     },
@@ -1556,9 +1679,11 @@ var fm_chfila = {
     create_new_context: function() {
         var num = 0;
         if (this.vpp != null) {
-            if (typeof(this.vpp.rulepack) != 'undefined') {
-                if (typeof(this.vpp.rulepack.contexts) != 'undefined') {
-                    num = this.vpp.rulepack.contexts.length;
+            if (this.vpp.rulepack != null) {
+                if (typeof(this.vpp.rulepack) != 'undefined') {
+                    if (typeof(this.vpp.rulepack.contexts) != 'undefined') {
+                        num = this.vpp.rulepack.contexts.length;
+                    }
                 }
             }
         }
@@ -1612,7 +1737,6 @@ var fm_chfila = {
      * Rule Pack Server Functions
      *************************************************************************/
 
-
     open_sample: function () {
         $.get(
             fm_chfila.static_url.sample,
@@ -1640,6 +1764,16 @@ var fm_chfila = {
                 fm_chfila._show_rulepack_list_in_prdialog(data.data);
             }
         );
+    },
+
+    open_select_local_dialog: function() {
+        // show the panel of local folder / zip
+        $('#boxtitle').text($('#boxtitle').attr('txt'));
+        Metro.infobox.open('#infobox-select-local-rulepack');
+    },
+
+    open_select_remote_dialog: function() {
+        Metro.infobox.open('#infobox-select-remote-rulepack');
     },
 
     open_rulepack: function(rulepack_id) {
@@ -1759,6 +1893,443 @@ var fm_chfila = {
                 $('#btn-upload-and-test').attr('disabled', null).html('Test');
             }
         });
+    },
+
+
+    /**************************************************************************
+     * Local folder / zip parsing functions
+     *************************************************************************/
+
+    // for temp upload files
+    upload_type: null,
+    upload_files: null,
+    upload_files_finished: null,
+    upload_folder_name: null,
+
+    bind_fileinput_drag_drop: function() {
+        // init the upload box
+        let dropzone = document.getElementById("dropzone");
+
+        dropzone.addEventListener("dragover", function(event) {
+            event.preventDefault();
+        }, false);
+
+        dropzone.addEventListener("drop", function(event) {
+            let items = event.dataTransfer.items;
+        
+            event.preventDefault();
+        
+            // clear the old files
+            fm_chfila.upload_files = [];
+
+            // clear the old folder name
+            fm_chfila.upload_folder_name = '';
+
+            // user should only upload one folder or a file
+
+            if (items.length>1) {
+                console.log('* selected more than 1 item!');
+                return;
+            }
+
+            for (let i=0; i<items.length; i++) {
+                let item = items[i].webkitGetAsEntry();
+        
+                if (item) {
+                    // ok, user select a folder
+                    if (item.isDirectory) {
+                        fm_chfila.upload_folder_name = item.name;
+                        fm_chfila.parse_drop_dir(item);
+                        fm_chfila.upload_type = 'dir';
+
+                    } else {
+                        // should be a zip file
+                        fm_chfila.parse_drop_zip(item);
+                        fm_chfila.upload_type = 'zip';
+                    }
+                }
+
+                // just detect one item, folder or zip
+                break;
+            }
+
+        }, false);
+    },
+
+    bind_fileinput_click: function() {
+        // let dropzone = document.getElementById("dropzone");
+        // dropzone.addEventListener("click", function(event) {
+        //     var input_elem = document.getElementById('local_ruleset_folder');
+            
+        //     // trigger the event
+        //     input_elem.click();
+
+        // });
+
+        // let input_elem = document.getElementById('local_ruleset_folder');
+
+        // input_elem.addEventListener('change', function(event) {
+        //     let input_elem = document.getElementById('local_ruleset_folder');
+        //     var files = input_elem.files;
+        //     fm_chfila.upload_files = [];
+        //     fm_chfila.scan_files(files);
+        // })
+        
+        let input_local_ruleset_zip = $("#local_ruleset_zip");
+        input_local_ruleset_zip.on("change", function(event) {
+            var files = event.target.files;
+
+            fm_chfila.read_local_zip(files[0]);
+        });
+
+    },
+
+    parse_drop_zip: function(item) {
+        // the item is just a FileEntry, convert it to File Object
+        item.file(function(file) {
+            fm_chfila.read_local_zip(file);
+        });
+    },
+
+    parse_drop_dir: function(item) {
+        fm_chfila.scan_item(item);
+        fm_chfila.read_scan_files();
+    },
+
+    parse_input_files: function(files) {
+        fm_chfila.scan_files(files);
+        fm_chfila.read_scan_files();
+    },
+
+    scan_item: function (item) {
+        // console.log('* found item ', item);
+      
+        if (item.isDirectory) {
+            let directoryReader = item.createReader();
+            
+            directoryReader.readEntries(function(entries) {
+                entries.forEach(function(entry) {
+                    fm_chfila.scan_item(entry);
+                });
+            });
+
+            return
+        }
+
+        // ok, it's a file
+        if (fm_chfila.upload_files == null) {
+            fm_chfila.upload_files = [];
+        }
+        
+        fm_chfila.upload_files.push(item);
+
+        // show how many files
+        $('#boxtitle').html(
+            'Found <b>' + fm_chfila.upload_files.length + '</b> files'
+        );
+    },
+
+    scan_files: function(files) {
+        // ok, it's a file
+        if (fm_chfila.upload_files == null) {
+            fm_chfila.upload_files = [];
+        }
+
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            console.log('* found file ' + file.webkitRelativePath);
+            fm_chfila.upload_files.push(file);
+        }
+
+        // show how many files
+        $('#boxtitle').html(
+            'Found <b>' + fm_chfila.upload_files.length + '</b> files'
+        );
+    },
+
+    extract_rsregexp_name: function(text) {
+        var rx = /resources_regexp_re(\S+).txt/gm;
+        return this._regexp(rx, text);
+    },
+
+    extract_matchrule_rule_name: function(text) {
+        var rx = /RULENAME\=\"([a-zA-Z_0-9]+)\"/gm;
+        return this._regexp(rx, text);
+    },
+
+    extract_matchrule_location: function(text) {
+        var rx = /LOCATION\=\"([a-zA-Z_0-9]+)\"/gm;
+        return this._regexp(rx, text);
+    },
+
+    extract_matchrule_norm: function(text) {
+        var rx = /NORM\=\"([a-zA-Z_0-9]+)\"/gm;
+        return this._regexp(rx, text);
+    },
+
+    extract_matchrule_regexp: function(text) {
+        var ps = text.split(',');
+        for (let i = 0; i < ps.length; i++) {
+            const p = ps[i];
+            if (p.startsWith('REGEXP')) {
+                return p.substring(8, p.length-1);
+            }
+        }
+        return null;
+    },
+
+    _regexp: function(rx, text) {
+        var arr = rx.exec(text);
+        if (arr.length>1) {
+            return arr[1];
+        } else {
+            return null;
+        }
+    },
+
+    read_file_async: function(fileEntry, callback) {
+        fileEntry.file(function(file) {
+            let reader = new FileReader();
+            reader.onload = callback;
+            reader.readAsText(file)
+        });
+    },
+
+
+    read_local_zip: function(file) {
+        console.log(file)
+        var rulepack = this.create_empty_rulepack();
+        fm_chfila.rulepack = rulepack;
+
+        // set the rulepack name as the upload folder / zip name
+        fm_chfila.rulepack.name = file.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+        JSZip.loadAsync(file).then(function(zip) {
+            zip.forEach(
+                function(relativePath, zipEntry) {
+                    // console.log(zipEntry);
+
+                    if (zipEntry.dir) {
+                        return;
+                    }
+
+                    fm_chfila.upload_files.push(zipEntry);
+                    $('#boxtitle').html(
+                        'Found <b>' + fm_chfila.upload_files.length + '</b> files in zip'
+                    );
+
+                    var callback = function(zipobj) {
+                        return function(text) {
+                            let path = zipobj.name.split('/')
+                            let fn = path[path.length - 1];
+                            console.log(fn);
+                            // console.log(text)
+
+                            if (fn.startsWith('used_resources')) {
+
+                            } else if (fn.startsWith('contextRule')) {
+                                fm_chfila.__add_context_rule(text);
+
+                            } else if (fn.startsWith('resources_rules_matchrules')) {
+                                fm_chfila.__add_matchrules(text);
+
+                            } else if (fn.startsWith('resources_regexp_re')) {
+                                var norm = fm_chfila.extract_rsregexp_name(fn);
+                                fm_chfila.__add_regexp(norm, text);
+
+                            } else {
+                                console.log('* unknown file', fn);
+                            }
+                        }
+                    }(zipEntry);
+
+                    zipEntry.async("text").then(callback);
+                }
+            );
+
+        }, function(e) {
+            console.log('* something wrong when unzipping')
+            console.log(e);
+        });
+
+        
+    },
+
+    __add_context_rule: function(text) {
+        // create a new context rule obj
+        var context = fm_chfila.create_new_context();
+        context.text = text;
+
+        // add to rulepack
+        fm_chfila.rulepack.contexts.push(context);
+    },
+
+    __add_matchrules: function(text) {
+        // split the text into lines
+        var lines = text.split('\n');
+
+        // loop on line
+        for (let i = 0; i < lines.length; i++) {
+            var line = lines[i];
+            console.log(line);
+
+            line = line.trim();
+
+            if (line == '') { continue }
+
+            var enabled = true;
+            if (line.startsWith('//')) {
+                // comment?
+                enabled = false;
+                continue;
+            }
+
+            // now try to extract the content
+            var rule_name = fm_chfila.extract_matchrule_rule_name(line);
+            var regexp = fm_chfila.extract_matchrule_regexp(line);
+            var location = fm_chfila.extract_matchrule_location(line);
+            var norm = fm_chfila.extract_matchrule_norm(line);
+
+            var matchrule = fm_chfila.create_new_matchrule();
+            matchrule.rule_name = rule_name;
+            matchrule.regexp = regexp;
+            matchrule.location = location;
+            matchrule.norm = norm;
+            matchrule.enabled = enabled;
+
+            // add to rulepack
+            fm_chfila.rulepack.matchrules.push(matchrule);
+        }
+    },
+
+    __add_regexp: function(norm, text) {
+        console.log('* regexp norm', norm)
+
+        // create a new rsregexps
+        var rsregexp = fm_chfila.create_new_rsregexp();
+        rsregexp.name = norm;
+        rsregexp.text = text;
+
+        // add to current
+        fm_chfila.rulepack.rsregexps.push(rsregexp);
+    },
+
+    read_scan_files: function() {
+        console.log('* start reading scanned files ' + fm_chfila.upload_files.length);
+        // folder check first, if something wrong, skip
+
+        // then create an empty rulepack
+        var rulepack = this.create_empty_rulepack();
+        fm_chfila.rulepack = rulepack;
+
+        // set the rulepack name as the upload folder / zip name
+        fm_chfila.rulepack.name = fm_chfila.upload_folder_name;
+
+        // init the finished files
+        fm_chfila.upload_files_finished = [];
+
+        // check every file items
+        for (let i = 0; i < fm_chfila.upload_files.length; i++) {
+            const file = fm_chfila.upload_files[i];
+            
+            var fn = file.name;
+            console.log('* reading ' + fn);
+
+            if (fn.startsWith('used_resources')) {
+                // this is the all file list
+                fm_chfila.upload_files_finished.push(fn);
+                fm_chfila.__check_is_read_all_files();
+
+            } else if (fn.startsWith('contextRule')) {
+                var callback = function(ctx) {
+                    return function(event) {
+                        var text = event.target.result;
+                        fm_chfila.__add_context_rule(text);
+                        fm_chfila.upload_files_finished.push(text);
+                        fm_chfila.__check_is_read_all_files();
+                    }
+                }('ctx');
+
+                fm_chfila.read_file_async(file, callback);
+
+            } else if (fn.startsWith('resources_rules_matchrules')) {
+                // the match rule file
+                var callback = function(event) {
+                    var text = event.target.result;
+                    fm_chfila.__add_matchrules(text);
+                    fm_chfila.upload_files_finished.push(text);
+                    fm_chfila.__check_is_read_all_files();
+                };
+
+                fm_chfila.read_file_async(file, callback);
+
+            } else if (fn.startsWith('resources_regexp_re')) {
+                // the rules file
+
+                // get the norm name
+                var name = fm_chfila.extract_rsregexp_name(fn);
+                var callback = function(norm) {
+                    return function(event) {
+                        var text = event.target.result;
+                        fm_chfila.__add_regexp(norm, text);
+                        fm_chfila.upload_files_finished.push(text);
+                        fm_chfila.__check_is_read_all_files();
+                    }
+                }(name);
+                fm_chfila.read_file_async(file, callback);
+
+            } else {
+                fm_chfila.upload_files_finished.push(fn);
+                fm_chfila.__check_is_read_all_files();
+            }
+        }
+  
+    },
+
+    __check_is_read_all_files: function() {
+        if (fm_chfila.upload_files_finished.length == 
+            fm_chfila.upload_files.length) {
+            // dispatch an event
+            document.dispatchEvent(new Event('read_all_files'));
+        } else {
+            console.log('* read ' + fm_chfila.upload_files_finished.length + 
+                ' / ' + fm_chfila.upload_files.length);
+        }
+    },
+
+    __on_read_all_files: function() {
+        // make a copy and put in the vpp
+        fm_chfila.set_rulepack(
+            null,
+            fm_chfila.rp.state.NEW,
+            JSON.parse(JSON.stringify(fm_chfila.rulepack))
+        )
+
+        // clear the current upload environment
+        fm_chfila.rulepack = null;
+        fm_chfila.upload_files = null;
+
+        // finally, close the infobox
+        Metro.infobox.close('#infobox-select-local-rulepack');
+    },
+
+    /**
+     * Import the fm_chfila.rulepack to vpp
+     * 
+     */
+    import_ruleset_from_local: function() {
+        if (fm_chfila.upload_type == 'dir') {
+            // then we need to read all files from fileentry
+            document.addEventListener('read_all_files', function(event) {
+                fm_chfila.__on_read_all_files();
+            }, false);
+
+            fm_chfila.read_scan_files();
+        } else {
+            // then just done reading,
+            fm_chfila.__on_read_all_files();
+        }
+        
     }
 };
 var collData = {
