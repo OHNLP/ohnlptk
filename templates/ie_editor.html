@@ -314,6 +314,28 @@ Ruleset Editor
     </div>
     <!-- /#infobox-select-local-rulepack -->
 
+    <div id="infobox-select-remote-rulepack" class="info-box" data-role="infobox">
+        <span class="button square closer"></span>
+        <div class="info-box-content">
+            <div class="row">
+                <div class="col">
+                    <h5>
+                        Ruleset Repository
+                    </h5>
+                    <p>
+                        Drop the ruleset folder or zip file to the following box.
+                    </p>
+                    
+                    <button class="button primary" 
+                        onclick="fm_chfila.import_ruleset_from_remote();">
+                        Import Ruleset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#infobox-select-local-rulepack -->
+
 
     <div class="container-fluid bg-cyan fg-white mb-1">
         <div class="row">
@@ -361,6 +383,14 @@ Ruleset Editor
                         </span>
                         <span class="caption">Local</span>
                     </button>
+
+                    <!-- <button class="ribbon-button" 
+                        v-on:click="open_select_remote_dialog">
+                        <span class="icon">
+                            <i class="fa fa-cloudversify"></i>
+                        </span>
+                        <span class="caption">Remote</span>
+                    </button> -->
 
                     <button class="ribbon-button"
                         v-on:click="create_pack">

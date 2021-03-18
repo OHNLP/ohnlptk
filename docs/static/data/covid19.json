@@ -71,6 +71,10 @@
     {
       "name": "FLUSHOT",
       "text": "influenza vaccine\nflu vaccine\ninfluenza vaccination\nflu vaccination\nflu shot\ninfluenza shot\ninfluenza laiv\nflu swab\ninfluenza results\nflu vaccinations\ninfluenza vaccinations\nflu shots\ninfluenza immunization\ninfluenza immunizations\nregex:influenza\\\\s(?:\\\\S+\\\\s+){0,2}vaccin(?:e\nation)s?\ninfluenza high dose\ninfluenza tiv\nflu tiv\nflu test\ninfluenza (?:IM)\ninfluenza quadrivalent\nInfluenza A\/B and Respiratory Syncytial Virus, PCR\nInfluenza A\/B and RSV, PCR\nInfluenza A, B, RSV, PCR\ninfluenza test\nINFLUENZA A AND B AND RSV"
+    },
+    {
+      "name": "CAREPLAN",
+      "text": "plan of care"
     }
   ],
   "name": "covid19",
@@ -80,112 +84,118 @@
   },
   "matchrules": [
     {
-      "regexp": "\\b(?:%reDYSPNEA)\\b",
+      "regexp": "\\b(?i)(?:%reDYSPNEA)\\b",
       "rule_name": "cm_dyspnea",
       "location": "NA",
       "norm": "DYSPNEA"
     },
     {
-      "regexp": "\\b(?:%reNASALCONGESTION)\\b",
+      "regexp": "\\b(?i)(?:%reNASALCONGESTION)\\b",
       "rule_name": "cm_nasalcongestion",
       "location": "NA",
       "norm": "NASAL_OBSTRUCTION"
     },
     {
-      "regexp": "\\b(?:%reAPPETITELOSS)\\b",
+      "regexp": "\\b(?i)(?:%reAPPETITELOSS)\\b",
       "rule_name": "cm_lossofappetite",
       "location": "NA",
       "norm": "LOSS_OF_APPETITE"
     },
     {
-      "regexp": "\\b(?:%reELEVATEDLDH)\\b",
+      "regexp": "\\b(?i)(?:%reELEVATEDLDH)\\b",
       "rule_name": "cm_elevatedldh",
       "location": "NA",
       "norm": "ELEVATED_LDH"
     },
     {
-      "regexp": "\\b(?:%rePROLONGEDPROTOTHROMBIN)\\b",
+      "regexp": "\\b(?i)(?:%rePROLONGEDPROTOTHROMBIN)\\b",
       "rule_name": "cm_elevatedpt",
       "location": "NA",
       "norm": "ELEVATED_PT_TIME"
     },
     {
-      "regexp": "\\b(?:%reLYMPHOPENIA)\\b",
+      "regexp": "\\b(?i)(?:%reLYMPHOPENIA)\\b",
       "rule_name": "cm_lymphopenia",
       "location": "NA",
       "norm": "LYMPHOPENIA"
     },
     {
-      "regexp": "\\b(?:%reDIARRHEA)\\b",
+      "regexp": "\\b(?i)(?:%reDIARRHEA)\\b",
       "rule_name": "cm_diarrhea",
       "location": "NA",
       "norm": "DIARRHEA"
     },
     {
-      "regexp": "\\b(?:%reABDOMINALPAIN)\\b",
+      "regexp": "\\b(?i)(?:%reABDOMINALPAIN)\\b",
       "rule_name": "cm_abdominalpain",
       "location": "NA",
       "norm": "ABDOMINAL_PAIN"
     },
     {
-      "regexp": "\\b(?:%reSORETHROAT)\\b",
+      "regexp": "\\b(?i)(?:%reSORETHROAT)\\b",
       "rule_name": "cm_sorethroat",
       "location": "NA",
       "norm": "SORE_THROAT"
     },
     {
-      "regexp": "\\b(?:%reHEADACHE)\\b",
+      "regexp": "\\b(?i)(?:%reHEADACHE)\\b",
       "rule_name": "cm_headache",
       "location": "NA",
       "norm": "HEADACHE"
     },
     {
-      "regexp": "\\b(?:%reMYALGIA)\\b",
+      "regexp": "\\b(?i)(?:%reMYALGIA)\\b",
       "rule_name": "cm_myalgia",
       "location": "NA",
       "norm": "MYALGIA"
     },
     {
-      "regexp": "\\b(?:%reFATIGUE)\\b",
+      "regexp": "\\b(?i)(?:%reFATIGUE)\\b",
       "rule_name": "cm_fatigue",
       "location": "NA",
       "norm": "FATIGUE"
     },
     {
-      "regexp": "\\b(?:%reDRYCOUGH)\\b",
+      "regexp": "\\b(?i)(?:%reDRYCOUGH)\\b",
       "rule_name": "cm_drycough",
       "location": "NA",
       "norm": "DRY_COUGH"
     },
     {
-      "regexp": "\\b(?:%reFEVER)\\b",
+      "regexp": "\\b(?i)(?:%reFEVER)\\b",
       "rule_name": "cm_fever",
       "location": "NA",
       "norm": "FEVER"
     },
     {
-      "regexp": "\\b(?:%reFLUEXPLICIT)\\b",
+      "regexp": "\\b(?i)(?:%reFLUEXPLICIT)\\b",
       "rule_name": "cm_influenzaexpl",
       "location": "NA",
       "norm": "INFLUENZA_EXPL"
     },
     {
-      "regexp": "\\b(?:%rePATCHYINFILTRATES)\\b",
+      "regexp": "\\b(?i)(?:%rePATCHYINFILTRATES)\\b",
       "rule_name": "cm_patchyinfiltrate",
       "location": "NA",
       "norm": "PATCHY_INFILTRATES"
     },
     {
-      "regexp": "\\b(?:%reGROUNDGLASSINFILTRATES)\\b",
+      "regexp": "\\b(?i)(?:%reGROUNDGLASSINFILTRATES)\\b",
       "rule_name": "cm_groundglassinfiltrate",
       "location": "NA",
       "norm": "GROUND_GLASS_INFILTRATES"
     },
     {
-      "regexp": "\\b%reFLUSHOT\\b",
+      "regexp": "\\b(?i)(?:%reFLUSHOT)\\b",
       "rule_name": "rem_vaccine_filter",
       "location": "NA",
-      "norm": "REMOVE"
+      "norm": "REMOVE_VACCINE"
+    },
+    {
+      "regexp": "\\b(?i)(?:%reCAREPLAN)\\b",
+      "rule_name": "rem_careplan",
+      "location": "NA",
+      "norm": "REMOVE_CAREPLAN"
     }
   ],
   "contexts": [{

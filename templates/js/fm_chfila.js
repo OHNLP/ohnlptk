@@ -154,6 +154,10 @@ var fm_chfila = {
                     fm_chfila.open_select_local_dialog();
                 },
 
+                open_select_remote_dialog: function() {
+                    fm_chfila.open_select_remote_dialog();
+                },
+
                 open_rulepack: function(rulepack_id) {
                     fm_chfila.open_rulepack(rulepack_id);
                 },
@@ -448,16 +452,16 @@ var fm_chfila = {
             matchrule.rule_name = ergroup.rule_type + '_' + cm_name;
             // regexp is the comb of regexp_name according to the rule_type
             if (ergroup.rule_type == 'cm') {
-                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+                matchrule.regexp = '\\b(?i)(?:%re'+regexp_name+')\\b';
 
             } else if (ergroup.rule_type == 'rem') {
-                matchrule.regexp = '\\b%re'+regexp_name+'\\b';
+                matchrule.regexp = '\\b(?i)%re'+regexp_name+'\\b';
 
             } else {
-                matchrule.regexp = '\\b(?:%re'+regexp_name+')\\b';
+                matchrule.regexp = '\\b(?i)(?:%re'+regexp_name+')\\b';
             }
 
-            // create a rsregexp
+            // create a rsregexp(?i)
             var rsregexp = this.create_new_rsregexp();
 
             // update the rsregexp
@@ -626,9 +630,10 @@ var fm_chfila = {
     create_new_matchrule: function () {
         return {
             rule_name: 'cm_fever',
-            regexp: '\\b(?:%reFEVER)\\b',
+            regexp: '\\b(?i)(?:%reFEVER)\\b',
             location: 'NA',
             enabled: true,
+            ignore_case: true,
             norm: 'FEVER'
         };
     },
@@ -734,6 +739,10 @@ var fm_chfila = {
         // show the panel of local folder / zip
         $('#boxtitle').text($('#boxtitle').attr('txt'));
         Metro.infobox.open('#infobox-select-local-rulepack');
+    },
+
+    open_select_remote_dialog: function() {
+        Metro.infobox.open('#infobox-select-remote-rulepack');
     },
 
     open_rulepack: function(rulepack_id) {
