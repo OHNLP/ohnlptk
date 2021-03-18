@@ -643,9 +643,11 @@ var fm_chfila = {
     create_new_context: function() {
         var num = 0;
         if (this.vpp != null) {
-            if (typeof(this.vpp.rulepack) != 'undefined') {
-                if (typeof(this.vpp.rulepack.contexts) != 'undefined') {
-                    num = this.vpp.rulepack.contexts.length;
+            if (this.vpp.rulepack != null) {
+                if (typeof(this.vpp.rulepack) != 'undefined') {
+                    if (typeof(this.vpp.rulepack.contexts) != 'undefined') {
+                        num = this.vpp.rulepack.contexts.length;
+                    }
                 }
             }
         }
@@ -730,6 +732,7 @@ var fm_chfila = {
 
     open_select_local_dialog: function() {
         // show the panel of local folder / zip
+        $('#boxtitle').text($('#boxtitle').attr('txt'));
         Metro.infobox.open('#infobox-select-local-rulepack');
     },
 
@@ -858,7 +861,9 @@ var fm_chfila = {
      *************************************************************************/
 
     // for temp upload files
+    upload_type: null,
     upload_files: null,
+    upload_files_finished: null,
     upload_folder_name: null,
 
     bind_fileinput_drag_drop: function() {
@@ -895,9 +900,12 @@ var fm_chfila = {
                     if (item.isDirectory) {
                         fm_chfila.upload_folder_name = item.name;
                         fm_chfila.parse_drop_dir(item);
+                        fm_chfila.upload_type = 'dir';
+
                     } else {
                         // should be a zip file
                         fm_chfila.parse_drop_zip(item);
+                        fm_chfila.upload_type = 'zip';
                     }
                 }
 
@@ -945,16 +953,16 @@ var fm_chfila = {
 
     parse_drop_dir: function(item) {
         fm_chfila.scan_item(item);
-        this.read_scan_files();
+        fm_chfila.read_scan_files();
     },
 
     parse_input_files: function(files) {
         fm_chfila.scan_files(files);
-        this.read_scan_files();
+        fm_chfila.read_scan_files();
     },
 
     scan_item: function (item) {
-        console.log('* found item ', item);
+        // console.log('* found item ', item);
       
         if (item.isDirectory) {
             let directoryReader = item.createReader();
@@ -1166,7 +1174,8 @@ var fm_chfila = {
         fm_chfila.rulepack.rsregexps.push(rsregexp);
     },
 
-    read_scan_files: function() {        
+    read_scan_files: function() {
+        console.log('* start reading scanned files ' + fm_chfila.upload_files.length);
         // folder check first, if something wrong, skip
 
         // then create an empty rulepack
@@ -1176,28 +1185,40 @@ var fm_chfila = {
         // set the rulepack name as the upload folder / zip name
         fm_chfila.rulepack.name = fm_chfila.upload_folder_name;
 
+        // init the finished files
+        fm_chfila.upload_files_finished = [];
+
         // check every file items
         for (let i = 0; i < fm_chfila.upload_files.length; i++) {
             const file = fm_chfila.upload_files[i];
             
             var fn = file.name;
+            console.log('* reading ' + fn);
 
             if (fn.startsWith('used_resources')) {
                 // this is the all file list
+                fm_chfila.upload_files_finished.push(fn);
+                fm_chfila.__check_is_read_all_files();
 
             } else if (fn.startsWith('contextRule')) {
                 var callback = function(ctx) {
                     return function(event) {
                         var text = event.target.result;
                         fm_chfila.__add_context_rule(text);
+                        fm_chfila.upload_files_finished.push(text);
+                        fm_chfila.__check_is_read_all_files();
                     }
                 }('ctx');
+
+                fm_chfila.read_file_async(file, callback);
 
             } else if (fn.startsWith('resources_rules_matchrules')) {
                 // the match rule file
                 var callback = function(event) {
                     var text = event.target.result;
                     fm_chfila.__add_matchrules(text);
+                    fm_chfila.upload_files_finished.push(text);
+                    fm_chfila.__check_is_read_all_files();
                 };
 
                 fm_chfila.read_file_async(file, callback);
@@ -1211,19 +1232,32 @@ var fm_chfila = {
                     return function(event) {
                         var text = event.target.result;
                         fm_chfila.__add_regexp(norm, text);
+                        fm_chfila.upload_files_finished.push(text);
+                        fm_chfila.__check_is_read_all_files();
                     }
                 }(name);
                 fm_chfila.read_file_async(file, callback);
+
+            } else {
+                fm_chfila.upload_files_finished.push(fn);
+                fm_chfila.__check_is_read_all_files();
             }
         }
   
     },
 
-    /**
-     * Import the fm_chfila.rulepack to vpp
-     * 
-     */
-    import_ruleset_from_local: function() {
+    __check_is_read_all_files: function() {
+        if (fm_chfila.upload_files_finished.length == 
+            fm_chfila.upload_files.length) {
+            // dispatch an event
+            document.dispatchEvent(new Event('read_all_files'));
+        } else {
+            console.log('* read ' + fm_chfila.upload_files_finished.length + 
+                ' / ' + fm_chfila.upload_files.length);
+        }
+    },
+
+    __on_read_all_files: function() {
         // make a copy and put in the vpp
         fm_chfila.set_rulepack(
             null,
@@ -1237,5 +1271,24 @@ var fm_chfila = {
 
         // finally, close the infobox
         Metro.infobox.close('#infobox-select-local-rulepack');
+    },
+
+    /**
+     * Import the fm_chfila.rulepack to vpp
+     * 
+     */
+    import_ruleset_from_local: function() {
+        if (fm_chfila.upload_type == 'dir') {
+            // then we need to read all files from fileentry
+            document.addEventListener('read_all_files', function(event) {
+                fm_chfila.__on_read_all_files();
+            }, false);
+
+            fm_chfila.read_scan_files();
+        } else {
+            // then just done reading,
+            fm_chfila.__on_read_all_files();
+        }
+        
     }
 };
