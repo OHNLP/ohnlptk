@@ -1133,6 +1133,7 @@ var fm_chfila = {
             if (line.startsWith('//')) {
                 // comment?
                 enabled = false;
+                continue;
             }
 
             // now try to extract the content
