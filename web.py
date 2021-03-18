@@ -40,6 +40,12 @@ def dt_builder():
     return render_template('dt_builder.html')
 
 
+@app.route('/test_ie_editor')
+@app.route('/test_ie_editor.html')
+def test_ie_editor():
+    return render_template('ie_editor.html')
+
+
 def build():
     '''
     Build the static website
@@ -49,6 +55,26 @@ def build():
             for url in [
                 '/index.html',
                 '/ie_editor.html']:
+                make_page(
+                    client, 
+                    url, 
+                    os.path.join(
+                        pathlib.Path(__file__).parent.absolute(),
+                        app.config['STATIC_PAGE_ROOT_PATH']
+                    )
+                )
+
+    print('* done building static pages')
+
+
+def build_test():
+    '''
+    Build the static website for test
+    '''
+    with app.test_client() as client:
+        with app.app_context():
+            for url in [
+                '/test_ie_editor.html']:
                 make_page(
                     client, 
                     url, 
@@ -84,7 +110,7 @@ if __name__=='__main__':
 
     # add paramters
     parser.add_argument("--mode", type=str, 
-        choices=['build', 'run'], default='run',
+        choices=['build', 'build_test', 'run'], default='run',
         help="Which mode?")
 
     args = parser.parse_args()
@@ -93,7 +119,12 @@ if __name__=='__main__':
         app.run(
             host=app.config['DEV_LISTEN'],
             port=app.config['DEV_PORT'])
+
     elif args.mode == 'build':
         build()
+
+    elif args.mode == 'build_test':
+        build_test()
+
     else:
         parser.print_usage()
