@@ -371,6 +371,23 @@ html, body {
   line-height: 75px;
   text-align: center;
 }
+
+.ruleset-test-host-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.ruleset-test-host-dropdown select {
+  position: absolute;
+  width: 100%;
+}
+
+.ruleset-test-host-dropdown input {
+  position: absolute;
+  left: 0;
+  width: calc(100% - 12px);
+}
+
 </style>
 
 </head>
@@ -433,39 +450,62 @@ html, body {
     <div id="ss-msg">Loading data and initializing GUI ...</div>
 </div>
 
+<div id="fm_chfila">
 
-<div id="infobox-upload-and-test" class="info-box" data-role="infobox">
-    <span class="button square closer"></span>
-    <div class="info-box-content">
-        <h5>Ruleset Test</h5>
-        <p class="text-sm">Due to server load and other issue, the testing may take a few minutes.</p>
-        <div class="row">
-            <div class="cell-9">
-                <textarea id="text-for-test" rows="5" style="width: 100%;">The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago. No sore throat.</textarea>
+    <div id="infobox-upload-and-test" class="info-box" data-role="infobox">
+        <span class="button square closer"></span>
+        <div class="info-box-content">
+            <h5>
+                Ruleset Test
+            </h5>
+            <p class="text-sm">Due to server load and other issue, the testing may take a few minutes.</p>
+            <div class="row">
+                <div class="cell-12">
+                    <textarea id="text-for-test" rows="5" style="width: 100%;">The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago. No sore throat.</textarea>
+                </div>
             </div>
-            <div class="cell-3">
-                <p style="display: none;">Document Date: <input class="form-control" type="text" id="datepicker" size="20"></p>
-                <p>
-                    <button id="btn-upload-and-test" class="button primary" onclick="fm_chfila.upload_and_test();">Test</button>
-                </p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="cell">
-                <div id="fig_bratvis">
+
+            <p class="text-sm">
+                Specify which server to use for testing
+            </p>
+            <div class="row">
+
+                <div class="cell-8">
+                    <div class="ruleset-test-host-dropdown">
+                        <select id="ruleset_test_host_list" name="ruleset_test_host_list"
+                            v-on:change="on_change_select_host($event)">
+                            <option v-for="host in hosts" :value="host.host">
+                                <b>{{ host.name }}</b>: {{ host.host }}
+                            </option>
+                        </select>
+                        <input type="text" v-bind:value="host"/>
+                    </div>
+                </div>
+
+                <div class="cell-2">
+                    <p style="display: none;">Document Date: <input class="form-control" type="text" id="datepicker" size="20"></p>
 
                 </div>
-                <p style="margin-top: 1em; font-size: .8em; text-align: right;"> 
-                    Powered by <a href="https://brat.nlplab.org/embed.html" target="_blank">brat</a>. 
-                </p>
+                <div class="cell-2">
+                    <button id="btn-upload-and-test" class="button primary" onclick="fm_chfila.upload_and_test();" text="Test Ruleset">
+                        Test Ruleset
+                    </button>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="cell">
+                    <div id="fig_bratvis">
+    
+                    </div>
+                    <p style="margin-top: 1em; font-size: .8em; text-align: right;"> 
+                        Powered by <a href="https://brat.nlplab.org/embed.html" target="_blank">brat</a>. 
+                    </p>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- /#infobox-upload-and-test -->
-
-
-<div id="fm_chfila">
+    <!-- /#infobox-upload-and-test -->
 
     <div id="infobox-select-project-rulepack" class="info-box" data-role="infobox">
         <span class="button square closer"></span>
@@ -1026,6 +1066,8 @@ html, body {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.8.36/dayjs.min.js"></script>
 <!-- brat -->
 <script src="./static/lib/brat/lib/head.load.min.js"></script>
+<!-- js cookie -->
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
 
 <script>
 
@@ -1035,21 +1077,14 @@ var fm_chfila = {
     rulepack: null,
 
     hosts: {
-        localtest: {
-            name: 'Localhost Test Server',
-            host: 'http://localhost:8080'
-        },
-        ohnlp4covid_dev: {
+        default: {
             name: 'OHNLP COVID Dev Server',
             host: 'https://ohnlp4covid-dev.n3c.ncats.io'
         },
-        ohnlp_az_dev: {
-            name: 'OHNLP Azure Server',
-            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
-        },
-        current: {
-            name: 'Current UI Server',
-            host: ''
+
+        localtest: {
+            name: 'Localhost Test Server',
+            host: 'http://localhost:8080'
         }
     },
 
@@ -1066,11 +1101,23 @@ var fm_chfila = {
         ie_editor_test: '/ie_editor_test'
     },
 
-    get_url: function(url, host) {
+    get_full_url: function(url, host) {
+        var base = '';
         if (typeof(host) == 'undefined') {
-            host = 'localtest';
+            base = this.hosts.default.host;
+        } else {
+            if (this.hosts.hasOwnProperty(host)) {
+                base = this.hosts[host].host;
+            }
         }
-        return this.hosts[host].host + url;
+        // use the vpp host
+        base = this.vpp.$data.host;
+
+        // cache this base
+        // Cookies.set('test-server-base', base);
+        
+        // use the base to get url
+        return base + url;
     },
 
     rp: {
@@ -1127,7 +1174,8 @@ var fm_chfila = {
 
     init: function () {
         // update the current host
-        this.hosts.current.host = location.protocol + '//' + location.hostname;
+        // this.hosts.current.host = location.protocol + '//' + location.hostname;
+        
 
         // init the vpp
         this.vpp = new Vue({
@@ -1153,12 +1201,21 @@ var fm_chfila = {
                     mode: 'easy',
                     enable_context: false,
                 },
+
+                // for select the server
+                hosts: this.hosts,
+                host: this.hosts.default.host,
                 
                 // simple rulecard
                 easypack: fm_chfila.create_new_easypack()
             },
 
             methods: {
+                on_change_select_host: function(event) {
+                    console.log(event.target.value);
+
+                    this.host = event.target.value;
+                },
 
                 ///////////////////////////////////////////////////////////////
                 // Ribbon menu functions
@@ -1868,7 +1925,7 @@ var fm_chfila = {
         var rulepack = JSON.stringify(this.get_current_rulepack());
 
         // console.log(rulepack);
-        var url = this.get_url(this.url.ie_editor_test, 'ohnlp4covid_dev');
+        var url = this.get_full_url(this.url.ie_editor_test);
         console.log('* send request to ' + url);
 
         $.ajax({
@@ -1881,7 +1938,9 @@ var fm_chfila = {
                 doc_date: doc_date
             },
             success: function(data) {
-                $('#btn-upload-and-test').attr('disabled', null).html('Test');
+                $('#btn-upload-and-test').attr('disabled', null).html(
+                    $('#btn-upload-and-test').attr('text')
+                );
                 console.log(data);
                 if (data.success) {
                     fig_bratvis.draw(data.data);
@@ -1890,7 +1949,13 @@ var fm_chfila = {
                 }
             },
             error: function(data, textStatus, errorThrown) {
-                $('#btn-upload-and-test').attr('disabled', null).html('Test');
+                jarvis.msg(
+                    'Error! Network issue or server issue, please check the URL and try again later',
+                    'alert'
+                );
+                $('#btn-upload-and-test').attr('disabled', null).html(
+                    $('#btn-upload-and-test').attr('text')
+                );
             }
         });
     },
