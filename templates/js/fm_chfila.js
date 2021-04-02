@@ -4,21 +4,14 @@ var fm_chfila = {
     rulepack: null,
 
     hosts: {
-        localtest: {
-            name: 'Localhost Test Server',
-            host: 'http://localhost:8080'
-        },
-        ohnlp4covid_dev: {
+        default: {
             name: 'OHNLP COVID Dev Server',
             host: 'https://ohnlp4covid-dev.n3c.ncats.io'
         },
-        ohnlp_az_dev: {
-            name: 'OHNLP Azure Server',
-            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
-        },
-        current: {
-            name: 'Current UI Server',
-            host: ''
+
+        localtest: {
+            name: 'Localhost Test Server',
+            host: 'http://localhost:8080'
         }
     },
 
@@ -35,11 +28,23 @@ var fm_chfila = {
         ie_editor_test: '/ie_editor_test'
     },
 
-    get_url: function(url, host) {
+    get_full_url: function(url, host) {
+        var base = '';
         if (typeof(host) == 'undefined') {
-            host = 'localtest';
+            base = this.hosts.default.host;
+        } else {
+            if (this.hosts.hasOwnProperty(host)) {
+                base = this.hosts[host].host;
+            }
         }
-        return this.hosts[host].host + url;
+        // use the vpp host
+        base = this.vpp.$data.host;
+
+        // cache this base
+        // Cookies.set('test-server-base', base);
+        
+        // use the base to get url
+        return base + url;
     },
 
     rp: {
@@ -96,7 +101,8 @@ var fm_chfila = {
 
     init: function () {
         // update the current host
-        this.hosts.current.host = location.protocol + '//' + location.hostname;
+        // this.hosts.current.host = location.protocol + '//' + location.hostname;
+        
 
         // init the vpp
         this.vpp = new Vue({
@@ -122,12 +128,21 @@ var fm_chfila = {
                     mode: 'easy',
                     enable_context: false,
                 },
+
+                // for select the server
+                hosts: this.hosts,
+                host: this.hosts.default.host,
                 
                 // simple rulecard
                 easypack: fm_chfila.create_new_easypack()
             },
 
             methods: {
+                on_change_select_host: function(event) {
+                    console.log(event.target.value);
+
+                    this.host = event.target.value;
+                },
 
                 ///////////////////////////////////////////////////////////////
                 // Ribbon menu functions
@@ -837,7 +852,7 @@ var fm_chfila = {
         var rulepack = JSON.stringify(this.get_current_rulepack());
 
         // console.log(rulepack);
-        var url = this.get_url(this.url.ie_editor_test, 'ohnlp4covid_dev');
+        var url = this.get_full_url(this.url.ie_editor_test);
         console.log('* send request to ' + url);
 
         $.ajax({
@@ -850,7 +865,9 @@ var fm_chfila = {
                 doc_date: doc_date
             },
             success: function(data) {
-                $('#btn-upload-and-test').attr('disabled', null).html('Test');
+                $('#btn-upload-and-test').attr('disabled', null).html(
+                    $('#btn-upload-and-test').attr('text')
+                );
                 console.log(data);
                 if (data.success) {
                     fig_bratvis.draw(data.data);
@@ -859,7 +876,13 @@ var fm_chfila = {
                 }
             },
             error: function(data, textStatus, errorThrown) {
-                $('#btn-upload-and-test').attr('disabled', null).html('Test');
+                jarvis.msg(
+                    'Error! Network issue or server issue, please check the URL and try again later',
+                    'alert'
+                );
+                $('#btn-upload-and-test').attr('disabled', null).html(
+                    $('#btn-upload-and-test').attr('text')
+                );
             }
         });
     },
