@@ -82,8 +82,8 @@ html,body {
                     <div id="dropzone_dtd" class="dropzone">
                         <div v-if="has_dtd" style="margin-top: 12px; line-height: 12px;">
                             DTD: <b>{{ dtd.name }}</b><br>
-                            {{ dtd.entities.length }} Entities<br>
-                            N Relations
+                            {{ dtd.etags.length }} NC Extend Tags<br>
+                            {{ dtd.ltags.length }} Link Tags
                         </div>
                         <div v-else>
                             Drop <b>Schema DTD</b> File Here
@@ -145,27 +145,29 @@ html,body {
                     class="group">
 
                     <button class="ribbon-button"
-                        v-for="e in dtd.entities">
+                        v-for="etag in dtd.etags">
                         <span class="icon">
                             <i class="fa fa-cube"></i>
                         </span>
-                        <span class="caption">{{ e }}</span>
+                        <span class="caption">{{ etag.name }}</span>
                     </button>
 
-                    <span class="title">Entities</span>
+                    <span class="title">Extend Tags</span>
                 </div>
                 
 
-                <div class="group">
+                <div v-if="has_dtd" 
+                    class="group">
 
-                    <button class="ribbon-button">
+                    <button class="ribbon-button"
+                        v-for="ltag in dtd.ltags">
                         <span class="icon">
                             <i class="fa fa-link"></i>
                         </span>
-                        <span class="caption">R1</span>
+                        <span class="caption">{{ ltag.name }}</span>
                     </button>
 
-                    <span class="title">Relations</span>
+                    <span class="title">Link Tags</span>
                 </div>
 
             </div>

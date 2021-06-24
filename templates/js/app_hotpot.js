@@ -53,9 +53,9 @@ var app_hotpot = {
      * }
      */
     set_dtd: function(dtd) {
+        console.log('* set dtd', dtd);
         this.vpp.$data.has_dtd = true;
         this.vpp.$data.dtd = dtd;
-        console.log('* set dtd', dtd);
     },
 
     bind_dropzone_dtd: function() {
@@ -108,7 +108,7 @@ var app_hotpot = {
             var dtd = dtd_parser.parse(text);
             
             // ok, set the dtd for annotator
-            
+            app_hotpot.set_dtd(dtd);
         });
     },
 
