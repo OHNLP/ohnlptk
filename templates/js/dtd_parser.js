@@ -2,8 +2,10 @@ var dtd_parser = {
     regex: {
         entity: /\<\!ENTITY\ name\ "([a-zA-Z\-0-9\_]+)"\>/gmi,
         element: /^\<\!ELEMENT\s+([a-zA-Z\-0-9\_]+)\s((\([#A-Z\ ]+\))|(EMPTY))/gmi,
-        attlist_etag: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([a-zA-Z0-9\_]+)\s+((\([\ a-zA-Z0-9\|\-\_]+\))|(CDATA)){0,1}\s+(\#IMPLIED.+){0,1}/gmi,
-        attlist_ltag: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([arg0-9]+)\s+(IDREF)\s+(prefix="[a-zA-Z0-9\_]+")\s(#[A-Z]+)/gmi
+        cdataset_attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([a-zA-Z0-9\_]+)\s+((\([\ a-zA-Z0-9\|\-\_]+\))|(CDATA)){0,1}\s+(\#IMPLIED.+){0,1}/gmi,
+        idref_attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([arg0-9]+)\s+(IDREF)\s+(prefix="[a-zA-Z0-9\_]+")\s(#[A-Z]+)/gmi,
+        id_attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s(id)\s+(ID)\s+(prefix="[a-zA-Z0-9\_]+")\s(#[A-Z]+){0,1}/gmi,
+        spans_attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s(spans)\s(#[A-Z]+){0,1}/gmi
     },
 
     parse: function(text) {
@@ -16,12 +18,12 @@ var dtd_parser = {
         console.log('* found elements:', elements);
 
         // get the attlists
-        var etag_attlists = this.get_etag_attlists(text);
-        console.log('* found etag_attlists:', etag_attlists);
+        var cdataset_attlists = this.get_cdataset_attlists(text);
+        console.log('* found cdataset_attlists:', cdataset_attlists);
 
-        // update etags
-        for (let i = 0; i < etag_attlists.length; i++) {
-            var attlist = etag_attlists[i];
+        // update etags with found cdataset attlists
+        for (let i = 0; i < cdataset_attlists.length; i++) {
+            var attlist = cdataset_attlists[i];
             for (let j = 0; j < elements.length; j++) {
                 if (elements[j].name == attlist.element) {
                     elements[j].attlists.push(attlist);
@@ -29,6 +31,10 @@ var dtd_parser = {
                 }
             }
         }
+
+        // update etags with found id tags
+
+        // summary the etags
         var etags = [];
         for (let i = 0; i < elements.length; i++) {
             if (elements[i].type == 'etag') {
@@ -54,10 +60,10 @@ var dtd_parser = {
         return dtd;
     },
 
-    get_ltag_attlists: function(text) {
+    get_idref_attlists: function(text) {
         let m;
         var ret = [];
-        let regex = this.regex.attlist_ltag;
+        let regex = this.regex.idref_attlist;
 
         while ((m = regex.exec(text)) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
@@ -133,10 +139,10 @@ var dtd_parser = {
         return ret;
     },
 
-    get_etag_attlists: function(text) {
+    get_cdataset_attlists: function(text) {
         let m;
         var ret = [];
-        let regex = this.regex.attlist_etag;
+        let regex = this.regex.cdataset_attlist;
 
         while ((m = regex.exec(text)) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
@@ -253,6 +259,8 @@ var dtd_parser = {
             var element = {
                 name: '',
                 type: '',
+                id_prefix: '',
+                is_non_consuming: false,
                 attlists: []
             };
             // The result can be accessed through the `m`-variable.
