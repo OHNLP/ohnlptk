@@ -242,8 +242,11 @@ if (isIE) {
 
 <script>
 
-{% include 'js/app_hotpot.js' %}
+// The DTD parser
+{% include 'js/dtd_parser.js' %}
 
+// The Vue APP
+{% include 'js/app_hotpot.js' %}
 
 var jarvis = {
     init: function() {

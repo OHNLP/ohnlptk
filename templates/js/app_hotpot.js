@@ -4,10 +4,7 @@ var app_hotpot = {
 
     dtd: {
         def: null,
-        regex: {
-            entity: /\<\!ENTITY\ name\ "([a-zA-Z\-0-9\_]+)"\>/gmi,
-            element: /^\<\!ELEMENT\s+([a-zA-Z\-0-9\_]+)\s/gmi
-        }
+        
     },
 
     vpp_data: {
@@ -102,70 +99,16 @@ var app_hotpot = {
         }, false);
     },
 
-    get_entity: function(text) {
-        let m;
-        var ret = '';
-        let regex = this.dtd.regex.entity;
-
-        while ((m = regex.exec(text)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
-            if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
-            }
-            
-            // The result can be accessed through the `m`-variable.
-            m.forEach((match, groupIndex) => {
-                console.log(`Found match, group ${groupIndex}: ${match}`);
-                ret = match;
-            });
-        }
-
-        return ret;
-    },
-
-    get_elements: function(text) {
-        let m;
-        var ret = [];
-        let regex = this.dtd.regex.element;
-
-        while ((m = regex.exec(text)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
-            if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
-            }
-            
-            // The result can be accessed through the `m`-variable.
-            m.forEach((match, groupIndex) => {
-                console.log(`Found match, group ${groupIndex}: ${match}`);
-                // group 0 is the leading text
-                if (groupIndex == 1) {
-                    ret.push(match);
-                }
-            });
-        }
-
-        return ret;
-
-    },
-
     parse_drop_dtd: function(fileEntry) {
         app_hotpot.read_file_async(fileEntry, function(evt) {
             var text = evt.target.result;
-            // console.log('* read dtd', text);
+            console.log('* read dtd', text);
 
-            // get the entity of dtd
-            var entity = app_hotpot.get_entity(text);
-            console.log('* found entity:', entity);
-
-            // get the elements of dtd
-            var entities = app_hotpot.get_elements(text);
-            console.log('* found entities:', entities);
-
+            // try to parse this dtd file
+            var dtd = dtd_parser.parse(text);
+            
             // ok, set the dtd for annotator
-            app_hotpot.set_dtd({
-                name: entity,
-                entities: entities
-            });
+            
         });
     },
 
