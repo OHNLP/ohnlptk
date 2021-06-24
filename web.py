@@ -40,10 +40,22 @@ def dt_builder():
     return render_template('dt_builder.html')
 
 
+@app.route('/annotator')
+@app.route('/annotator.html')
+def annotator():
+    return render_template('annotator.html')
+
+
 @app.route('/test_ie_editor')
 @app.route('/test_ie_editor.html')
 def test_ie_editor():
     return render_template('ie_editor.html')
+
+
+@app.route('/brat_demo')
+@app.route('/brat_demo.html')
+def brat_demo():
+    return render_template('brat_demo.html')
 
 
 def build():

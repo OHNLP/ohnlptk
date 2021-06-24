@@ -1,0 +1,293 @@
+{% extends '_layout.html' %}
+
+{% block title %}
+Annotator
+{% endblock %}
+
+{% block style %}
+<!-- jquery UI style -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+
+<meta name="metro4:init" content="false">
+
+<style>
+{% include 'css/box.css' %}
+
+html,body {
+    overflow: hidden;
+}
+
+#app_hotpot {
+    margin-top: 70px;
+}
+
+.dropzone:hover {
+  border-color: rgb(0, 89, 255);
+  font-weight: bold;
+}
+#dropzone_dtd {
+    width: 200px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    font-size: 12px;
+    border: 1px dotted rgb(17, 61, 110);
+    border-radius: 4px;
+}
+
+#dropzone_raw {
+    width: 200px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    font-size: 12px;
+    border: 1px dotted rgb(17, 61, 110);
+    border-radius: 4px;
+}
+</style>
+{% endblock %}
+
+{% block main %}
+
+<div id="start-screen">
+    <h1>
+        <i class="fa fa-highlighter"></i>
+        Annotator
+    </h1>
+    <div id="ss-msg">Loading data and initializing GUI ...</div>
+</div>
+
+<div id="app_hotpot">
+
+    <div class="container-fluid bg-cyan fg-white mb-1">
+        <div class="row">
+            <div class="cell">
+                <i class="fa fa-code"></i>
+                Annotator
+            </div>
+        </div>
+    </div>
+
+    <nav data-role="ribbonmenu">
+        <ul class="tabs-holder">
+            <li><a href="#section-1-1">Files</a></li>
+            <li><a href="#section-1-2">Schema</a></li>
+        </ul>
+
+        <div class="content-holder">
+            <div class="section" id="section-1-1">
+
+                <div class="group">
+
+                    <div id="dropzone_dtd" class="dropzone">
+                        <div v-if="has_dtd" style="margin-top: 12px; line-height: 12px;">
+                            DTD: <b>{{ dtd.name }}</b><br>
+                            {{ dtd.entities.length }} Entities<br>
+                            N Relations
+                        </div>
+                        <div v-else>
+                            Drop <b>Schema DTD</b> File Here
+                        </div>
+                    </div>
+
+                    <!-- <button class="ribbon-button" 
+                        v-on:click="open_select_remote_dialog">
+                        <span class="icon">
+                            <i class="fa fa-mixcloud"></i>
+                        </span>
+                        <span class="caption">Remote</span>
+                    </button> -->
+
+                    <span class="title">Schema File</span>
+                </div>
+
+                <div class="group">
+
+                    <div id="dropzone_raw" class="dropzone">
+                        Drop <b>Text</b> File(s) Here (txt / xml)
+                    </div>
+
+                    <span class="title">Text File(s)</span>
+                </div>
+
+                <div class="group">
+                    <button class="ribbon-button"
+                        v-on:click="download_xml">
+                        <span class="icon">
+                            <i class="fa fa-file-code"></i>
+                        </span>
+                        <span class="caption">XML File(s)</span>
+                    </button>
+                    <a id="downloadAnchorElem" style="display:none"></a>
+
+                    <span class="title">Download</span>
+                </div>
+
+                <div class="group">
+
+                    <button class="ribbon-button" 
+                        v-on:click="show_about">
+                        <span class="icon">
+                            <i class="fa fa-book"></i>
+                        </span>
+                        <span class="caption">About</span>
+                    </button>
+
+                    <span class="title">Help</span>
+                </div>
+
+            </div>
+
+
+            <div class="section" id="section-1-2">
+
+                <div v-if="has_dtd" 
+                    class="group">
+
+                    <button class="ribbon-button"
+                        v-for="e in dtd.entities">
+                        <span class="icon">
+                            <i class="fa fa-cube"></i>
+                        </span>
+                        <span class="caption">{{ e }}</span>
+                    </button>
+
+                    <span class="title">Entities</span>
+                </div>
+                
+
+                <div class="group">
+
+                    <button class="ribbon-button">
+                        <span class="icon">
+                            <i class="fa fa-link"></i>
+                        </span>
+                        <span class="caption">R1</span>
+                    </button>
+
+                    <span class="title">Relations</span>
+                </div>
+
+            </div>
+        </div>
+
+    </nav>
+
+    <div id="main_ui" class="container-fluid" style="height: 200px;">
+        <div class="row h-100">
+            <div class="cell d-flex flex-row">
+                
+                <div data-role="splitter" class="w-100 h-100" 
+                    data-split-sizes="20,80"
+                    data-min-sizes="240,460">
+                    <div class="d-flex flex-justify-center flex-align-center">
+
+                    </div>
+
+                    <div data-role="splitter" data-split-mode="vertical" 
+                        data-split-sizes="80,20"
+                        data-min-sizes="200,200">
+                        <div class="d-flex flex-justify-center flex-align-center">
+
+                        </div>
+
+                        <div id="mui_annlist" class="d-flex flex-justify-center flex-align-center w-100 h-100">
+                            <table class="w-100">
+                                <thead>
+                                    <tr>
+                                        <th>TYPE</th>
+                                        <th>ID</th>
+                                        <th>SPANS</th>
+                                        <th>TEXT</th>
+                                    </tr>
+                                </thead>
+                                <tbody v-if="has_dtd" style="overflow-y: auto;">
+                                    <tr v-for="e in dtd.entities">
+                                        <td>{{ e }}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+var isIE = /*@cc_on!@*/false || !!document.documentMode;
+if (isIE) {
+    document.getElementById('ss-msg').innerHTML = 'The visualization used in this website require advanced web technologies, which are <b>NOT</b> supported by Internet Explorer.<br>Try using Google Chrome, Apple Safari, Mozilla Firefox or other modern browsers to access:<br><span style="font-size:1.2em;">' + location.href + '</span>';
+}
+</script>
+
+<!-- jszip -->
+<script src="https://stuk.github.io/jszip/dist/jszip.js"></script>
+<!-- filesaver -->
+<script src="./static/lib/filesaver/FileSaver.js"></script>
+<!-- dayjs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.8.36/dayjs.min.js"></script>
+<!-- brat -->
+<script src="./static/lib/brat/lib/head.load.min.js"></script>
+<!-- js cookie -->
+<script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+
+<script>
+
+{% include 'js/app_hotpot.js' %}
+
+
+var jarvis = {
+    init: function() {
+        // too bad ...
+        if (isIE) { return 0; }
+
+        app_hotpot.init();
+
+        jarvis.ssmsg('Initializated')
+        setTimeout('jarvis.ssclose();', 500);
+
+        $(window).resize(function() {
+            app_hotpot.resize();
+        });
+    },
+
+    msg: function(s, cls) {
+        if (typeof(cls) == 'undefined') {
+            cls = 'info';
+        }
+        s = '<i class="fa fa-info-circle"></i> ' + s; 
+        var notify = Metro.notify;
+        notify.setup({
+            width: 300,
+            timeout: 8000,
+            animation: 'swing'
+        });
+        notify.create(s, null, { 
+            cls: cls
+        });
+    },
+
+    ssmsg: function(msg) {
+        $('#ss-msg').html(msg);
+    },
+
+    ssclose: function() {
+        $('#start-screen').hide();
+    },
+}
+
+
+$(document).ready(function () {
+    jarvis.init();
+})
+</script>
+{% endblock %}

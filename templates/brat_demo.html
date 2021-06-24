@@ -1,0 +1,333 @@
+{% extends '_layout.html' %}
+
+{% block title %}
+Brat Demo
+{% endblock %}
+
+{% block style %}
+<!-- jquery ui style -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+<!-- Brat style -->
+<link rel="stylesheet" type="text/css" href="./static/lib/brat/css/style.css"/>
+
+<style>
+/* fix vuetify.js default style */
+.v-treeview--dense .v-treeview-node__root {
+    min-height: 24px;
+}
+
+.container {
+    padding: 0;
+}
+
+/* for brat visualization */
+#fig_bratvis {
+    width: 100%;
+    min-width: 500px;
+    min-height: 280px;
+}
+.brat-vis {
+    width: 100%;
+    min-width: 500px;
+    min-height: 280px;
+}
+#fig_bratvis svg {
+    border: 1px solid #efefef;
+}
+
+/* for this page */
+.pre-output {
+    font-size: 10px;
+    line-height: 12px;
+    max-height: 200px;
+    height: 280px;
+    border: 1px solid #dddddd;
+    overflow-y: auto;
+    padding: 5px;
+    background: #eeeeee;
+}
+</style>
+{% endblock %}
+
+{% block main %}
+
+<div class="container">
+    <div class="container-fluid" style="margin-top: 70px; height: calc(100% - 70px);">
+
+        <div class="row">
+
+            <div class="col-md-5">
+                <h5 class="mt-2">Input Text
+                    <small>Maximum length: 3,000 characters</small>
+                </h5>
+                <div class="form-group">
+                    <textarea id="text" maxlength="3000" width="100%" class="form-control" rows="10">The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago.</textarea>
+                </div>
+                <div class="form-group form-inline">
+                    <p>Document Date: <input class="form-control" type="text" id="datepicker" size="30"></p>
+                    <p>
+                        <button id="btn-parse" class="btn btn-primary btn-sm" onclick="jarvis.parse();">
+                            <i class="fa fa-pencil-alt"></i>
+                            Parse the text
+                        </button>
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="col-md-7">
+
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="vis-tab" data-toggle="tab" href="#output_tab_vis" role="tab" aria-controls="output_tab_vis" aria-selected="true">Visualization</a>
+                    </li>
+                    <!-- <li class="nav-item">
+                        <a class="nav-link" id="func1-tab" data-toggle="tab" href="#output_tab_func1" role="tab" aria-controls="output_tab_func1" aria-selected="false">Funtion X</a>
+                    </li> -->
+                    <li class="nav-item">
+                        <a class="nav-link" id="raw-tab" data-toggle="tab" href="#output_tab_rawoutput" role="tab" aria-controls="output_tab_rawoutput" aria-selected="false">Raw Output</a>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="output_tab_vis" role="tabpanel" aria-labelledby="vis-tab">
+                        <p class="mt-2">Brat visualization</p>
+                        <div id="fig_bratvis">
+
+                        </div>
+                        <p class="mt-2"> Powered by <a href="https://brat.nlplab.org/embed.html" target="_blank">brat</a>. </p>
+
+                    </div>
+                    
+                    <div class="tab-pane fade" id="output_tab_func1" role="tabpanel" aria-labelledby="func1-tab">
+                        <p class="mt-2">Other output content</p>
+                        <pre id="output_func1" class="pre-output"></pre>
+                    </div>
+
+                    <div class="tab-pane fade" id="output_tab_rawoutput" role="tabpanel" aria-labelledby="raw-tab">
+                        <p id="output-msg" class="mt-2">JSON response:</p>
+                        <pre id="output_json" class="pre-output"></pre>
+                    </div>
+                </div>
+                
+            </div>
+
+        </div>
+        <!-- /.row -->
+
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Concept/Term List</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul>
+                            <li>Dry cough</li>
+                            <li>Fever</li>
+                            <li>Lymphopenia</li>
+                            <li>Sore Throat</li>
+                            <li>Ground Flass Infiltrates</li>
+                            <li>Elevated LDH</li>
+                            <li>Diarrhea</li>
+                            <li>Nasal Congestion</li>
+                            <li>Loss of Appetite</li>
+                        </ul>
+                        <a class="btn btn-secondary"
+                            href="https://github.com/OHNLP/MedTagger/tree/master/src/main/resources/medtaggerieresources/covid19"
+                            target="_blank" role="button">Ruleset »</a>
+                    </div>
+                    <div class="col-md-6">
+                        <ul>
+                            <li>Fatigue</li>
+                            <li>Dyspnea</li>
+                            <li>Headache</li>
+                            <li>Myalgia</li>
+                            <li>Abdominal Pain</li>
+                            <li>Patchy Infiltrates</li>
+                            <li>Elevated PT Time</li>
+                            <li>Influenza</li>
+                        </ul>
+
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <h4>COVID-19 Severe Case </h4>
+                <p>To identify people at higher risk for severe illness using structured
+                    and unstructured data according to the
+                    <a href="https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-at-higher-risk.html"
+                        target="_blank">CDC guideline</a>.</p>
+                <p><a class="btn btn-secondary"
+                        href="https://github.com/OHNLP/N3C-NLP-Documentation/wiki" target="_blank" role="button">Wiki
+                    »</a></p>
+            </div>
+        </div>
+
+        <footer class="my-5 pt-5 text-muted text-center text-small">
+            <p class="mb-1">&copy; 2020 Open Health Natural Language Processing (OHNLP) Consortium</p>
+            <ul class="list-inline">
+                <li class="list-inline-item"><a href="http://184.73.168.219/index.php/OHNLP:Privacy_policy">Privacy</a>
+                </li>
+                <li class="list-inline-item"><a
+                        href="http://184.73.168.219/index.php/OHNLP:General_disclaimer">Disclaimers</a></li>
+                <li class="list-inline-item"><a href="https://github.com/OHNLP/MedTagger/issues">Support</a></li>
+                <li class="list-inline-item"><a href="http://ohnlp.org/">About</a></li>
+            </ul>
+        </footer>
+
+    </div>
+
+
+    <div id="toastmsg" class="toast" data-delay="8000" style="position: absolute; top: 20px; right: 20px;">
+        <div class="toast-header">
+            <i class="fa fa-info-circle"></i>&nbsp;&nbsp;
+            <strong class="mr-auto">System Message</strong>
+            <!-- <small>11 mins ago</small> -->
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div id="toastmsg-body" class="toast-body">
+            &nbsp;
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<!-- dayjs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.8.36/dayjs.min.js"></script>
+<!-- brat -->
+<script src="./static/lib/brat/lib/head.load.min.js"></script>
+
+<script>
+
+{% include 'js/fm_chfila.js' %}
+{% include 'js/fig_bratvis.js' %}
+
+
+var jarvis = {
+    init: function() {
+        fig_bratvis.init();
+
+        $( "#datepicker" ).datepicker({
+            dateFormat: 'yy-mm-dd'
+        }).datepicker('setDate', new Date());
+    },
+
+    hosts: {
+        localtest: {
+            name: 'Localhost Test Server',
+            host: 'http://localhost:8080'
+        },
+        ohnlp4covid_dev: {
+            name: 'OHNLP COVID Dev Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        ohnlp_az_dev: {
+            name: 'OHNLP Azure Server',
+            host: 'https://ohnlp4covid-dev.n3c.ncats.io'
+        },
+        current: {
+            name: 'Current UI Server',
+            host: ''
+        }
+    },
+
+    url: {
+        parse: '/parse',
+    },
+
+    get_url: function(url, host) {
+        if (typeof(host) == 'undefined') {
+            host = 'ohnlp4covid_dev';
+        }
+        return this.hosts[host].host + url;
+    },
+
+    msg: function(s, cls) {
+        if (typeof(cls) == 'undefined') {
+            cls = 'info';
+        }
+        s = '<i class="fa fa-info-circle"></i> ' + s; 
+        var notify = Metro.notify;
+        notify.setup({
+            width: 300,
+            timeout: 8000,
+            animation: 'swing'
+        });
+        notify.create(s, null, { 
+            cls: cls
+        });
+    },
+    
+    parse: function () {
+        // get the text of the doc
+        var doc_text = $('#text').val().trim();
+        if (doc_text == '') {
+            return
+        }
+
+        // get the date of the doc
+        var doc_date = $('#datepicker').val().trim();
+
+        // clear the output
+        $('#output-json').html('');
+
+        // show animation
+        $('#btn-parse').attr('disabled', 'disabled');
+        $('#btn-parse').html('<i class="fas fa-spinner fa-pulse"></i> Parsing ...');
+
+        // send to backend
+        $.ajax({
+            url: this.get_url(this.url.parse),
+            type: 'post',
+            data: {
+                doc_text: doc_text, 
+                doc_date: doc_date
+            },
+            dataType: 'json',
+            timeout: 3 * 60 * 1000,
+            success: function (data) {
+                $('#btn-parse').attr('disabled', null).html('<i class="fa fa-pencil-alt"></i> Parse the text');
+                console.log(data);
+                jarvis.msg('The request text is parsed successfully.');
+
+                if (data.success) {
+                    jarvis.show(data);
+                } else {
+                    $('#output_json').html(data.msg);
+                }
+            },
+            error: function(data, textStatus, errorThrown) {
+                $('#btn-parse').attr('disabled', null).html('<i class="fa fa-pencil-alt"></i> Parse the text');
+                jarvis.msg('System error or lost connection when parsing, please try later.', 'error');
+            }
+        });
+    },
+
+    show: function (data) {
+        this.data = data;
+
+        // show return json
+        $('#output_json').html(JSON.stringify(data, null, 2));
+
+        // show the Brat visualization
+        var doc_date = $('#datepicker').val();
+        if (data.data.hasOwnProperty('doc_date')) {
+            doc_date = data.data.doc_date;
+        }
+        fig_bratvis.draw(data.data, doc_date);
+
+        // show other things
+    },
+}
+
+
+$(document).ready(function () {
+    jarvis.init();
+})
+</script>
+{% endblock %}

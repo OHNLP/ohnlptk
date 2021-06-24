@@ -158,6 +158,8 @@ Ruleset Editor
 }
 .er-list {
     min-width: 220px;
+    width: 240px;
+    overflow-x: hidden;
 }
 .er-list-item {
     height: 24px;
@@ -362,10 +364,18 @@ Ruleset Editor
                     <h5>
                         Ruleset Repository
                     </h5>
-                    <p>
-                        Drop the ruleset folder or zip file to the following box.
-                    </p>
-                    
+                    <div id="isrr-loading">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <div id="isrr-main">
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
                     <button class="button primary" 
                         onclick="fm_chfila.import_ruleset_from_remote();">
                         Import Ruleset
@@ -424,13 +434,13 @@ Ruleset Editor
                         <span class="caption">Local</span>
                     </button>
 
-                    <!-- <button class="ribbon-button" 
+                    <button class="ribbon-button" 
                         v-on:click="open_select_remote_dialog">
                         <span class="icon">
-                            <i class="fa fa-cloudversify"></i>
+                            <i class="fa fa-mixcloud"></i>
                         </span>
                         <span class="caption">Remote</span>
-                    </button> -->
+                    </button>
 
                     <button class="ribbon-button"
                         v-on:click="create_pack">
@@ -478,13 +488,13 @@ Ruleset Editor
                 </div>
 
                 <div class="group">
-                    <!-- <button class="ribbon-button"
+                    <button class="ribbon-button"
                         v-on:click="download_pack">
                         <span class="icon">
                             <i class="fa fa-file-code"></i>
                         </span>
                         <span class="caption">As JSON</span>
-                    </button> -->
+                    </button>
                     <a id="downloadAnchorElem" style="display:none"></a>
 
                     <button class="ribbon-button"

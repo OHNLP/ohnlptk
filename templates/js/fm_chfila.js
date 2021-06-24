@@ -19,6 +19,8 @@ var fm_chfila = {
         sample: './static/data/covid19.json'
     },
 
+    remote_ruleset_menu_url: 'https://raw.githubusercontent.com/OHNLP/covid19ruleset/main/dist/menu.json',
+
     url: {
         parse: '/parse',
         get_rulepack_list: '/get_rulepack_list',
@@ -506,7 +508,11 @@ var fm_chfila = {
         easypack.ergroups = [];
         
         // now update the easy part
-        easypack.contexts = rulepack.contexts;
+        if (rulepack.hasOwnProperty('contexts')) {
+            easypack.contexts = rulepack.contexts;
+        } else {
+            easypack.contexts = [];
+        }
 
         // convert to ergroups
         // so, basically, the converting is from the matchrules to ergroup
@@ -758,6 +764,21 @@ var fm_chfila = {
 
     open_select_remote_dialog: function() {
         Metro.infobox.open('#infobox-select-remote-rulepack');
+        // show loading
+        $('#isrr-main').hide();
+        $('#isrr-loading').show();
+
+        // load menu from server
+        $.get(
+            fm_chfila.remote_ruleset_menu_url,
+            { rnd: Math.random() },
+            function(data) {
+                console.log(data);
+                
+                // show some messgae
+                jarvis.msg('Loaded latest list [' + data.last_update + '].');
+            }, 'json'
+        );
     },
 
     open_rulepack: function(rulepack_id) {
