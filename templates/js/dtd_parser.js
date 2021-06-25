@@ -1,63 +1,69 @@
 var dtd_parser = {
     regex: {
         entity: /\<\!ENTITY\ name\ "([a-zA-Z\-0-9\_]+)"\>/gmi,
-        element: /^\<\!ELEMENT\s+([a-zA-Z\-0-9\_]+)\s((\([#A-Z\ ]+\))|(EMPTY))/gmi,
-        cdataset_attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([a-zA-Z0-9\_]+)\s+((\([\ a-zA-Z0-9\|\-\_]+\))|(CDATA)){0,1}\s+(\#IMPLIED.+){0,1}/gmi,
-        idref_attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([arg0-9]+)\s+(IDREF)\s+(prefix="[a-zA-Z0-9\_]+")\s(#[A-Z]+)/gmi,
-        id_attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s(id)\s+(ID)\s+(prefix="[a-zA-Z0-9\_]+")\s(#[A-Z]+){0,1}/gmi,
-        spans_attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s(spans)\s(#[A-Z]+){0,1}/gmi
+        element: /^\<\!ELEMENT\s+([a-zA-Z\-0-9\_]+)\s.+/gmi,
+        attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([a-zA-Z0-9\_]+)\s+/gmi,
     },
 
     parse: function(text) {
-        // get the entity of dtd
-        var entity = this.get_entity(text);
-        console.log('* found entity:', entity);
-
-        // get the elements of dtd
-        var elements = this.get_elements(text);
-        console.log('* found elements:', elements);
-
-        // get the attlists
-        var cdataset_attlists = this.get_cdataset_attlists(text);
-        console.log('* found cdataset_attlists:', cdataset_attlists);
-
-        // update etags with found cdataset attlists
-        for (let i = 0; i < cdataset_attlists.length; i++) {
-            var attlist = cdataset_attlists[i];
-            for (let j = 0; j < elements.length; j++) {
-                if (elements[j].name == attlist.element) {
-                    elements[j].attlists.push(attlist);
-                    break;
-                }
-            }
-        }
-
-        // update etags with found id tags
-
-        // summary the etags
-        var etags = [];
-        for (let i = 0; i < elements.length; i++) {
-            if (elements[i].type == 'etag') {
-                etags.push(elements[i]);
-            }
-        }
-
-        // update ltags
-        var ltags = [];
-        for (let i = 0; i < elements.length; i++) {
-            if (elements[i].type == 'ltag') {
-                ltags.push(elements[i]);
-            }
-        }
+        var lines = text.split('\n');
 
         var dtd = {
-            name: entity,
-            elements: elements,
-            etags: etags,
-            ltags: ltags
+            id_prefixd: {},
+            name: '',
+            etags: [],
+            ltags: []
         };
 
+        for (let l = 0; l < lines.length; l++) {
+            const line = lines[l];
+            
+            // check this line
+            var ret = this.parse_line(line);
+
+            if (ret == null) {
+                // nothing happens
+                continue;
+
+            } else if (ret.type == 'entity') {
+                dtd.name = ret.name;
+
+            } else if (ret.type == 'etag') {
+                // check the id
+                if (dtd.id_prefixd.hasOwnProperty(ret.id_prefix)) {
+                    ret.id_prefix = this.get_next_id_prefix(ret);
+                }
+                dtd.id_prefixd[ret.id_prefix] = ret;
+                dtd.etags.push(ret);
+
+            } else if (ret.type == 'ltag') {
+                // check the id
+                if (dtd.id_prefixd.hasOwnProperty(ret.id_prefix)) {
+                    ret.id_prefix = this.get_next_id_prefix(ret);
+                }
+                dtd.id_prefixd[ret.id_prefix] = ret;
+                dtd.ltags.push(ret);
+
+            } else {
+                // what???
+            }
+        }
+
         return dtd;
+    },
+
+    parse_line: function(line) {
+        var obj = null;
+        var ret = null;
+
+        // try entity
+        ret = this.get_entity(line);
+        if (ret != null) { return ret; }
+
+        // try element
+        ret = this.get_element(line);
+
+        return ret;
     },
 
     get_idref_attlists: function(text) {
@@ -227,7 +233,7 @@ var dtd_parser = {
 
     get_entity: function(text) {
         let m;
-        var ret = '';
+        var ret = null;
         let regex = this.regex.entity;
 
         while ((m = regex.exec(text)) !== null) {
@@ -239,51 +245,62 @@ var dtd_parser = {
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
                 console.log(`Found entity match, group ${groupIndex}: ${match}`);
-                ret = match;
+                ret = {
+                    name: match,
+                    type: 'entity'
+                };
             });
         }
 
         return ret;
     },
 
-    get_elements: function(text) {
+    get_element: function(line) {
         let m;
-        var ret = [];
+        var ret = null;
         let regex = this.regex.element;
 
-        while ((m = regex.exec(text)) !== null) {
+        while ((m = regex.exec(line)) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
             if (m.index === regex.lastIndex) {
                 regex.lastIndex++;
             }
             var element = {
                 name: '',
-                type: '',
+                type: 'etag',
                 id_prefix: '',
                 is_non_consuming: false,
                 attlists: []
             };
+
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
                 console.log(`Found element match, group ${groupIndex}: ${match}`);
-                // group 0 is the leading text
+                // group 0 is the leading line
                 if (groupIndex == 1) {
                     element.name = match;
-
-                } else if (groupIndex == 2) {
-                    // which means it is the type of this element
-                    if (match == 'EMPTY') {
-                        element.type = 'ltag';
-                    } else {
-                        element.type = 'etag';
-                    }
-                }
+                    element.id_prefix = match.substring(0, 1);
+                } 
             });
+        
+            // check the element type
+            if (line.lastIndexOf('EMPTY')>=0) {
+                element.type = 'ltag';
+            }
 
-            ret.push(element);
+            ret = element;
         }
 
         return ret;
 
     },
+
+    get_next_id_prefix: function(element) {
+        var ret = element.name.substring(
+            0,
+            element.id_prefix.length + 1
+        );
+
+        return ret;
+    }
 };

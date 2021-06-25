@@ -102,7 +102,7 @@ var app_hotpot = {
     parse_drop_dtd: function(fileEntry) {
         app_hotpot.read_file_async(fileEntry, function(evt) {
             var text = evt.target.result;
-            console.log('* read dtd', text);
+            // console.log('* read dtd', text);
 
             // try to parse this dtd file
             var dtd = dtd_parser.parse(text);
