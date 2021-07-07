@@ -3,6 +3,7 @@ var dtd_parser = {
         entity: /\<\!ENTITY\ name\ "([a-zA-Z\-0-9\_]+)"\>/gmi,
         element: /^\<\!ELEMENT\s+([a-zA-Z\-0-9\_]+)\s.+/gmi,
         attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([a-zA-Z0-9\_]+)\s+(\S+)\s/gmi,
+        attlist_values: /\(([a-zA-Z0-9\_\ \|]+)\)/gmi,
     },
 
     parse: function(text) {
@@ -11,6 +12,7 @@ var dtd_parser = {
         var dtd = {
             id_prefixd: {},
             name: '',
+            tag_dict: {},
             etags: [],
             ltags: []
         };
@@ -34,7 +36,7 @@ var dtd_parser = {
                     ret.id_prefix = this.get_next_id_prefix(ret);
                 }
                 dtd.id_prefixd[ret.id_prefix] = ret;
-                dtd.etags.push(ret);
+                dtd.tag_dict[ret.name] = ret;
 
             } else if (ret.type == 'ltag') {
                 // check the id
@@ -42,10 +44,28 @@ var dtd_parser = {
                     ret.id_prefix = this.get_next_id_prefix(ret);
                 }
                 dtd.id_prefixd[ret.id_prefix] = ret;
-                dtd.ltags.push(ret);
+                dtd.tag_dict[ret.name] = ret;
+
+            } else if (ret.type == 'attr') {
+                // put this attr to an element
+                dtd.tag_dict[ret.element].attlists.push(
+                    ret
+                );
 
             } else {
                 // what???
+            }
+        }
+
+        // split the tags
+        for (const name in dtd.tag_dict) {
+            if (Object.hasOwnProperty.call(dtd.tag_dict, name)) {
+                const element = dtd.tag_dict[name];
+                if (element.type == 'etag') {
+                    dtd.etags.push(element);
+                } else {
+                    dtd.ltags.push(element);
+                }
             }
         }
 
@@ -62,171 +82,10 @@ var dtd_parser = {
 
         // try element
         ret = this.get_element(line);
+        if (ret != null) { return ret; }
 
-        return ret;
-    },
-
-    get_idref_attlists: function(text) {
-        let m;
-        var ret = [];
-        let regex = this.regex.idref_attlist;
-
-        while ((m = regex.exec(text)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
-            if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
-            }
-            var attlist = {
-                element: '',
-                name: '',
-                type: '',
-                values: [],
-                default_value: ''
-            };
-            // The result can be accessed through the `m`-variable.
-            m.forEach((match, groupIndex) => {
-                console.log(`Found etag attlist match, group ${groupIndex}: ${match}`);
-                // group 0 is the leading text
-                if (groupIndex == 1) {
-                    // which is the element name
-                    attlist.element = match;
-
-                } else if (groupIndex == 2) {
-                    // which means it is the att of this element
-                    attlist.name = match;
-
-                } else if (groupIndex == 3) {
-                    if (match == 'CDATA') {
-                        // ok, it's just a text content
-                        attlist.type = 'text';
-                    } else if (match.lastIndexOf('(')>=0) {
-                        // this is a list
-                        attlist.type = 'list';
-
-                        // then let's parse the content
-                        var t = match.replace('(', '');
-                        t = t.replace(')', '');
-                        var ps = t.split('|');
-
-                        // ok, then we put the values into a 
-                        var vals = [];
-
-                        for (let i = 0; i < ps.length; i++) {
-                            const p = ps[i];
-                            var _p = p.trim();
-                            vals.push(_p);
-                        }
-                        // ok, done with this list item
-                        attlist.values = vals;
-
-                    } else {
-                        // ? what happens?
-                    }
-                } else if (groupIndex == 6) {
-                    // which is the default value for this attributre
-                    if (match == '') {
-                        // usually this is the CDATA attr
-                        attlist.default_value = '';
-                    } else if (match.lastIndexOf('#IMPLIED') >= 0) {
-                        // ok, we have some kind of default value
-                        var t = match.replace('#IMPLIED', '');
-                        t = t.replace(/"/g, '');
-                        t = t.trim();
-                        attlist.default_value = t;
-                    } else {
-                        // ? what happens?
-                    }
-                }
-            });
-
-            ret.push(attlist);
-        }
-
-        return ret;
-    },
-
-    get_cdataset_attlists: function(text) {
-        let m;
-        var ret = [];
-        let regex = this.regex.cdataset_attlist;
-
-        while ((m = regex.exec(text)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
-            if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
-            }
-            var attlist = {
-                element: '',
-                name: '',
-                type: '',
-                values: [],
-                default_value: ''
-            };
-            // The result can be accessed through the `m`-variable.
-            m.forEach((match, groupIndex) => {
-                console.log(`Found etag attlist match, group ${groupIndex}: ${match}`);
-                // group 0 is the leading text
-                if (groupIndex == 1) {
-                    // which is the element name
-                    attlist.element = match;
-
-                } else if (groupIndex == 2) {
-                    // which means it is the att of this element
-                    attlist.name = match;
-
-                } else if (groupIndex == 3) {
-                    if (match == 'CDATA') {
-                        // ok, it's just a text content
-                        attlist.type = 'text';
-
-                    } else if (match.lastIndexOf('(')>=0) {
-                        // this is a list
-                        attlist.type = 'list';
-
-                        // then let's parse the content
-                        var t = match.replace('(', '');
-                        t = t.replace(')', '');
-                        var ps = t.split('|');
-
-                        // ok, then we put the values into a 
-                        var vals = [];
-
-                        for (let i = 0; i < ps.length; i++) {
-                            const p = ps[i];
-                            var _p = p.trim();
-                            vals.push(_p);
-                        }
-                        // ok, done with this list item
-                        attlist.values = vals;
-
-                    } else {
-                        // ? what happens?
-                    }
-                } else if (groupIndex == 6) {
-                    // which is the default value for this attributre
-                    if (typeof(match) == 'undefined') {
-                        // what???
-
-                    } else if (match == '') {
-                        // usually this is the CDATA attr
-                        attlist.default_value = '';
-
-                    } else if (match.lastIndexOf('#IMPLIED') >= 0) {
-                        // ok, we have some kind of default value
-                        var t = match.replace('#IMPLIED', '');
-                        t = t.replace(/"/g, '');
-                        t = t.replace(/\>/g, '');
-                        t = t.trim();
-                        attlist.default_value = t;
-
-                    } else {
-                        // ? what happens?
-                    }
-                }
-            });
-
-            ret.push(attlist);
-        }
+        // try attlist
+        ret = this.get_attlist(line);
 
         return ret;
     },
@@ -300,7 +159,7 @@ var dtd_parser = {
         var ret = null;
         let regex = this.regex.attlist;
 
-        while ((m = regex.exec(text)) !== null) {
+        while ((m = regex.exec(line)) !== null) {
             // This is necessary to avoid infinite loops with zero-width matches
             if (m.index === regex.lastIndex) {
                 regex.lastIndex++;
@@ -308,74 +167,86 @@ var dtd_parser = {
             var attlist = {
                 element: '',
                 name: '',
-                type: '',
+                type: 'attr',
+                vtype: '',
                 values: [],
                 default_value: ''
             };
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
-                console.log(`Found etag attlist match, group ${groupIndex}: ${match}`);
+                console.log(`Found attlist match, group ${groupIndex}: ${match}`);
                 // group 0 is the leading text
                 if (groupIndex == 1) {
                     // which is the element name
                     attlist.element = match;
 
                 } else if (groupIndex == 2) {
-                    // which means it is the att of this element
+                    // which means it is the attr of this element
                     attlist.name = match;
+
+                    // special rule for some attrs
+                    if (match == 'spans') {
+                        // for attr `spans`, need to update the elememt
+                        attlist.vtype = 'dfix';
+                    }
 
                 } else if (groupIndex == 3) {
                     if (match == 'CDATA') {
                         // ok, it's just a text content
-                        attlist.type = 'text';
+                        attlist.vtype = 'text';
 
-                    } else if (match.lastIndexOf('(')>=0) {
+                    } else if (match == '(') {
                         // this is a list
-                        attlist.type = 'list';
+                        attlist.vtype = 'list';
 
-                        // then let's parse the content
-                        var t = match.replace('(', '');
-                        t = t.replace(')', '');
-                        var ps = t.split('|');
+                        // get the values
+                        attlist.values = this.get_attlist_values(line);
 
-                        // ok, then we put the values into a 
-                        var vals = [];
+                    } else if (match == 'IDREF') {
+                        // it's an attr for link tag
+                        attlist.vtype = 'idref';
 
-                        for (let i = 0; i < ps.length; i++) {
-                            const p = ps[i];
-                            var _p = p.trim();
-                            vals.push(_p);
-                        }
-                        // ok, done with this list item
-                        attlist.values = vals;
-
-                    } else {
-                        // ? what happens?
+                    } else if (match.startsWith('#')) {
+                        // sometimes ...
                     }
-                } else if (groupIndex == 6) {
-                    // which is the default value for this attributre
-                    if (typeof(match) == 'undefined') {
-                        // what???
-
-                    } else if (match == '') {
-                        // usually this is the CDATA attr
-                        attlist.default_value = '';
-
-                    } else if (match.lastIndexOf('#IMPLIED') >= 0) {
-                        // ok, we have some kind of default value
-                        var t = match.replace('#IMPLIED', '');
-                        t = t.replace(/"/g, '');
-                        t = t.replace(/\>/g, '');
-                        t = t.trim();
-                        attlist.default_value = t;
-
-                    } else {
-                        // ? what happens?
-                    }
+                } else {
+                    // what?
                 }
             });
 
-            ret.push(attlist);
+            ret = attlist;
+        }
+
+        return ret;
+    },
+
+    get_attlist_values: function(line) {
+        let m;
+        var ret = [];
+        let regex = this.regex.attlist_values;
+
+        while ((m = regex.exec(line)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+            var values = [];
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                console.log(`Found attlist values match, group ${groupIndex}: ${match}`);
+                // group 0 is the leading text
+                if (groupIndex == 1) {
+                    // which is the element name
+                    var ps = match.split('|');
+                    for (let i = 0; i < ps.length; i++) {
+                        const p = ps[i];
+                        var _p = p.trim();
+                        values.push(_p);
+                    }
+                } 
+            });
+
+            ret = values;
         }
 
         return ret;
