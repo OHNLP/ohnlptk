@@ -31,17 +31,25 @@ var dtd_parser = {
                 dtd.name = ret.name;
 
             } else if (ret.type == 'etag') {
-                // check the id
-                if (dtd.id_prefixd.hasOwnProperty(ret.id_prefix)) {
-                    ret.id_prefix = this.get_next_id_prefix(ret);
+                // check the id by a looping
+                while (true) {
+                    if (dtd.id_prefixd.hasOwnProperty(ret.id_prefix)) {
+                        ret.id_prefix = this.get_next_id_prefix(ret);
+                    } else {
+                        break;
+                    }
                 }
                 dtd.id_prefixd[ret.id_prefix] = ret;
                 dtd.tag_dict[ret.name] = ret;
 
             } else if (ret.type == 'ltag') {
                 // check the id
-                if (dtd.id_prefixd.hasOwnProperty(ret.id_prefix)) {
-                    ret.id_prefix = this.get_next_id_prefix(ret);
+                while (true) {
+                    if (dtd.id_prefixd.hasOwnProperty(ret.id_prefix)) {
+                        ret.id_prefix = this.get_next_id_prefix(ret);
+                    } else {
+                        break;
+                    }
                 }
                 dtd.id_prefixd[ret.id_prefix] = ret;
                 dtd.tag_dict[ret.name] = ret;

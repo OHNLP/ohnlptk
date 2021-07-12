@@ -2,14 +2,37 @@ var app_hotpot = {
     vpp: null,
     vpp_id: '#app_hotpot',
 
-    dtd: {
-        def: null,
-        
-    },
-
     vpp_data: {
         has_dtd: false,
-        dtd: null
+        dtd: null,
+        ann: null
+    },
+
+    sample: {
+        ann: {
+            fn: 'test.txt_1.xml',
+            text: 'The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago.',
+            tags: [{
+                "tag": "AMS",
+                "id": "A0",
+                "spans": "4~11",
+                "text": "patient",
+                "status": "present",
+                "experiencer": "patient",
+                "certainty": "confirmed",
+                "exclusion": "no",
+                "CAM_criteria": "A"
+            }, {
+                "tag": "Delirium",
+                "id": "D0",
+                "spans": "32~37,41~47,65~69",
+                "text": "fever ... chills ... also",
+                "status": "present",
+                "experiencer": "patient",
+                "certainty": "confirmed",
+                "exclusion": "no"
+            }]
+        }
     },
 
     vpp_methods: {
@@ -23,6 +46,7 @@ var app_hotpot = {
     },
 
     init: function() {
+        this.vpp_data.ann = this.sample.ann;
         this.vpp = new Vue({
             el: this.vpp_id,
             data: this.vpp_data,

@@ -72,6 +72,8 @@ html,body {
         <ul class="tabs-holder">
             <li><a href="#section-1-1">Files</a></li>
             <li><a href="#section-1-2">Schema</a></li>
+            <li><a href="#section-1-3">IAA</a></li>
+            <li><a href="#section-1-4">IE Ruleset</a></li>
         </ul>
 
         <div class="content-holder">
@@ -104,10 +106,10 @@ html,body {
                 <div class="group">
 
                     <div id="dropzone_raw" class="dropzone">
-                        Drop <b>Annotation</b> File(s) Here
+                        Drop <b>Annotation</b> File Here
                     </div>
 
-                    <span class="title">Annotation File(s) (txt / xml)</span>
+                    <span class="title">Annotation File (txt / xml)</span>
                 </div>
 
                 <div class="group">
@@ -116,11 +118,19 @@ html,body {
                         <span class="icon">
                             <i class="fa fa-file-code"></i>
                         </span>
-                        <span class="caption">XML File(s)</span>
+                        <span class="caption">XML File</span>
                     </button>
                     <a id="downloadAnchorElem" style="display:none"></a>
 
                     <span class="title">Download</span>
+                </div>
+
+                <div class="group">
+                    <div>
+                        <input type="radio" name="mode" data-role="radio" data-caption="Normal" checked>
+                        <input type="radio" name="mode" data-role="radio" data-caption="Discontiguous" >
+                    </div>
+                    <span class="title">Mode</span>
                 </div>
 
                 <div class="group">
@@ -138,7 +148,7 @@ html,body {
 
             </div>
 
-
+            <!-- the section for DTD schema -->
             <div class="section" id="section-1-2">
 
                 <div v-if="has_dtd" 
@@ -171,6 +181,16 @@ html,body {
                 </div>
 
             </div>
+
+            <!-- the section for IAA operations -->
+            <div class="section" id="section-1-3">
+
+            </div>
+
+            <!-- the section for IE ruleset -->
+            <div class="section" id="section-1-4">
+
+            </div>
         </div>
 
     </nav>
@@ -182,8 +202,27 @@ html,body {
                 <div data-role="splitter" class="w-100 h-100" 
                     data-split-sizes="20,80"
                     data-min-sizes="240,460">
-                    <div class="d-flex flex-justify-center flex-align-center">
 
+                    <div class="d-flex flex-justify-start flex-align-start" style="overflow-y: auto;">
+                        <ul v-if="has_dtd"
+                            class="w-100"
+                            data-role="listview"
+                            data-view="table"
+                            data-select-node="true"
+                            data-structure='{"count": true, "name": true}'>
+
+                            <li data-icon="<span class='mif-folder fg-orange'>"
+                                data-caption="All Tags"
+                                data-count="12"
+                                data-name="Video library"></li>
+
+                            <li v-for="etag in dtd.etags"
+                                data-icon="<span class='mif-folder fg-cyan'>"
+                                v-bind:data-caption="etag.name"
+                                data-count="12"
+                                data-name="My images"></li>
+
+                        </ul>
                     </div>
 
                     <div data-role="splitter" data-split-mode="vertical" 
@@ -193,22 +232,23 @@ html,body {
 
                         </div>
 
-                        <div id="mui_annlist" class="d-flex flex-justify-center flex-align-center w-100 h-100">
-                            <table class="w-100">
+                        <div id="mui_annlist" 
+                            class="d-flex flex-justify-start flex-align-start w-100 h-100">
+                            <table v-if="has_dtd" class="w-100">
                                 <thead>
                                     <tr>
-                                        <th>TYPE</th>
+                                        <th>Tag</th>
                                         <th>ID</th>
-                                        <th>SPANS</th>
-                                        <th>TEXT</th>
+                                        <th>Spans</th>
+                                        <th>Text</th>
                                     </tr>
                                 </thead>
-                                <tbody v-if="has_dtd" style="overflow-y: auto;">
-                                    <tr v-for="e in dtd.entities">
-                                        <td>{{ e }}</td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                <tbody style="overflow-y: auto;">
+                                    <tr v-for="tag in ann.tags">
+                                        <td>{{ tag.tag }}</td>
+                                        <td>{{ tag.id }}</td>
+                                        <td>{{ tag.spans }}</td>
+                                        <td>{{ tag.text }}</td>
                                     </tr>
                                 </tbody>
                             </table>
