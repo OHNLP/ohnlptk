@@ -7,12 +7,12 @@ Annotator
 {% block style %}
 <!-- jquery UI style -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
-
+<!-- code mirror style -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css" />
 <meta name="metro4:init" content="false">
 
-<style>
+<style id="app_style">
 {% include 'css/box.css' %}
-
 html,body {
     overflow: hidden;
 }
@@ -20,10 +20,16 @@ html,body {
 #app_hotpot {
     margin-top: 70px;
 }
-
 .dropzone:hover {
   border-color: rgb(0, 89, 255);
   font-weight: bold;
+}
+.disabled-zone {
+    opacity: .5;
+}
+.zone-text {
+    margin-top: 12px; 
+    line-height: 12px;
 }
 #dropzone_dtd {
     width: 200px;
@@ -34,8 +40,7 @@ html,body {
     border: 1px dotted rgb(17, 61, 110);
     border-radius: 4px;
 }
-
-#dropzone_raw {
+#dropzone_ann {
     width: 200px;
     height: 60px;
     line-height: 60px;
@@ -43,6 +48,30 @@ html,body {
     font-size: 12px;
     border: 1px dotted rgb(17, 61, 110);
     border-radius: 4px;
+}
+.mark-label {
+    border-radius: 3px;
+    padding: 1px 3px;
+    cursor: pointer;
+    border: 1px solid white;
+}
+.mark-label:hover{
+    border-color: red;
+}
+.mark-label-hover {    
+    border: 2px dotted red;
+}
+.mark-round {
+    border-radius: 8px;
+    padding: 0 1px 0 0;
+    color: black !important;
+}
+#cm_editor {
+    height: 100%;
+}
+.CodeMirror {
+    height: 100%;
+    font-size: 12px;
 }
 </style>
 {% endblock %}
@@ -82,8 +111,8 @@ html,body {
                 <div class="group">
 
                     <div id="dropzone_dtd" class="dropzone">
-                        <div v-if="has_dtd" style="margin-top: 12px; line-height: 12px;">
-                            DTD: <b>{{ dtd.name }}</b><br>
+                        <div v-if="has_dtd" class="zone-text">
+                            <b>{{ dtd.name }}</b><br>
                             {{ dtd.etags.length }} NC Extend Tags<br>
                             {{ dtd.ltags.length }} Link Tags
                         </div>
@@ -105,8 +134,16 @@ html,body {
 
                 <div class="group">
 
-                    <div id="dropzone_raw" class="dropzone">
-                        Drop <b>Annotation</b> File Here
+                    <div id="dropzone_ann" 
+                        v-bind:class="{'disabled-zone': !has_dtd, 'dropzone': has_dtd}">
+                        <div v-if="has_ann" class="zone-text">
+                            <b>{{ ann.fn }}</b><br>
+                            {{ ann.text.length }} chars<br>
+                            {{ ann.tags.length }} tags
+                        </div>
+                        <div v-else>
+                            Drop <b>Annotation</b> File Here
+                        </div>
                     </div>
 
                     <span class="title">Annotation File (txt / xml)</span>
@@ -127,10 +164,10 @@ html,body {
 
                 <div class="group">
                     <div>
-                        <input type="radio" name="mode" data-role="radio" data-caption="Normal" checked>
+                        <input type="radio" name="mode" data-role="radio" data-caption="Normal" checked><br>
                         <input type="radio" name="mode" data-role="radio" data-caption="Discontiguous" >
                     </div>
-                    <span class="title">Mode</span>
+                    <span class="title">Annotation Mode</span>
                 </div>
 
                 <div class="group">
@@ -211,16 +248,16 @@ html,body {
                             data-select-node="true"
                             data-structure='{"count": true, "name": true}'>
 
-                            <li data-icon="<span class='mif-folder fg-orange'>"
+                            <li data-icon="<span class='mif-folder fg-red'>"
                                 data-caption="All Tags"
                                 data-count="12"
                                 data-name="Video library"></li>
 
                             <li v-for="etag in dtd.etags"
-                                data-icon="<span class='mif-folder fg-cyan'>"
+                                v-bind:data-icon="'<span class=\'mif-folder fg-tag-'+etag.name+'\'>'"
                                 v-bind:data-caption="etag.name"
                                 data-count="12"
-                                data-name="My images"></li>
+                                data-name=""></li>
 
                         </ul>
                     </div>
@@ -228,8 +265,11 @@ html,body {
                     <div data-role="splitter" data-split-mode="vertical" 
                         data-split-sizes="80,20"
                         data-min-sizes="200,200">
-                        <div class="d-flex flex-justify-center flex-align-center">
 
+                        <div class="d-flex flex-justify-start flex-align-start w-100 h-100">
+                            <div id="cm_editor" class="w-100 h-100">
+
+                            </div>
                         </div>
 
                         <div id="mui_annlist" 
@@ -281,11 +321,15 @@ if (isIE) {
 <script src="./static/lib/brat/lib/head.load.min.js"></script>
 <!-- js cookie -->
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
-
+<!-- code mirror -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
 <script>
 
 // The DTD parser
 {% include 'js/dtd_parser.js' %}
+
+// The Ann parser
+{% include 'js/ann_parser.js' %}
 
 // The Vue APP
 {% include 'js/app_hotpot.js' %}
