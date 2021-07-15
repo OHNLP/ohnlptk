@@ -23,9 +23,22 @@ var app_hotpot = {
         },
 
         /////////////////////////////////////////////////////////////////
-        // Context Menu Related
+        // Menu Related
         /////////////////////////////////////////////////////////////////
-        ctxmenu_add_tag: function(tag) {
+        ctxmenu_add_tag: function(tag_def) {
+            // get the basic tag
+            var _tag = app_hotpot.cm_make_basic_tag_from_selection();
+
+            // create a new tag
+            var tag = app_hotpot.make_tag(_tag, tag_def, this.ann);
+
+            // add this tag to ann
+            this.ann.tags.push(tag);
+
+            // update the cm
+            app_hotpot.cm_update_marks();
+
+            // after 
             app_hotpot.ctxmenu_sel.hide();
         },
 
@@ -33,6 +46,13 @@ var app_hotpot = {
             app_hotpot.ctxmenu_sel.hide();
         },
 
+        popmenu_del_tag: function() {
+
+        },
+
+        /////////////////////////////////////////////////////////////////
+        // Other utils
+        /////////////////////////////////////////////////////////////////
         count_n_tags: function(tag) {
             if (!this.has_ann) {
                 return '';
@@ -59,6 +79,9 @@ var app_hotpot = {
 
     // the context menu for selection
     ctxmenu_sel: null,
+
+    // the popup menu for tag
+    popmenu_tag: null,
 
     // sample: {
     //     ann: {
@@ -120,13 +143,14 @@ var app_hotpot = {
             document.getElementById('cm_editor'), {
                 lineNumbers: true,
                 readOnly: true,
-                lineWrapping: true,
-                lint: true
+                lineWrapping: true
             }
         );
 
         this.codemirror.on('contextmenu', function(inst, evt) {
             evt.preventDefault();
+
+            // update the selection texts
             app_hotpot.selection = {
                 sel_txts: inst.getSelections(),
                 sel_locs: inst.listSelections()
@@ -163,6 +187,9 @@ var app_hotpot = {
         // update the context menu
         this.update_tag_ctxmenu();
 
+        // update the pop menu
+        this.update_tag_popmenu();
+
         // force update
         this.vpp.$forceUpdate();
     },
@@ -179,13 +206,61 @@ var app_hotpot = {
         this.cm_update_marks();
     },
 
+    make_tag: function(basic_tag, tag_def, ann) {
+        // first, add the tag name
+        basic_tag['tag'] = tag_def.name;
+
+        // find the id number
+        var n = 0;
+        for (let i = 0; i < ann.tags.length; i++) {
+            if (ann.tags[i].tag == tag_def.name) {
+                n += 1
+            }
+        }
+        basic_tag['id'] = tag_def.id_prefix + n;
+
+        // add other attr
+        for (let i = 0; i < tag_def.attlists.length; i++) {
+            const att = tag_def.attlists[i];
+
+            if (att.name == 'spans') {
+                // special rule for spans attr
+            } else {
+                // set the default value
+                basic_tag[att.name] = att.default_value;
+            }
+        }
+
+        return basic_tag;
+    },
+
     bind_events: function() {
+        // bind global click event
         document.getElementById('app_hotpot').addEventListener(
             "click",
             function(event) {
                 console.log('* clicked on', event.target);
+
+                var dom = event.target;
+                var obj = $(dom);
+
+                // show the menu
+                var mouseX = event.clientX;
+                var mouseY = event.clientY;
+
+                // close the right click menu
                 if (app_hotpot.ctxmenu_sel != null) {
                     app_hotpot.ctxmenu_sel.hide();
+                }
+
+                if (obj.hasClass('mark-tag')) {
+                    // this is a mark in code mirror
+                    var tag_id = dom.getAttribute('tag_id');
+                    app_hotpot.show_tag_popmenu(mouseX, mouseY);
+                } else {
+                    if (app_hotpot.ctxmenu_sel != null) {
+                        app_hotpot.popmenu_tag.hide();
+                    }
                 }
             }
         );
@@ -401,7 +476,7 @@ var app_hotpot = {
                 
                 // add this tag as the given color
                 style.insertRule(
-                    ".mark-" + tag_name + " { background-color: " + color + "; }",
+                    ".mark-tag-" + tag_name + " { background-color: " + color + "; }",
                     0
                 );
                 style.insertRule(
@@ -421,6 +496,13 @@ var app_hotpot = {
             .show('drop', {}, 200, null);
     },
 
+    show_tag_popmenu: function(x, y) {
+        console.log("* show pop menu on ", x, y);
+        this.popmenu_tag.css('left', (x + 10) + 'px')
+            .css('top', y + 'px')
+            .show('drop', {}, 200, null);
+    },
+
     update_tag_ctxmenu: function() {
         // update the context menu
         this.ctxmenu_sel = $('#ctxmenu_sel').menu({
@@ -428,9 +510,40 @@ var app_hotpot = {
         });
     },
 
+    update_tag_popmenu: function() {
+        // update the pop menu
+        this.popmenu_tag = $('#popmenu_tag').menu({
+            items: "> :not(.ui-widget-header)"
+        });
+    },
+
     /////////////////////////////////////////////////////////////////
     // Code Mirror Related
     /////////////////////////////////////////////////////////////////
+    cm_make_basic_tag_from_selection: function() {
+        var locs = [];
+        var txts = [];
+        for (let i = 0; i < app_hotpot.selection.sel_locs.length; i++) {
+            var sel_loc = app_hotpot.selection.sel_locs[i];
+            var sel_txt = app_hotpot.selection.sel_txts[i];
+            locs.push(
+                app_hotpot._calc_range2spans(
+                    sel_loc, 
+                    this.vpp.$data.ann.text
+                )
+            );
+            txts.push(sel_txt);
+        }
+        
+        // now push new ann
+        var tag = {
+            'spans': locs.join(','),
+            'text': txts.join(' ... ')
+        };
+
+        return tag;
+    },
+
     cm_update_marks: function() {
         // clear and add the markers
         for (let i = 0; i < this.marktexts.length; i++) {
@@ -470,9 +583,16 @@ var app_hotpot = {
             this.marktexts.push(this.codemirror.markText(
                 {line: ln0, ch: ch0},
                 {line: ln1, ch: ch1},
-                {className: 'mark-label mark-' + tag.tag + ' mark-id-' + tag_id}
+                {
+                    className: 'mark-tag mark-tag-' + tag.tag,
+                    attributes: {
+                        id: 'mark-id-' + tag_id,
+                        tag_id: tag_id
+                    }
+                }
             ));
         }
+
     },
 
     _calc_range2spans: function(sel_loc, full_txt) {

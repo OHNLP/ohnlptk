@@ -7,6 +7,7 @@ Annotator
 {% block style %}
 <!-- jquery UI style -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
+
 <!-- code mirror style -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.css" />
 <meta name="metro4:init" content="false">
@@ -48,16 +49,16 @@ html,body {
     border: 1px dotted rgb(17, 61, 110);
     border-radius: 4px;
 }
-.mark-label {
+.mark-tag {
     border-radius: 3px;
     padding: 1px 3px;
     cursor: pointer;
     border: 1px solid white;
 }
-.mark-label:hover{
+.mark-tag:hover{
     border-color: red;
 }
-.mark-label-hover {    
+.mark-tag-hover {    
     border: 2px dotted red;
 }
 .mark-round {
@@ -71,6 +72,13 @@ html,body {
 .CodeMirror {
     height: 100%;
     font-size: 12px;
+}
+/* for the pop menu */
+#popmenu_tag {
+    z-index: 998;
+    position: absolute;
+    font-size: 12px;
+    padding: 1px 3px;
 }
 /* for the context menu */
 #ctxmenu_sel {
@@ -378,6 +386,7 @@ html,body {
         </div>
     </div>
 
+    <!-- the context menu -->
     <div v-if="has_dtd"
         id="ctxmenu_sel">
         <!-- <li class="ui-widget-header"
@@ -393,6 +402,22 @@ html,body {
     </div>
     <div v-else
         id="ctxmenu_sel">
+
+    </div>
+
+    <!-- the tag click menu -->
+    <div v-if="has_dtd"
+        id="popmenu_tag">
+        <li class="ctxmenu-item"
+            v-on:click="popmenu_del_tag()">
+            <div>
+                <i class="far fa-trash-alt"></i>
+                Delete this tag
+            </div>
+        </li>
+    </div>
+    <div v-else
+        id="popmenu_tag">
 
     </div>
     
