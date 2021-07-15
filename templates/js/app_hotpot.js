@@ -87,6 +87,9 @@ var app_hotpot = {
         // the code mirror
         this.init_codemirror();
 
+        // the global event
+        this.bind_events();
+
         // set the resize
         this.resize();
     },
@@ -150,6 +153,18 @@ var app_hotpot = {
 
         // update the marks
         this.cm_update_marks();
+    },
+
+    bind_events: function() {
+        document.getElementById('app_hotpot').addEventListener(
+            "click",
+            function(event) {
+                console.log('* clicked on', event.target);
+                if (app_hotpot.ctxmenu_sel != null) {
+                    app_hotpot.ctxmenu_sel.hide();
+                }
+            }
+        );
     },
 
     bind_dropzone_dtd: function() {

@@ -94,6 +94,27 @@ html,body {
     text-indent: 0.5em;
     background-color: #EAEAEA;
 }
+.tag-table {
+    font-size: 12px;
+}
+.tag-table th, 
+.tag-table td {
+    padding: 2px;
+}
+.tag-table th {
+    border-bottom: 1px solid #999999;
+}
+.tag-table td {
+    border-bottom: 1px dotted #aaaaaa;
+}
+.tag-table tr:hover {
+    background-color: #EAEAEA;
+}
+.tag-attr-span {
+    background-color: whitesmoke;
+    border-radius: 3px;
+    padding: 1px 4px;
+}
 </style>
 {% endblock %}
 
@@ -170,7 +191,8 @@ html,body {
                     <span class="title">Annotation File (txt / xml)</span>
                 </div>
 
-                <div class="group">
+                <div v-if="has_ann"
+                    class="group">
                     <button class="ribbon-button"
                         v-on:click="download_xml">
                         <span class="icon">
@@ -294,14 +316,16 @@ html,body {
                         </div>
 
                         <div id="mui_annlist" 
+                            style="overflow-y: auto;"
                             class="d-flex flex-justify-start flex-align-start w-100 h-100">
-                            <table v-if="has_ann" class="w-100">
+                            <table v-if="has_ann" class="tag-table w-100 mt-0 mb-0">
                                 <thead>
                                     <tr>
                                         <th>Tag</th>
                                         <th>ID</th>
                                         <th>Spans</th>
                                         <th>Text</th>
+                                        <th>Attributes</th>
                                     </tr>
                                 </thead>
                                 <tbody style="overflow-y: auto;">
@@ -310,6 +334,13 @@ html,body {
                                         <td>{{ tag.id }}</td>
                                         <td>{{ tag.spans }}</td>
                                         <td>{{ tag.text }}</td>
+                                        <td>
+                                            <span v-for="(value, attr) in tag"
+                                                v-if="!['id','spans','text','tag'].contains(attr)"
+                                                class="tag-attr-span mr-1">
+                                                {{ attr }}: {{ tag[attr] }}
+                                            </span>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -323,12 +354,12 @@ html,body {
 
     <div v-if="has_dtd"
         id="ctxmenu_sel">
-        <li class="ui-widget-header"
-            v-on:click="ctxmenu_close">Tags:</li>
+        <!-- <li class="ui-widget-header"
+            v-on:click="ctxmenu_close">Tags:</li> -->
         <li class="ctxmenu-item"
             v-for="tag, tag_idx in dtd.etags"
             v-on:click="ctxmenu_add_tag(tag)">
-            <div>
+            <div v-bind:id="'ctxmenu-item-' + tag.name">
                 <i v-bind:class="'fa fa-tag fg-tag-' + tag.name"></i>
                 {{ tag.name }}
             </div>
