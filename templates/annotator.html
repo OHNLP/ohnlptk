@@ -1,4 +1,4 @@
-{% extends '_layout.html' %}
+{% extends '_layout_simple.html' %}
 
 {% block title %}
 Annotator
@@ -16,9 +16,8 @@ Annotator
 html,body {
     overflow: hidden;
 }
-
 #app_hotpot {
-    margin-top: 70px;
+    margin-top: 0px;
 }
 .dropzone:hover {
   border-color: rgb(0, 89, 255);
@@ -29,12 +28,12 @@ html,body {
 }
 .zone-text {
     margin-top: 12px; 
-    line-height: 12px;
+    line-height: 14px;
 }
 #dropzone_dtd {
     width: 200px;
-    height: 60px;
-    line-height: 60px;
+    height: 70px;
+    line-height: 70px;
     text-align: center;
     font-size: 12px;
     border: 1px dotted rgb(17, 61, 110);
@@ -42,8 +41,8 @@ html,body {
 }
 #dropzone_ann {
     width: 200px;
-    height: 60px;
-    line-height: 60px;
+    height: 70px;
+    line-height: 70px;
     text-align: center;
     font-size: 12px;
     border: 1px dotted rgb(17, 61, 110);
@@ -92,6 +91,17 @@ html,body {
     height: 2em;
     line-height: 2em;
     text-indent: 0.5em;
+    background-color: #EAEAEA;
+}
+.tag-list {
+    font-size: 12px;
+    padding: 2px;
+}
+.tag-list li {
+    padding: 2px 0;
+    border-bottom: 1px dotted #eeeeee;
+}
+.tag-list li:hover {
     background-color: #EAEAEA;
 }
 .tag-table {
@@ -280,27 +290,37 @@ html,body {
             <div class="cell d-flex flex-row">
                 
                 <div data-role="splitter" class="w-100 h-100" 
-                    data-split-sizes="20,80"
-                    data-min-sizes="240,460">
+                    data-split-sizes="15,85"
+                    data-min-sizes="200,460">
 
                     <div class="d-flex flex-justify-start flex-align-start" style="overflow-y: auto;">
                         <ul v-if="has_dtd"
-                            class="w-100"
-                            data-role="listview"
-                            data-view="table"
-                            data-select-node="true"
-                            data-structure='{"count": true, "name": true}'>
+                            class="w-100 tag-list">
 
-                            <li data-icon="<span class='mif-folder fg-red'>"
-                                data-caption="All Tags"
-                                data-count="12"
-                                data-name=""></li>
+                            <li v-on:click="update_tag_table(null)"
+                                class="d-flex flex-row flex-justify-between">
+                                <div>
+                                    <span class='mif-folder fg-red'></span>
+                                    All Tags
+                                </div>
+                                <div class="mr-1">
+                                    {{ count_n_tags(null) }}
+                                </div>
+                            </li>
 
                             <li v-for="etag in dtd.etags"
-                                v-bind:data-icon="'<span class=\'fa fa-tag fg-tag-'+etag.name+'\'>'"
-                                v-bind:data-caption="etag.name"
-                                data-count="12"
-                                data-name=""></li>
+                                v-on:click="update_tag_table(etag)"
+                                class="d-flex flex-row flex-justify-between">
+                                <div>
+                                    <i class="fa fa-tag"
+                                        v-bind:class="'fg-tag-' + etag.name">
+                                    </i>
+                                    {{ etag.name }}
+                                </div>
+                                <div class="mr-1">
+                                    {{ count_n_tags(etag) }}
+                                </div>
+                            </li>
 
                         </ul>
                     </div>
@@ -330,7 +350,12 @@ html,body {
                                 </thead>
                                 <tbody style="overflow-y: auto;">
                                     <tr v-for="tag in ann.tags">
-                                        <td>{{ tag.tag }}</td>
+                                        <td>
+                                            <i class="fa fa-tag"
+                                                v-bind:class="'fg-tag-' + tag.tag">
+                                            </i>
+                                            {{ tag.tag }}
+                                        </td>
                                         <td>{{ tag.id }}</td>
                                         <td>{{ tag.spans }}</td>
                                         <td>{{ tag.text }}</td>
@@ -338,7 +363,8 @@ html,body {
                                             <span v-for="(value, attr) in tag"
                                                 v-if="!['id','spans','text','tag'].contains(attr)"
                                                 class="tag-attr-span mr-1">
-                                                {{ attr }}: {{ tag[attr] }}
+                                                <span class="">{{ attr }}: </span>
+                                                <span>{{ tag[attr] }}</span>
                                             </span>
                                         </td>
                                     </tr>

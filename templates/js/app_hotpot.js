@@ -18,6 +18,10 @@ var app_hotpot = {
 
         },
 
+        update_tag_table: function(tag) {
+            console.log('* update tag table', tag);
+        },
+
         /////////////////////////////////////////////////////////////////
         // Context Menu Related
         /////////////////////////////////////////////////////////////////
@@ -27,6 +31,22 @@ var app_hotpot = {
 
         ctxmenu_close: function() {
             app_hotpot.ctxmenu_sel.hide();
+        },
+
+        count_n_tags: function(tag) {
+            if (!this.has_ann) {
+                return '';
+            }
+            var cnt = 0;
+            if (tag == null) {
+                return this.ann.tags.length;
+            }
+            for (let i = 0; i < this.ann.tags.length; i++) {
+                if (this.ann.tags[i].tag == tag.name) {
+                    cnt += 1;
+                }
+            }
+            return cnt;
         }
     },
 
@@ -100,7 +120,8 @@ var app_hotpot = {
             document.getElementById('cm_editor'), {
                 lineNumbers: true,
                 readOnly: true,
-                lineWrapping: true
+                lineWrapping: true,
+                lint: true
             }
         );
 
@@ -141,6 +162,9 @@ var app_hotpot = {
 
         // update the context menu
         this.update_tag_ctxmenu();
+
+        // force update
+        this.vpp.$forceUpdate();
     },
 
     set_ann: function(ann) {
@@ -292,7 +316,7 @@ var app_hotpot = {
 
     resize: function() {
         var h = $(window).height();
-        $('#main_ui').css('height', h - 240);
+        $('#main_ui').css('height', h - 170);
     },
 
     /////////////////////////////////////////////////////////////////
@@ -325,6 +349,33 @@ var app_hotpot = {
         '#bc80bd',
         '#ccebc5',
         '#ffed6f',
+    ],
+
+    app_shortcuts: [
+        '1',
+        '2',
+        '3',
+        '4',
+        'q',
+        'w',
+        'e',
+        'r',
+        'a',
+        's',
+        'd',
+        'f',
+        'z',
+        'x',
+        'c',
+        'v',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
     ],
 
     update_tag_styles: function() {
