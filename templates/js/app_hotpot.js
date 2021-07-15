@@ -16,6 +16,17 @@ var app_hotpot = {
 
         show_about: function() {
 
+        },
+
+        /////////////////////////////////////////////////////////////////
+        // Context Menu Related
+        /////////////////////////////////////////////////////////////////
+        ctxmenu_add_tag: function(tag) {
+            app_hotpot.ctxmenu_sel.hide();
+        },
+
+        ctxmenu_close: function() {
+            app_hotpot.ctxmenu_sel.hide();
         }
     },
 
@@ -26,36 +37,39 @@ var app_hotpot = {
     // the selected text
     selection: null,
 
-    sample: {
-        ann: {
-            fn: 'test.txt_1.xml',
-            text: 'The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago.',
-            dtd_name: 'delirium',
-            tags: [{
-                "tag": "AMS",
-                "id": "A0",
-                "spans": "4~11",
-                "text": "patient",
-                "status": "present",
-                "experiencer": "patient",
-                "certainty": "confirmed",
-                "exclusion": "no",
-                "CAM_criteria": "A"
-            }, {
-                "tag": "Delirium",
-                "id": "D0",
-                "spans": "32~37,41~47,65~69",
-                "text": "fever ... chills ... also",
-                "status": "present",
-                "experiencer": "patient",
-                "certainty": "confirmed",
-                "exclusion": "no"
-            }]
-        }
-    },
+    // the context menu for selection
+    ctxmenu_sel: null,
+
+    // sample: {
+    //     ann: {
+    //         fn: 'test.txt_1.xml',
+    //         text: 'The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago.',
+    //         dtd_name: 'delirium',
+    //         tags: [{
+    //             "tag": "AMS",
+    //             "id": "A0",
+    //             "spans": "4~11",
+    //             "text": "patient",
+    //             "status": "present",
+    //             "experiencer": "patient",
+    //             "certainty": "confirmed",
+    //             "exclusion": "no",
+    //             "CAM_criteria": "A"
+    //         }, {
+    //             "tag": "Delirium",
+    //             "id": "D0",
+    //             "spans": "32~37,41~47,65~69",
+    //             "text": "fever ... chills ... also",
+    //             "status": "present",
+    //             "experiencer": "patient",
+    //             "certainty": "confirmed",
+    //             "exclusion": "no"
+    //         }]
+    //     }
+    // },
 
     init: function() {
-        this.vpp_data.ann = this.sample.ann;
+        // this.vpp_data.ann = this.sample.ann;
         this.vpp = new Vue({
             el: this.vpp_id,
             data: this.vpp_data,
@@ -89,16 +103,17 @@ var app_hotpot = {
 
         this.codemirror.on('contextmenu', function(inst, evt) {
             evt.preventDefault();
-            // tb_webmae.selection = {
-            //     sel_txts: inst.getSelections(),
-            //     sel_locs: inst.listSelections()
-            // };
-            // console.log(tb_webmae.selection);
+            app_hotpot.selection = {
+                sel_txts: inst.getSelections(),
+                sel_locs: inst.listSelections()
+            };
+            console.log("* found selection:", app_hotpot.selection);
 
-            // var mouseX = event.clientX;
-            // var mouseY = event.clientY;
-            // ui_rcmenu.show(mouseX, mouseY);
-        })
+            // show the menu
+            var mouseX = evt.clientX;
+            var mouseY = evt.clientY;
+            app_hotpot.show_tag_ctxmenu(mouseX, mouseY);
+        });
     },
 
     /**
@@ -120,6 +135,9 @@ var app_hotpot = {
 
         // update the color define
         this.update_tag_styles();
+
+        // update the context menu
+        this.update_tag_ctxmenu();
     },
 
     set_ann: function(ann) {
@@ -263,7 +281,7 @@ var app_hotpot = {
     },
 
     /////////////////////////////////////////////////////////////////
-    // Style Related
+    // DTD update related
     /////////////////////////////////////////////////////////////////
     // the default colors are from
     // https://colorbrewer2.org/#type=qualitative&scheme=Set3&n=12
@@ -328,6 +346,20 @@ var app_hotpot = {
                 i += 1;
             }
         }
+    },
+
+    show_tag_ctxmenu: function(x, y) {
+        console.log("* show ctx menu on ", x, y);
+        this.ctxmenu_sel.css('left', (x + 10) + 'px')
+            .css('top', y + 'px')
+            .show('drop', {}, 200, null);
+    },
+
+    update_tag_ctxmenu: function() {
+        // update the context menu
+        this.ctxmenu_sel = $('#ctxmenu_sel').menu({
+            items: "> :not(.ui-widget-header)"
+        });
     },
 
     /////////////////////////////////////////////////////////////////

@@ -73,6 +73,27 @@ html,body {
     height: 100%;
     font-size: 12px;
 }
+/* for the context menu */
+#ctxmenu_sel {
+    z-index: 999;
+    position: absolute;
+    font-size: 12px;
+    padding: 1px 3px;
+}
+.ctxmenu-item {
+    padding: 1px;
+    cursor: pointer;
+}
+.ctxmenu-item:hover {
+    background-color: rgb(221, 221, 221);
+}
+.ui-widget-header {
+    border: 0;
+    height: 2em;
+    line-height: 2em;
+    text-indent: 0.5em;
+    background-color: #EAEAEA;
+}
 </style>
 {% endblock %}
 
@@ -162,13 +183,13 @@ html,body {
                     <span class="title">Download</span>
                 </div>
 
-                <div class="group">
+                <!-- <div class="group">
                     <div>
                         <input type="radio" name="mode" data-role="radio" data-caption="Normal" checked><br>
                         <input type="radio" name="mode" data-role="radio" data-caption="Discontiguous" >
                     </div>
                     <span class="title">Annotation Mode</span>
-                </div>
+                </div> -->
 
                 <div class="group">
 
@@ -251,10 +272,10 @@ html,body {
                             <li data-icon="<span class='mif-folder fg-red'>"
                                 data-caption="All Tags"
                                 data-count="12"
-                                data-name="Video library"></li>
+                                data-name=""></li>
 
                             <li v-for="etag in dtd.etags"
-                                v-bind:data-icon="'<span class=\'mif-folder fg-tag-'+etag.name+'\'>'"
+                                v-bind:data-icon="'<span class=\'fa fa-tag fg-tag-'+etag.name+'\'>'"
                                 v-bind:data-caption="etag.name"
                                 data-count="12"
                                 data-name=""></li>
@@ -274,7 +295,7 @@ html,body {
 
                         <div id="mui_annlist" 
                             class="d-flex flex-justify-start flex-align-start w-100 h-100">
-                            <table v-if="has_dtd" class="w-100">
+                            <table v-if="has_ann" class="w-100">
                                 <thead>
                                     <tr>
                                         <th>Tag</th>
@@ -299,6 +320,24 @@ html,body {
             </div>
         </div>
     </div>
+
+    <div v-if="has_dtd"
+        id="ctxmenu_sel">
+        <li class="ui-widget-header"
+            v-on:click="ctxmenu_close">Tags:</li>
+        <li class="ctxmenu-item"
+            v-for="tag, tag_idx in dtd.etags"
+            v-on:click="ctxmenu_add_tag(tag)">
+            <div>
+                <i v-bind:class="'fa fa-tag fg-tag-' + tag.name"></i>
+                {{ tag.name }}
+            </div>
+        </li>
+    </div>
+    <div v-else
+        id="ctxmenu_sel">
+
+    </div>
     
 </div>
 {% endblock %}
@@ -321,6 +360,8 @@ if (isIE) {
 <script src="./static/lib/brat/lib/head.load.min.js"></script>
 <!-- js cookie -->
 <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+<!-- jquery-ui -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <!-- code mirror -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
 <script>
