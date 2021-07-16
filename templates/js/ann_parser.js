@@ -76,7 +76,7 @@ var ann_parser = {
         var xmlDoc = document.implementation.createDocument(
             null, ann.dtd_name
         );
-
+        
         return xmlDoc;
     }
 };

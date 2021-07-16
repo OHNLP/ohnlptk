@@ -6,7 +6,8 @@ var app_hotpot = {
         has_dtd: false,
         has_ann: false,
         dtd: null,
-        ann: null
+        ann: null,
+        anns: []
     },
 
     vpp_methods: {
@@ -402,7 +403,7 @@ var app_hotpot = {
 
     resize: function() {
         var h = $(window).height();
-        $('#main_ui').css('height', h - 170);
+        $('#main_ui').css('height', h - 175);
     },
 
     /////////////////////////////////////////////////////////////////
