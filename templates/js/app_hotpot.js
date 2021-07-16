@@ -184,6 +184,9 @@ var app_hotpot = {
         // update the color define
         this.update_tag_styles();
 
+        // update the shortcuts
+        this.update_tag_shortcuts();
+
         // update the context menu
         this.update_tag_ctxmenu();
 
@@ -262,6 +265,14 @@ var app_hotpot = {
                         app_hotpot.popmenu_tag.hide();
                     }
                 }
+            }
+        );
+
+        // bind global key event
+        document.addEventListener(
+            "keypress",
+            function(event) {
+                console.log('* pressed on', event);
             }
         );
     },
@@ -426,33 +437,6 @@ var app_hotpot = {
         '#ffed6f',
     ],
 
-    app_shortcuts: [
-        '1',
-        '2',
-        '3',
-        '4',
-        'q',
-        'w',
-        'e',
-        'r',
-        'a',
-        's',
-        'd',
-        'f',
-        'z',
-        'x',
-        'c',
-        'v',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-    ],
-
     update_tag_styles: function() {
         // get my style
         var style = document.getElementById('app_style').sheet;
@@ -485,6 +469,37 @@ var app_hotpot = {
                 );
 
                 i += 1;
+            }
+        }
+    },
+
+    app_shortcuts: [
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        'q',
+        'w',
+        'e',
+        'r',
+        't',
+        'a',
+        's',
+        'd',
+        'f',
+        'g',
+        'z',
+        'x',
+        'c',
+        'v',
+        'b'
+    ],
+
+    update_tag_shortcuts: function() {
+        for (let i = 0; i < this.vpp.dtd.etags.length; i++) {
+            if (i < this.app_shortcuts.length) {
+                this.vpp.dtd.etags[i].shortcut = this.app_shortcuts[i];
             }
         }
     },

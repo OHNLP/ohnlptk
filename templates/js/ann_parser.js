@@ -72,6 +72,11 @@ var ann_parser = {
     },
 
     ann2xml: function(ann) {
+        // create the root document
+        var xmlDoc = document.implementation.createDocument(
+            null, ann.dtd_name
+        );
 
+        return xmlDoc;
     }
 };
