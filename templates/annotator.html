@@ -128,6 +128,7 @@ html,body {
     position: absolute;
     font-size: 12px;
     padding: 1px 3px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 /* for the context menu */
 #ctxmenu_sel {
@@ -135,6 +136,7 @@ html,body {
     position: absolute;
     font-size: 12px;
     padding: 1px 3px;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 .ctxmenu-item {
     padding: 1px;
@@ -180,6 +182,10 @@ html,body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.tag-list-row-count-0 {
+    color: #bdbdbd;
+    font-size: .9em;
 }
 .tag-table {
     font-size: .85em;
@@ -452,7 +458,8 @@ input[type=text].tag-attr-input {
                                 {{ etag.name }}
                             </span>
                         </div>
-                        <div class="mr-1">
+                        <div class="mr-1"
+                            v-bind:class="'tag-list-row-count-'+count_n_tags(etag)">
                             {{ count_n_tags(etag) }}
                         </div>
                     </li>
@@ -532,6 +539,11 @@ input[type=text].tag-attr-input {
     <!-- the tag click menu -->
     <div v-if="has_dtd"
         id="popmenu_tag">
+        <li class="ui-widget-header"
+            v-on:click="ctxmenu_close">
+            TAG <i class="fa fa-tag"></i>
+            <b>{{ clicked_tag_id }}</b>
+        </li>
         <li class="ctxmenu-item"
             v-on:click="popmenu_del_tag()">
             <div>

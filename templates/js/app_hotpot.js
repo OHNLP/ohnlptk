@@ -6,8 +6,13 @@ var app_hotpot = {
         has_dtd: false,
         has_ann: false,
         dtd: null,
+
+        // for the ann files
         ann_idx: null,
-        anns: []
+        anns: [],
+
+        // for menu
+        clicked_tag_id: null
     },
 
     vpp_methods: {
@@ -90,7 +95,17 @@ var app_hotpot = {
         },
 
         popmenu_del_tag: function() {
+            // delete the clicked tag id
+            app_hotpot.delete_tag(this.clicked_tag_id, this.anns[this.ann_idx]);
 
+            // update the cm
+            app_hotpot.cm_update_marks();
+
+            // hide the menu 
+            app_hotpot.popmenu_tag.hide();
+
+            // reset the clicked tag id
+            this.clicked_tag_id = null;
         },
 
         /////////////////////////////////////////////////////////////////
@@ -164,10 +179,6 @@ var app_hotpot = {
                 Metro.init();
             },
         });
-
-        // bind other events
-        this.bind_dropzone_dtd();
-        this.bind_dropzone_ann();
 
         // the code mirror
         this.init_codemirror();
@@ -272,40 +283,21 @@ var app_hotpot = {
         this.cm_update_marks();
     },
 
-    make_tag: function(basic_tag, tag_def, ann) {
-        // first, add the tag name
-        basic_tag['tag'] = tag_def.name;
+    bind_events: function() {
+        // bind drop zone for dtd
+        this.bind_dropzone_dtd();
 
-        // find the id number
-        var n = 0;
-        for (let i = 0; i < ann.tags.length; i++) {
-            if (ann.tags[i].tag == tag_def.name) {
-                // get the id number of this tag
-                var _id = parseInt(ann.tags[i].id.replace(tag_def.id_prefix, ''));
-                if (_id >= n) {
-                    n = _id + 1;
-                }
-            }
-        }
-        basic_tag['id'] = tag_def.id_prefix + n;
+        // bind drop zone for anns
+        this.bind_dropzone_ann();
 
-        // add other attr
-        for (let i = 0; i < tag_def.attlists.length; i++) {
-            const att = tag_def.attlists[i];
+        // bind global click event
+        this.bind_click_event();
 
-            if (att.name == 'spans') {
-                // special rule for spans attr
-            } else {
-                // set the default value
-                basic_tag[att.name] = att.default_value;
-            }
-        }
-
-        return basic_tag;
+        // bind global key event
+        this.bind_keypress_event();
     },
 
-    bind_events: function() {
-        // bind global click event
+    bind_click_event: function() {
         document.getElementById('app_hotpot').addEventListener(
             "click",
             function(event) {
@@ -322,20 +314,27 @@ var app_hotpot = {
                 if (app_hotpot.ctxmenu_sel != null) {
                     app_hotpot.ctxmenu_sel.hide();
                 }
+                if (app_hotpot.popmenu_tag != null) {
+                    app_hotpot.popmenu_tag.hide();
+                }
 
                 if (obj.hasClass('mark-tag-text')) {
                     // this is a mark in code mirror
                     var tag_id = dom.getAttribute('tag_id');
+
+                    // set the clicked tag_id
+                    app_hotpot.vpp.$data.clicked_tag_id = tag_id;
+
+                    // show the menu
                     app_hotpot.show_tag_popmenu(mouseX, mouseY);
                 } else {
-                    if (app_hotpot.ctxmenu_sel != null) {
-                        app_hotpot.popmenu_tag.hide();
-                    }
+                    // what to do?
                 }
             }
         );
+    },
 
-        // bind global key event
+    bind_keypress_event: function() {
         document.addEventListener(
             "keypress",
             function(event) {
@@ -582,6 +581,61 @@ var app_hotpot = {
         this.popmenu_tag = $('#popmenu_tag').menu({
             items: "> :not(.ui-widget-header)"
         });
+    },
+
+
+    /////////////////////////////////////////////////////////////////
+    // Tag Related
+    /////////////////////////////////////////////////////////////////
+    make_tag: function(basic_tag, tag_def, ann) {
+        // first, add the tag name
+        basic_tag['tag'] = tag_def.name;
+
+        // find the id number
+        var n = 0;
+        for (let i = 0; i < ann.tags.length; i++) {
+            if (ann.tags[i].tag == tag_def.name) {
+                // get the id number of this tag
+                var _id = parseInt(ann.tags[i].id.replace(tag_def.id_prefix, ''));
+                if (_id >= n) {
+                    n = _id + 1;
+                }
+            }
+        }
+        basic_tag['id'] = tag_def.id_prefix + n;
+
+        // add other attr
+        for (let i = 0; i < tag_def.attlists.length; i++) {
+            const att = tag_def.attlists[i];
+
+            if (att.name == 'spans') {
+                // special rule for spans attr
+            } else {
+                // set the default value
+                basic_tag[att.name] = att.default_value;
+            }
+        }
+
+        return basic_tag;
+    },
+
+    delete_tag: function(tag_id, ann) {
+        var tag_idx = -1;
+        for (let i = 0; i < ann.tags.length; i++) {
+            if (ann.tags[i].id == tag_id) {
+                tag_idx = i;
+                break;
+            }            
+        }
+
+        // delete the found tag idx
+        if (tag_idx == -1) {
+            // ???
+        } else {
+            ann.tags.splice(tag_idx, 1); 
+        }
+
+        return ann;
     },
 
     /////////////////////////////////////////////////////////////////
