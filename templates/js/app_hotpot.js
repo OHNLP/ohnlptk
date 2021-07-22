@@ -280,7 +280,11 @@ var app_hotpot = {
         var n = 0;
         for (let i = 0; i < ann.tags.length; i++) {
             if (ann.tags[i].tag == tag_def.name) {
-                n += 1
+                // get the id number of this tag
+                var _id = parseInt(ann.tags[i].id.replace(tag_def.id_prefix, ''));
+                if (_id >= n) {
+                    n = _id + 1;
+                }
             }
         }
         basic_tag['id'] = tag_def.id_prefix + n;
@@ -366,7 +370,6 @@ var app_hotpot = {
                     if (item.isDirectory) {
                         // show something?
 
-
                     } else {
                         // should be a dtd file
                         // so item is a fileEntry
@@ -394,29 +397,25 @@ var app_hotpot = {
             event.preventDefault();
         
             // user should only upload one folder or a file
-            if (items.length>1) {
-                console.log('* selected more than 1 item!');
-                return;
-            }
+            // if (items.length>1) {
+            //     console.log('* selected more than 1 item!');
+            //     return;
+            // }
 
             for (let i=0; i<items.length; i++) {
-                let item = items[i].webkitGetAsEntry();
-        
-                if (item) {
-                    // ok, user select a folder
-                    // well, maybe in future we could support
-                    if (item.isDirectory) {
+                console.log(items[i]);
+                // let item = items[i].webkitGetAsEntry();
+                let item = items[i].getAsFileSystemHandle();
+                item.then(function(fh) {
+                    if (fh.kind == 'file') {
                         // show something?
+                        // should be a ann txt/xml file
+                        app_hotpot.parse_drop_ann(fh);
 
                     } else {
-                        // should be a ann txt/xml file
                         // so item is a fileEntry
-                        app_hotpot.parse_drop_ann(item);
                     }
-                }
-
-                // just detect one item, folder or zip
-                break;
+                });
             }
 
         }, false);
@@ -436,25 +435,13 @@ var app_hotpot = {
         });
     },
 
-    parse_drop_ann: function(fileEntry) {
+    parse_drop_ann: function(fh) {
         // get the ann file
-        console.log('* ann file:', fileEntry);
-
-        // read this file
-        app_hotpot.read_file_async(fileEntry, (function(fileEntry){
-            return function(evt) {
-                var text = evt.target.result;
-    
-                // try to parse this dtd file
-                var ann = ann_parser.parse(fileEntry.name, text);
-
-                // bind the fileEntry
-                ann.fileEntry = fileEntry;
-                
-                // ok, set the dtd for annotator
-                app_hotpot.set_ann(ann);
-            }
-        })(fileEntry));
+        console.log('* ann file:', fh);
+        var p_ann = read_ann_file_handle(fh);
+        p_ann.then(function(ann) {
+            app_hotpot.set_ann(ann);
+        });
     },
 
     read_file_async: function(fileEntry, callback) {
