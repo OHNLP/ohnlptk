@@ -1,45 +1,38 @@
 var ann_parser = {
-    // contains the xml 
-    xmlDoc: null,
 
-    // the file name to be parsed
-    filename: '',
-
-    parse: function(text) {
-        
-        var ann = this.xml2ann(this.filename, text);
+    parse: function(fn, text) {
+        var ann = this.xml2ann(fn, text);
         return ann;
     },
 
-    txt2ann: function(fn, dtd_name, txt) {
+    txt2ann: function(dtd_name, txt) {
 
     },
 
-    xml2ann: function(fn, text) {
+    xml2ann: function(text) {
         // create a new DOM parser
         var parser = new DOMParser();
 
         // parse the given text
-        this.xmlDoc = parser.parseFromString(text, "text/xml");
+        var xmlDoc = parser.parseFromString(text, "text/xml");
 
         // create an empty ann
         var ann = {
-            fn: fn,
             text: '',
             dtd_name: '',
             tags: []
         };
 
         // first, get the dtd name
-        var dtd_name = this.xmlDoc.children[0].tagName;
+        var dtd_name = xmlDoc.children[0].tagName;
         ann.dtd_name = dtd_name;
 
         // then get the text content
-        var textContent = this.xmlDoc.getElementsByTagName('TEXT')[0].textContent;
+        var textContent = xmlDoc.getElementsByTagName('TEXT')[0].textContent;
         ann.text = textContent;
 
         // then check all of the tags
-        var elems = this.xmlDoc.getElementsByTagName('TAGS')[0].children;
+        var elems = xmlDoc.getElementsByTagName('TAGS')[0].children;
 
         for (let i = 0; i < elems.length; i++) {
             var elem = elems[i];

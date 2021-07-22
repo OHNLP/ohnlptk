@@ -6,7 +6,7 @@ var app_hotpot = {
         has_dtd: false,
         has_ann: false,
         dtd: null,
-        ann: null,
+        ann_idx: null,
         anns: []
     },
 
@@ -23,6 +23,45 @@ var app_hotpot = {
             console.log('* update tag table', tag);
         },
 
+        //
+        open_files: function() {
+            // the settings for annotation file
+            var pickerOpts = {
+                types: [
+                    {
+                        description: 'Annotation File',
+                        accept: {
+                            'text/*': ['.txt', '.xml']
+                        }
+                    },
+                ],
+                excludeAcceptAllOption: true,
+                multiple: true
+            };
+
+            // get the file handles
+            var promise_fileHandles = open_files(pickerOpts);
+
+            promise_fileHandles.then(function(fileHandles) {
+                // bind the content
+                for (let i = 0; i < fileHandles.length; i++) {
+                    const fh = fileHandles[i];
+                    
+                    // read the file
+                    var p_ann = read_ann_file_handle(fh);
+                    p_ann.then(function(ann) {
+                        app_hotpot.set_ann(ann);
+                    });
+                    
+                }
+            });
+        },
+
+
+        set_ann_idx: function(ann_idx) {
+            app_hotpot.set_ann_idx(ann_idx);
+        },
+
         /////////////////////////////////////////////////////////////////
         // Menu Related
         /////////////////////////////////////////////////////////////////
@@ -31,10 +70,10 @@ var app_hotpot = {
             var _tag = app_hotpot.cm_make_basic_tag_from_selection();
 
             // create a new tag
-            var tag = app_hotpot.make_tag(_tag, tag_def, this.ann);
+            var tag = app_hotpot.make_tag(_tag, tag_def, this.anns[this.ann_idx]);
 
             // add this tag to ann
-            this.ann.tags.push(tag);
+            this.anns[this.ann_idx].tags.push(tag);
 
             // update the cm
             app_hotpot.cm_update_marks();
@@ -63,10 +102,10 @@ var app_hotpot = {
             }
             var cnt = 0;
             if (tag == null) {
-                return this.ann.tags.length;
+                return this.anns[this.ann_idx].tags.length;
             }
-            for (let i = 0; i < this.ann.tags.length; i++) {
-                if (this.ann.tags[i].tag == tag.name) {
+            for (let i = 0; i < this.anns[this.ann_idx].tags.length; i++) {
+                if (this.anns[this.ann_idx].tags[i].tag == tag.name) {
                     cnt += 1;
                 }
             }
@@ -116,7 +155,6 @@ var app_hotpot = {
     // },
 
     init: function() {
-        // this.vpp_data.ann = this.sample.ann;
         this.vpp = new Vue({
             el: this.vpp_id,
             data: this.vpp_data,
@@ -201,13 +239,34 @@ var app_hotpot = {
         this.vpp.$forceUpdate();
     },
 
-    set_ann: function(ann) {
+    set_ann: function(ann, is_switch_to_this_ann) {
         console.log("* set ann", ann);
         this.vpp.$data.has_ann = true;
-        this.vpp.$data.ann = ann;
+        this.vpp.$data.anns.push(ann);
+
+        if (is_switch_to_this_ann || this.vpp.$data.anns.length == 1) {
+            this.vpp.$data.ann_idx = this.vpp.$data.anns.length - 1;
+
+            // update the text display
+            this.codemirror.setValue(
+                this.vpp.$data.anns[this.vpp.$data.ann_idx].text
+            );
+    
+            // update the marks
+            this.cm_update_marks();
+        }
+    },
+
+    set_ann_idx: function(ann_idx) {
+        console.log('* set ann_idx', ann_idx);
+
+        // update the ann_idx
+        this.vpp.$data.ann_idx = ann_idx;
 
         // update the text display
-        this.codemirror.setValue(this.vpp.$data.ann.text);
+        this.codemirror.setValue(
+            this.vpp.$data.anns[this.vpp.$data.ann_idx].text
+        );
 
         // update the marks
         this.cm_update_marks();
@@ -381,19 +440,21 @@ var app_hotpot = {
         // get the ann file
         console.log('* ann file:', fileEntry);
 
-        // set the file name
-        ann_parser.filename = fileEntry.name;
-
         // read this file
-        app_hotpot.read_file_async(fileEntry, function(evt) {
-            var text = evt.target.result;
+        app_hotpot.read_file_async(fileEntry, (function(fileEntry){
+            return function(evt) {
+                var text = evt.target.result;
+    
+                // try to parse this dtd file
+                var ann = ann_parser.parse(fileEntry.name, text);
 
-            // try to parse this dtd file
-            var ann = ann_parser.parse(text);
-            
-            // ok, set the dtd for annotator
-            app_hotpot.set_ann(ann);
-        });
+                // bind the fileEntry
+                ann.fileEntry = fileEntry;
+                
+                // ok, set the dtd for annotator
+                app_hotpot.set_ann(ann);
+            }
+        })(fileEntry));
     },
 
     read_file_async: function(fileEntry, callback) {
@@ -548,7 +609,7 @@ var app_hotpot = {
             locs.push(
                 app_hotpot._calc_range2spans(
                     sel_loc, 
-                    this.vpp.$data.ann.text
+                    this.vpp.$data.anns[this.vpp.$data.ann_idx].text
                 )
             );
             txts.push(sel_txt);
@@ -571,9 +632,11 @@ var app_hotpot = {
         }
         this.marktexts.slice(0, this.marktexts.length);
 
-        for (let i = 0; i < this.vpp.$data.ann.tags.length; i++) {
-            var tag = this.vpp.$data.ann.tags[i];
-            this.cm_mark_obj_in_text(tag, this.vpp.$data.ann.text);
+        var working_ann = this.vpp.$data.anns[this.vpp.$data.ann_idx];
+
+        for (let i = 0; i < working_ann.tags.length; i++) {
+            var tag = working_ann.tags[i];
+            this.cm_mark_obj_in_text(tag, working_ann.text);
         }
 
         this.vpp.$forceUpdate();

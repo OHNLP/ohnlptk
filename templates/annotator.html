@@ -150,6 +150,21 @@ html,body {
     text-indent: 0.5em;
     background-color: #EAEAEA;
 }
+.file-list {
+    font-size: .85em;
+    padding: 2px;
+}
+.file-list li {
+    border-bottom: 1px dotted #eeeeee;
+    cursor: pointer;
+}
+.file-list li.file-selected {
+    font-weight: bold;
+    background-color: #EFEFEF;
+    border-left: 3px solid #1ba1e2;
+    padding-left: 5px;
+}
+/* tag list */
 .tag-list {
     font-size: .85em;
     padding: 2px;
@@ -270,9 +285,9 @@ input[type=text].tag-attr-input {
                     <div id="dropzone_ann" 
                         v-bind:class="{'disabled-zone': !has_dtd, 'dropzone': has_dtd}">
                         <div v-if="has_ann" class="zone-text">
-                            <b>{{ ann.fn }}</b><br>
-                            {{ ann.text.length }} chars<br>
-                            {{ ann.tags.length }} tags
+                            <b>{{ anns[ann_idx]._fh.name }}</b><br>
+                            {{ anns[ann_idx].text.length }} chars<br>
+                            {{ anns[ann_idx].tags.length }} tags
                         </div>
                         <div v-else>
                             Drop <b>Annotation</b> File Here
@@ -280,11 +295,11 @@ input[type=text].tag-attr-input {
                     </div>
 
                     <button class="ribbon-button"
-                        v-on:click="download_xml">
+                        v-on:click="open_files">
                         <span class="icon">
                             <i class="fa fa-file-code"></i>
                         </span>
-                        <span class="caption">XML File</span>
+                        <span class="caption">Load Files</span>
                     </button>
 
                     <span class="title">Annotation File (txt / xml)</span>
@@ -379,15 +394,23 @@ input[type=text].tag-attr-input {
             style="height: 60%;">
             <div id="mui_filelist"
                 class="d-flex flex-justify-start flex-align-start h-100"
-                style="width: 200px;">
-                
+                style="width: 250px;">
+                <ul class="w-100 file-list">
+                    <li v-for="ann, idx in anns"
+                        v-bind:class="{'file-selected':idx == ann_idx}">
+                        <div v-on:click="set_ann_idx(idx)"
+                            v-bind:title="ann._fh.name">
+                            {{ ann._fh.name }}
+                        </div>
+                    </li>
+                </ul>
             </div>
 
             <div class="h-100 h-splitter">
             </div>
 
             <div id="mui_texteditor"
-                style="width: calc(100% - 200px); height: calc(100% - 10);">
+                style="width: calc(100% - 250px); height: calc(100% - 10);">
                 <div id="cm_editor" class="w-100">
                     
                 </div>
@@ -399,7 +422,7 @@ input[type=text].tag-attr-input {
             style="height: 40%;">
             <div id="mui_dtdlist" 
                 class="d-flex h-100"
-                style="width: 200px;">
+                style="width: 250px;">
                 <ul v-if="has_dtd"
                     class="w-100 tag-list">
 
@@ -441,7 +464,7 @@ input[type=text].tag-attr-input {
             </div>
 
             <div id="mui_annlist" 
-                style="overflow-y: auto; width: calc(100% - 200px);"
+                style="overflow-y: auto; width: calc(100% - 250px);"
                 class="d-flex flex-justify-start flex-align-start h-100">
                 <table v-if="has_ann" class="tag-table w-100 mt-0 mb-0">
                     <thead>
@@ -454,7 +477,7 @@ input[type=text].tag-attr-input {
                         </tr>
                     </thead>
                     <tbody style="overflow-y: auto;">
-                        <tr v-for="tag, tag_idx in ann.tags">
+                        <tr v-for="tag, tag_idx in anns[ann_idx].tags">
                             <td>
                                 <i class="fa fa-tag"
                                     v-bind:class="'fg-tag-' + tag.tag">
@@ -474,7 +497,7 @@ input[type=text].tag-attr-input {
                                     <span>
                                         <input type="text"
                                             class="tag-attr-input"
-                                            v-model="ann.tags[tag_idx][attr]">
+                                            v-model="anns[ann_idx].tags[tag_idx][attr]">
                                     </span>
                                 </span>
                             </td>
@@ -548,6 +571,9 @@ if (isIE) {
 <!-- code mirror -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
 <script>
+
+// The file helper 
+{% include 'js/fs_helper.js' %}
 
 // The DTD parser
 {% include 'js/dtd_parser.js' %}
