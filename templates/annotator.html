@@ -96,6 +96,20 @@ html,body {
 .mark-tag-hover {    
     border: 2px dotted red;
 }
+.mark-tag-info {
+    font-size: .75em;
+    margin: 0 5px 0 0;
+    padding: 0px 2px;
+    background: white;
+    border-radius: 4px;
+}
+.mark-tag-info-inline {
+}
+.mark-tag-info-offset {
+    position: relative;
+    left: 0;
+    bottom: -1em;
+}
 .mark-round {
     border-radius: 8px;
     padding: 0 1px 0 0;
@@ -106,7 +120,7 @@ html,body {
 }
 .CodeMirror {
     height: 100%;
-    font-size: 12px;
+    font-size: 14px;
 }
 /* for the pop menu */
 #popmenu_tag {
@@ -137,7 +151,7 @@ html,body {
     background-color: #EAEAEA;
 }
 .tag-list {
-    font-size: 12px;
+    font-size: .85em;
     padding: 2px;
 }
 .tag-list li {
@@ -147,8 +161,13 @@ html,body {
 .tag-list li:hover {
     background-color: #EAEAEA;
 }
+.tag-list-row-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 .tag-table {
-    font-size: 12px;
+    font-size: .85em;
 }
 .tag-table th, 
 .tag-table td {
@@ -173,6 +192,19 @@ html,body {
     background-color: whitesmoke;
     border-radius: 3px;
     padding: 1px 4px;
+}
+.tag-attr-name {
+    font-size: .85em;
+}
+input[type=text].tag-attr-input {
+    padding: 0 3px;
+    max-width: 80px;
+    line-height: .9em;
+    height: 1.5em;
+    display: inline;
+    font-size: .9em;
+    border: 0;
+    border-bottom: 1px solid #999999;
 }
 </style>
 {% endblock %}
@@ -246,6 +278,14 @@ html,body {
                             Drop <b>Annotation</b> File Here
                         </div>
                     </div>
+
+                    <button class="ribbon-button"
+                        v-on:click="download_xml">
+                        <span class="icon">
+                            <i class="fa fa-file-code"></i>
+                        </span>
+                        <span class="caption">XML File</span>
+                    </button>
 
                     <span class="title">Annotation File (txt / xml)</span>
                 </div>
@@ -377,7 +417,7 @@ html,body {
                     <li v-for="etag in dtd.etags"
                         v-on:click="update_tag_table(etag)"
                         class="tag-list-row d-flex flex-row flex-justify-between">
-                        <div>
+                        <div class="tag-list-row-name">
                             <i class="fa fa-tag"
                                 v-bind:class="'fg-tag-' + etag.name">
                             </i>
@@ -414,7 +454,7 @@ html,body {
                         </tr>
                     </thead>
                     <tbody style="overflow-y: auto;">
-                        <tr v-for="tag in ann.tags">
+                        <tr v-for="tag, tag_idx in ann.tags">
                             <td>
                                 <i class="fa fa-tag"
                                     v-bind:class="'fg-tag-' + tag.tag">
@@ -428,8 +468,14 @@ html,body {
                                 <span v-for="(value, attr) in tag"
                                     v-if="!['id','spans','text','tag'].contains(attr)"
                                     class="tag-attr-span mr-1">
-                                    <span class="">{{ attr }}: </span>
-                                    <span>{{ tag[attr] }}</span>
+                                    <span class="tag-attr-name">
+                                        {{ attr }}: 
+                                    </span>
+                                    <span>
+                                        <input type="text"
+                                            class="tag-attr-input"
+                                            v-model="ann.tags[tag_idx][attr]">
+                                    </span>
                                 </span>
                             </td>
                         </tr>
@@ -439,7 +485,7 @@ html,body {
         </div>
             
     </div>
-    </div>
+    
 
     <!-- the context menu -->
     <div v-if="has_dtd"

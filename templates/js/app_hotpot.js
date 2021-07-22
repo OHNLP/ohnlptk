@@ -41,6 +41,9 @@ var app_hotpot = {
 
             // after 
             app_hotpot.ctxmenu_sel.hide();
+
+            // scroll the view
+            app_hotpot.scroll_annlist_to_bottom();
         },
 
         ctxmenu_close: function() {
@@ -257,7 +260,7 @@ var app_hotpot = {
                     app_hotpot.ctxmenu_sel.hide();
                 }
 
-                if (obj.hasClass('mark-tag')) {
+                if (obj.hasClass('mark-tag-text')) {
                     // this is a mark in code mirror
                     var tag_id = dom.getAttribute('tag_id');
                     app_hotpot.show_tag_popmenu(mouseX, mouseY);
@@ -595,16 +598,33 @@ var app_hotpot = {
             var ln1 = rst[1][0];
             var ch1 = rst[1][1];
 
+
+            // the second step is to enhance the mark tag with more info
+            var markHTML = [
+                '<span class="mark-tag mark-tag-'+tag.tag+'" id="mark-id-'+tag_id+'">',
+                '<span class="mark-tag-info">',
+                    '<span class="mark-tag-info-inline">',
+                    tag_id,
+                    '</span>',
+                '</span>',
+                '<span class="mark-tag-text" tag_id="'+tag_id+'">',
+                tag.text,
+                '</span>',
+                '</span>'
+            ].join('');
+
+            // convert this HTML to DOMElement
+            var placeholder = document.createElement('div');
+            placeholder.innerHTML = markHTML;
+            var markNode = placeholder.firstElementChild;
+
             // add mark to text
             this.marktexts.push(this.codemirror.markText(
                 {line: ln0, ch: ch0},
                 {line: ln1, ch: ch1},
                 {
                     className: 'mark-tag mark-tag-' + tag.tag,
-                    attributes: {
-                        id: 'mark-id-' + tag_id,
-                        tag_id: tag_id
-                    }
+                    replacedWith: markNode
                 }
             ));
         }
@@ -655,4 +675,8 @@ var app_hotpot = {
         return [ [ln0, ch0], [ln1, ch1] ];
     },
 
+    scroll_annlist_to_bottom: function() {
+        var objDiv = document.getElementById("mui_annlist");
+        objDiv.scrollTop = objDiv.scrollHeight;
+    }
 };
