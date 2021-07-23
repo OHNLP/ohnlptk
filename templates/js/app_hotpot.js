@@ -30,8 +30,7 @@ var app_hotpot = {
         update_tag_table: function(tag) {
             console.log('* update tag table', tag);
         },
-
-        //
+        
         open_files: function() {
             // the settings for annotation file
             var pickerOpts = {
@@ -65,9 +64,17 @@ var app_hotpot = {
             });
         },
 
+        set_ann_idx: function(idx) {
+            app_hotpot.set_ann_idx(idx);
+        },
 
-        set_ann_idx: function(ann_idx) {
-            app_hotpot.set_ann_idx(ann_idx);
+        remove_ann_file: function(idx) {
+            // delete this first
+            this.anns.splice(idx, 1);
+
+            if (idx == this.ann_idx) {
+                app_hotpot.set_ann_idx(null);
+            }
         },
 
         /////////////////////////////////////////////////////////////////
@@ -115,7 +122,7 @@ var app_hotpot = {
         // Other utils
         /////////////////////////////////////////////////////////////////
         count_n_tags: function(tag) {
-            if (!this.has_ann) {
+            if (this.ann_idx == null) {
                 return '';
             }
             var cnt = 0;
@@ -210,8 +217,9 @@ var app_hotpot = {
         this.codemirror = CodeMirror(
             document.getElementById('cm_editor'), {
                 lineNumbers: true,
+                lineWrapping: true,
                 readOnly: true,
-                lineWrapping: true
+                styleActiveLine: true
             }
         );
 
@@ -289,13 +297,21 @@ var app_hotpot = {
         // update the ann_idx
         this.vpp.$data.ann_idx = ann_idx;
 
-        // update the text display
-        this.codemirror.setValue(
-            this.vpp.$data.anns[this.vpp.$data.ann_idx].text
-        );
+        if (ann_idx == null) {
+            // which means remove the content
+            this.codemirror.setValue('');
 
-        // update the marks
-        this.cm_update_marks();
+            // update the marks
+            this.cm_update_marks();
+        } else {
+            // update the text display
+            this.codemirror.setValue(
+                this.vpp.$data.anns[this.vpp.$data.ann_idx].text
+            );
+
+            // update the marks
+            this.cm_update_marks();
+        }
     },
 
     bind_events: function() {
@@ -703,6 +719,12 @@ var app_hotpot = {
         }
         this.marktexts.slice(0, this.marktexts.length);
 
+        if (this.vpp.$data.ann_idx == null) {
+            // nothing to do for empty
+            return;
+        }
+
+        // update the new marks
         var working_ann = this.vpp.$data.anns[this.vpp.$data.ann_idx];
 
         for (let i = 0; i < working_ann.tags.length; i++) {

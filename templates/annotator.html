@@ -151,6 +151,9 @@ html,body {
     height: 100%;
     font-size: 14px;
 }
+.CodeMirror-activeline-background {
+    background-color: #e3f3fb;
+}
 /* for the pop menu */
 #popmenu_tag {
     z-index: 998;
@@ -191,6 +194,12 @@ html,body {
     background-color: #EFEFEF;
     border-left: 3px solid #1ba1e2;
     padding-left: 5px;
+}
+.file-list-item {
+    margin-bottom: 1px;
+}
+.file-list-item:hover {
+    background-color: #e9e8e8;
 }
 .file-list-item-name {
     overflow: hidden;
@@ -495,7 +504,8 @@ input[type=text].ipt-xs {
                     <ul class="w-100 file-list">
                         <li v-for="ann, idx in anns"
                             v-show="idx == ann_idx || is_match_filename(ann._fh.name)"
-                            v-bind:class="{'file-selected':idx == ann_idx}">
+                            v-bind:class="{'file-selected':idx == ann_idx}"
+                            class="file-list-item">
                             <div v-bind:title="ann._fh.name"
                                 class="d-flex flex-row flex-justify-between">
                                 <div class="file-list-item-name"
@@ -509,7 +519,8 @@ input[type=text].ipt-xs {
                                     </div>
 
                                     <div>
-                                        <a class="btn btn-red btn-xs"
+                                        <a v-on:click="remove_ann_file(idx)"
+                                            class="btn btn-red btn-xs"
                                             href="javascript:void(0);">
                                             <i class="fa fa-sign-out-alt"></i>
                                         </a>
@@ -709,6 +720,8 @@ if (isIE) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <!-- code mirror -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
+<!-- code mirror addon -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/selection/active-line.min.js"></script>
 <script>
 
 // The file helper 
