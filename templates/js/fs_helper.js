@@ -17,6 +17,15 @@ async function read_ann_file_handle(fh) {
     // bind a status
     ann._saved = true;
 
-
     return ann;
+}
+
+async function write_ann_file(fh, contents) {
+    const writable = await fh.createWritable();
+    
+    // write the contents
+    await writable.write(contents);
+
+    // close the file
+    await writable.close();
 }

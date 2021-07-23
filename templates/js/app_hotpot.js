@@ -12,7 +12,10 @@ var app_hotpot = {
         anns: [],
 
         // for menu
-        clicked_tag_id: null
+        clicked_tag_id: null,
+
+        // for file name filter
+        fn_pattern: '',
     },
 
     vpp_methods: {
@@ -96,7 +99,7 @@ var app_hotpot = {
 
         popmenu_del_tag: function() {
             // delete the clicked tag id
-            app_hotpot.delete_tag(this.clicked_tag_id, this.anns[this.ann_idx]);
+            app_hotpot.remove_tag_from_ann(this.clicked_tag_id, this.anns[this.ann_idx]);
 
             // update the cm
             app_hotpot.cm_update_marks();
@@ -125,6 +128,18 @@ var app_hotpot = {
                 }
             }
             return cnt;
+        },
+
+        is_match_filename: function(fn) {
+            let p = this.fn_pattern.trim();
+            if (p == '') {
+                return true;
+            }
+            if (fn.lastIndexOf(p) >= 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
 
@@ -475,7 +490,7 @@ var app_hotpot = {
         '#ffff99',
         '#b15928',
         '#8dd3c7',
-        '#ffffb3',
+        '#9c9c64',
         '#bebada',
         '#fb8072',
         '#80b1d3',
@@ -516,6 +531,12 @@ var app_hotpot = {
                 );
                 style.insertRule(
                     ".fg-tag-" + tag_name + " { color: " + color + " !important; }",
+                    0
+                );
+
+                // add this tag as the hint
+                style.insertRule(
+                    ".mark-tag-hint-" + tag_name + " { background-color: " + color + "66; }",
                     0
                 );
 
@@ -583,6 +604,15 @@ var app_hotpot = {
         });
     },
 
+    del_tag: function(tag_id, ann) {
+        if (typeof(ann) == 'undefined') {
+            ann = this.vpp.$data.anns[this.vpp.$data.ann_idx];
+        }
+        this.remove_tag_from_ann(tag_id, ann);
+
+        // update the marks
+        app_hotpot.cm_update_marks();
+    },
 
     /////////////////////////////////////////////////////////////////
     // Tag Related
@@ -618,8 +648,8 @@ var app_hotpot = {
 
         return basic_tag;
     },
-
-    delete_tag: function(tag_id, ann) {
+    
+    remove_tag_from_ann: function(tag_id, ann) {
         var tag_idx = -1;
         for (let i = 0; i < ann.tags.length; i++) {
             if (ann.tags[i].id == tag_id) {
@@ -684,7 +714,6 @@ var app_hotpot = {
     },
 
     cm_mark_obj_in_text: function(tag, text) {
-        var tag_id = tag['id'];
         var raw_spans = tag['spans'];
         if (raw_spans == '' || raw_spans == null) { 
             return [-1]; 
@@ -705,14 +734,17 @@ var app_hotpot = {
 
             // the second step is to enhance the mark tag with more info
             var markHTML = [
-                '<span class="mark-tag mark-tag-'+tag.tag+'" id="mark-id-'+tag_id+'">',
+                '<span class="mark-tag mark-tag-'+tag.tag+'" id="mark-id-'+tag.id+'">',
                 '<span class="mark-tag-info">',
-                    '<span class="mark-tag-info-inline">',
-                    tag_id,
+                    '<span class="mark-tag-info-inline fg-tag-'+tag.tag+'">',
+                    tag.id,
                     '</span>',
                 '</span>',
-                '<span class="mark-tag-text" tag_id="'+tag_id+'">',
+                '<span class="mark-tag-text" tag_id="'+tag.id+'">',
                 tag.text,
+                '</span>',
+                '<span class="mark-tag-info-offset" title="Delete tag '+tag.id+'" onclick="app_hotpot.del_tag(\''+tag.id+'\');">',
+                    '<i class="fa fa-times-circle"></i>',
                 '</span>',
                 '</span>'
             ].join('');
