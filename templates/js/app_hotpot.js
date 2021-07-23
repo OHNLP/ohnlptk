@@ -711,13 +711,14 @@ var app_hotpot = {
         return tag;
     },
 
+    // cm_add_mark(tar)
+
     cm_update_marks: function() {
         // clear and add the markers
-        for (let i = 0; i < this.marktexts.length; i++) {
-            var marktext = this.marktexts[i];
-            marktext.clear();
+        var marks = this.codemirror.getAllMarks();
+        for (let i = 0; i < marks.length; i++) {
+            marks[i].clear();
         }
-        this.marktexts.slice(0, this.marktexts.length);
 
         if (this.vpp.$data.ann_idx == null) {
             // nothing to do for empty
@@ -777,14 +778,17 @@ var app_hotpot = {
             var markNode = placeholder.firstElementChild;
 
             // add mark to text
-            this.marktexts.push(this.codemirror.markText(
+            this.codemirror.markText(
                 {line: ln0, ch: ch0},
                 {line: ln1, ch: ch1},
                 {
                     className: 'mark-tag mark-tag-' + tag.tag,
-                    replacedWith: markNode
+                    replacedWith: markNode,
+                    attributes: {
+                        tag_id: tag.id
+                    }
                 }
-            ));
+            );
         }
 
     },
