@@ -250,21 +250,36 @@ html,body {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.tag-attr-span {
+.tag-attr-box {
     background-color: whitesmoke;
     border-radius: 3px;
-    padding: 1px 4px;
+    padding: 1px 5px;
+}
+.tag-attr-box:hover{
+    background-color: rgb(209, 209, 209);
 }
 .tag-attr-name {
-    font-size: .85em;
+    font-size: .9em;
 }
 input[type=text].tag-attr-input {
     padding: 0 3px;
-    max-width: 80px;
+    width: auto;
+    max-width: 120px;
     line-height: .9em;
     height: 1.5em;
     display: inline;
-    font-size: .9em;
+    font-size: 1em;
+    border: 0;
+    border-bottom: 1px solid #999999;
+}
+select.tag-attr-select {
+    padding: 0 3px;
+    width: auto;
+    max-width: 120px;
+    line-height: .9em;
+    height: 1.5em;
+    display: inline;
+    font-size: 1em;
     border: 0;
     border-bottom: 1px solid #999999;
 }
@@ -614,19 +629,35 @@ input[type=text].ipt-xs {
                             <td>{{ tag.id }}</td>
                             <td>{{ tag.spans }}</td>
                             <td class="td-text">{{ tag.text }}</td>
-                            <td>
-                                <span v-for="(value, attr) in tag"
-                                    v-if="!['id','spans','text','tag'].contains(attr)"
-                                    class="tag-attr-span mr-1">
-                                    <span class="tag-attr-name">
-                                        {{ attr }}: 
-                                    </span>
-                                    <span>
+                            <td class="d-flex flex-row flex-justify-start flex-align-start">
+                                <div v-for="(attlist, attlist_idx) in dtd.tag_dict[tag.tag].attlists"
+                                    v-if="!['id','spans','text','tag'].contains(attlist.name)"
+                                    class="tag-attr-box mr-1 d-flex flex-column">
+                                    <div class="tag-attr-name">
+                                        {{ attlist.name }}
+                                    </div>
+                                    
+                                    <div v-if="attlist.vtype == 'list'">
+                                        <select class="tag-attr-select"
+                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]">
+                                            <option v-for="val in attlist.values"
+                                                v-bind:value="val">
+                                                {{ val }}
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div v-else-if="attlist.vtype == 'text'">
                                         <input type="text"
                                             class="tag-attr-input"
-                                            v-model="anns[ann_idx].tags[tag_idx][attr]">
-                                    </span>
-                                </span>
+                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]">
+                                    </div>
+                                    <div v-else>
+                                        <input type="text"
+                                            class="tag-attr-input"
+                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]">
+                                    </div>
+                                </div>
+                                
                             </td>
                         </tr>
                     </tbody>
