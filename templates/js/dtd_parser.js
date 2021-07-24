@@ -4,6 +4,7 @@ var dtd_parser = {
         element: /^\<\!ELEMENT\s+([a-zA-Z\-0-9\_]+)\s.+/gmi,
         attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([a-zA-Z0-9\_]+)\s+(\S+)\s/gmi,
         attlist_values: /\(([a-zA-Z0-9\_\ \|]+)\)/gmi,
+        attlist_require: /#([A-Z]+)+(\b["a-zA-Z0-9\-\_\ ]+|\>)/gm
     },
 
     parse: function(text) {
@@ -66,8 +67,13 @@ var dtd_parser = {
         }
 
         // split the tags
+        
         for (const name in dtd.tag_dict) {
             if (Object.hasOwnProperty.call(dtd.tag_dict, name)) {
+                // now, create a attlist_dict for each tag
+                dtd.tag_dict[name].attlist_dict = this.make_attlist_dict(dtd.tag_dict[name]);
+
+                // last, put this tag to list
                 const element = dtd.tag_dict[name];
                 if (element.type == 'etag') {
                     dtd.etags.push(element);
@@ -177,6 +183,7 @@ var dtd_parser = {
                 name: '',
                 type: 'attr',
                 vtype: '',
+                require: '',
                 values: [],
                 default_value: ''
             };
@@ -214,13 +221,27 @@ var dtd_parser = {
                         // it's an attr for link tag
                         attlist.vtype = 'idref';
 
-                    } else if (match.startsWith('#')) {
-                        // sometimes ...
                     }
                 } else {
                     // what?
                 }
             });
+
+            // before end, check the require info
+            var require = this.get_attlist_require(line);
+                        
+            if (require.length == 0) {
+                // which means this attlist has nothing
+
+            } else if (require.length == 1) {
+                // which means just has the require name it self
+                attlist.require = require[0];
+
+            } else if (require.length == 2) {
+                // which means it has the default value!
+                attlist.require = require[0];
+                attlist.default_value = require[1];
+            }
 
             ret = attlist;
         }
@@ -258,6 +279,56 @@ var dtd_parser = {
         }
 
         return ret;
+    },
+
+    get_attlist_require: function(line) {
+        let m;
+        var ret = [];
+        let regex = this.regex.attlist_require;
+
+        while ((m = regex.exec(line)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+
+            // the final values?
+            var values = [];
+
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                console.log(`Found attlist require match, group ${groupIndex}: ${match}`);
+                // group 0 is the leading text
+                if (groupIndex == 1) {
+                    // which is the require name
+                    // IMPLIED or REQUIRED
+                    values.push(match)
+                } else if (groupIndex == 2) {
+                    // get default value 
+                    var t = match.replaceAll('"', '');
+                    t = t.replaceAll('>', '');
+                    t = t.trim();
+
+                    // not matter what is left, save it
+                    values.push(t);
+                }
+            });
+
+            ret = values;
+        }
+
+        
+        return ret;
+    },
+
+    make_attlist_dict: function(tag) {
+        let attlist_dict = {};
+
+        for (let i = 0; i < tag.attlists.length; i++) {
+            attlist_dict[tag.attlists[i].name] = tag.attlists[i];
+        }
+
+        return attlist_dict;
     },
 
     get_next_id_prefix: function(element) {
