@@ -1,4 +1,8 @@
 var app_hotpot = {
+    // metro app toast
+    toast: Metro.toast.create,
+
+    // vue app
     vpp: null,
     vpp_id: '#app_hotpot',
 
@@ -100,6 +104,17 @@ var app_hotpot = {
             if (idx == this.ann_idx) {
                 app_hotpot.set_ann_idx(null);
             }
+        },
+
+        on_change_attr_value: function(event) {
+            // just mark current ann as unsaved
+            this.anns[this.ann_idx]._has_saved = false;
+            // console.log('* changed attr to', event.target.value);
+        },
+
+        on_input_attr_value: function(event) {
+            // just mark current ann as unsaved
+            this.anns[this.ann_idx]._has_saved = false;
         },
 
         /////////////////////////////////////////////////////////////////
@@ -708,6 +723,9 @@ var app_hotpot = {
     callback_save_xml: function(fh) {
         // update the status
         this.vpp.anns[this.vpp.$data.ann_idx]._has_saved = true;
+
+        // show something
+        this.msg('Successfully saved ' + fh.name);
     },
 
     /////////////////////////////////////////////////////////////////
@@ -866,5 +884,24 @@ var app_hotpot = {
     scroll_annlist_to_bottom: function() {
         var objDiv = document.getElementById("mui_annlist");
         objDiv.scrollTop = objDiv.scrollHeight;
+    },
+
+    
+    /////////////////////////////////////////////////////////////////
+    // Utils
+    /////////////////////////////////////////////////////////////////
+    msg: function(msg, cls, timeout) {
+        if (typeof(cls) == 'undefined') {
+            cls = '';
+        }
+        if (typeof(timeout) == 'undefined') {
+            timeout = 4000;
+        }
+        var options = {
+            showTop: true,
+            timeout: timeout,
+            clsToast: cls
+        };
+        this.toast(msg, null, null, null, options);
     }
 };

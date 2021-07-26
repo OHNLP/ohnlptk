@@ -657,7 +657,8 @@ input[type=text].ipt-xs {
                                     
                                     <div v-if="attlist.vtype == 'list'">
                                         <select class="tag-attr-select"
-                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]">
+                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
+                                            @change="on_change_attr_value">
                                             <option v-for="val in attlist.values"
                                                 v-bind:value="val">
                                                 {{ val }}
@@ -667,12 +668,14 @@ input[type=text].ipt-xs {
                                     <div v-else-if="attlist.vtype == 'text'">
                                         <input type="text"
                                             class="tag-attr-input"
-                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]">
+                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
+                                            @input="on_input_attr_value">
                                     </div>
                                     <div v-else>
                                         <input type="text"
                                             class="tag-attr-input"
-                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]">
+                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
+                                            @input="on_input_attr_value">
                                     </div>
                                 </div>
                                 

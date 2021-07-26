@@ -128,7 +128,7 @@ var ann_parser = {
         if (xmlStr.startsWith('<?xml')) {
             // nothing, it' OK
         } else {
-            xmlStr = '<?xml version="1.0" encoding="UTF-8" ?>' + xmlStr;
+            xmlStr = '<?xml version="1.0" encoding="UTF-8" ?>\n' + xmlStr;
         }
 
         if (typeof(pretty)=='undefined') {
