@@ -397,7 +397,7 @@ input[type=text].ipt-xs {
                     <button class="ribbon-button"
                         v-on:click="open_files">
                         <span class="icon">
-                            <i class="fa fa-file-code"></i>
+                            <i class="far fa-file-code"></i>
                         </span>
                         <span class="caption">Load Files</span>
                     </button>
@@ -410,9 +410,17 @@ input[type=text].ipt-xs {
                     <button class="ribbon-button"
                         v-on:click="download_xml">
                         <span class="icon">
-                            <i class="fa fa-file-code"></i>
+                            <i class="far fa-save"></i>
                         </span>
-                        <span class="caption">XML File</span>
+                        <span class="caption">Save</span>
+                    </button>
+ 
+                    <button class="ribbon-button"
+                        v-on:click="download_xml">
+                        <span class="icon">
+                            <i class="far fa-copy"></i>
+                        </span>
+                        <span class="caption">Save as</span>
                     </button>
                     <a id="downloadAnchorElem" style="display:none"></a>
 
@@ -432,7 +440,7 @@ input[type=text].ipt-xs {
                     <button class="ribbon-button" 
                         v-on:click="show_about">
                         <span class="icon">
-                            <i class="fa fa-book"></i>
+                            <i class="fa fa-info"></i>
                         </span>
                         <span class="caption">About</span>
                     </button>
@@ -753,6 +761,8 @@ if (isIE) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
 <!-- code mirror addon -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/selection/active-line.min.js"></script>
+<!-- xml vkbeautify -->
+<script src="https://cdn.jsdelivr.net/npm/xml-formatter@1.1.0/browser/xml-formatter.js"></script>
 <script>
 
 // The file helper 

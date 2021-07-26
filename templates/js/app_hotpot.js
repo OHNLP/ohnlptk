@@ -20,7 +20,13 @@ var app_hotpot = {
 
     vpp_methods: {
         download_xml: function() {
+            // convert to xml
+            var xmlDoc = ann_parser.ann2xml(this.anns[this.ann_idx]);
 
+            // convert to text
+            var xmlStr = ann_parser.xml2str(xmlDoc, false);
+
+            console.log('* converted to XML', xmlStr);
         },
 
         show_about: function() {
@@ -172,34 +178,6 @@ var app_hotpot = {
 
     // the popup menu for tag
     popmenu_tag: null,
-
-    // sample: {
-    //     ann: {
-    //         fn: 'test.txt_1.xml',
-    //         text: 'The patient had a dry cough and fever or chills yesterday. He is also experiencing new loss of taste today and three days ago.',
-    //         dtd_name: 'delirium',
-    //         tags: [{
-    //             "tag": "AMS",
-    //             "id": "A0",
-    //             "spans": "4~11",
-    //             "text": "patient",
-    //             "status": "present",
-    //             "experiencer": "patient",
-    //             "certainty": "confirmed",
-    //             "exclusion": "no",
-    //             "CAM_criteria": "A"
-    //         }, {
-    //             "tag": "Delirium",
-    //             "id": "D0",
-    //             "spans": "32~37,41~47,65~69",
-    //             "text": "fever ... chills ... also",
-    //             "status": "present",
-    //             "experiencer": "patient",
-    //             "certainty": "confirmed",
-    //             "exclusion": "no"
-    //         }]
-    //     }
-    // },
 
     init: function() {
         this.vpp = new Vue({

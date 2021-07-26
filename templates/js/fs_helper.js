@@ -15,7 +15,7 @@ async function read_ann_file_handle(fh) {
     ann._fh = fh;
 
     // bind a status
-    ann._saved = true;
+    ann._has_saved = true;
 
     return ann;
 }
@@ -29,3 +29,19 @@ async function write_ann_file(fh, contents) {
     // close the file
     await writable.close();
 }
+
+async function get_new_ann_file_handle(fn) {
+    const options = {
+    suggestedName: fn,
+      types: [
+        {
+          description: 'Text Files',
+          accept: {
+            'text/xml': ['.xml'],
+          },
+        },
+      ],
+    };
+    const handle = await window.showSaveFilePicker(options);
+    return handle;
+  }
