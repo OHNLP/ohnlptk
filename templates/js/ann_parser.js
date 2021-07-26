@@ -122,16 +122,23 @@ var ann_parser = {
 
     xml2str: function(xmlDoc, pretty) {
         const serializer = new XMLSerializer();
-        const xmlStr = serializer.serializeToString(xmlDoc);
+        var xmlStr = serializer.serializeToString(xmlDoc);
+
+        // fix missing 
+        if (xmlStr.startsWith('<?xml')) {
+            // nothing, it' OK
+        } else {
+            xmlStr = '<?xml version="1.0" encoding="UTF-8" ?>' + xmlStr;
+        }
 
         if (typeof(pretty)=='undefined') {
             pretty = true;
         }
 
         if (pretty) {
-            var xml_prettify = require('xml-formatter');
-            var pretty_xmlStr = xml_prettify(xmlStr);
-            return pretty_xmlStr;
+            // var pretty_xmlStr = vkbeautify.xml(xmlStr, 0);
+            // return pretty_xmlStr;
+            
         }
 
         return xmlStr;

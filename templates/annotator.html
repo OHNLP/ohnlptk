@@ -414,7 +414,7 @@ input[type=text].ipt-xs {
                 <div v-if="ann_idx != null"
                     class="group">
                     <button class="ribbon-button"
-                        v-on:click="download_xml">
+                        v-on:click="save_xml">
                         <span class="icon">
                             <i class="far fa-save"></i>
                         </span>
@@ -771,8 +771,7 @@ if (isIE) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
 <!-- code mirror addon -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/selection/active-line.min.js"></script>
-<!-- xml vkbeautify -->
-<script src="https://cdn.jsdelivr.net/npm/xml-formatter@1.1.0/browser/xml-formatter.js"></script>
+
 <script>
 
 // The file helper 

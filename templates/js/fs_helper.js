@@ -28,6 +28,8 @@ async function write_ann_file(fh, contents) {
 
     // close the file
     await writable.close();
+
+    return fh;
 }
 
 async function get_new_ann_file_handle(fn) {

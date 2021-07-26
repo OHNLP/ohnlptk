@@ -19,6 +19,25 @@ var app_hotpot = {
     },
 
     vpp_methods: {
+        save_xml: function() {
+            // convert to xml
+            var xmlDoc = ann_parser.ann2xml(this.anns[this.ann_idx]);
+
+            // convert to text
+            var xmlStr = ann_parser.xml2str(xmlDoc, false);
+
+            // save it!
+            var p_rst = write_ann_file(
+                this.anns[this.ann_idx]._fh,
+                xmlStr
+            );
+
+            p_rst.then(function(fh) {
+                // in fact, please make sure the file is saved correctly
+                app_hotpot.callback_save_xml(fh);
+            });
+        },
+
         download_xml: function() {
             // convert to xml
             var xmlDoc = ann_parser.ann2xml(this.anns[this.ann_idx]);
@@ -684,6 +703,11 @@ var app_hotpot = {
         }
 
         return ann;
+    },
+
+    callback_save_xml: function(fh) {
+        // update the status
+        this.vpp.anns[this.vpp.$data.ann_idx]._has_saved = true;
     },
 
     /////////////////////////////////////////////////////////////////
