@@ -38,7 +38,7 @@ var app_hotpot = {
                     {
                         description: 'Annotation File',
                         accept: {
-                            'text/*': ['.txt', '.xml']
+                            'text/xml': ['.xml']
                         }
                     },
                 ],
@@ -147,6 +147,16 @@ var app_hotpot = {
             } else {
                 return false;
             }
+        },
+
+        has_included_ann_file: function(fn) {
+            for (let i = 0; i < this.anns.length; i++) {
+                if (this.anns[i]._fh.name == fn) {
+                    return true;
+                }
+            }
+
+            return false;
         }
     },
 
@@ -435,10 +445,19 @@ var app_hotpot = {
             for (let i=0; i<items.length; i++) {
                 console.log(items[i]);
                 // let item = items[i].webkitGetAsEntry();
+
+                // get this item as a FileSystemHandle Object
+                // this could be used for saving the content back
                 let item = items[i].getAsFileSystemHandle();
                 item.then(function(fh) {
                     if (fh.kind == 'file') {
-                        // show something?
+                        // show something or 
+                        // check if this file name exists
+                        if (app_hotpot.vpp.has_included_ann_file(fh.name)) {
+                            // exists? skip this file
+                            return;
+                        }
+
                         // should be a ann txt/xml file
                         app_hotpot.parse_drop_ann(fh);
 
