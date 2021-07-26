@@ -207,6 +207,9 @@ html,body {
     white-space: nowrap;
     cursor: pointer;
 }
+.file-list-item-name-unsaved {
+    font-style: italic;
+}
 /* tag list */
 .tag-list {
     font-size: 1em;
@@ -320,6 +323,9 @@ input[type=text].ipt-xs {
     display: inline;
     border: 0;
     border: 1px solid #999999;
+}
+.clr-fg-unsaved {
+    color: #da8f03;
 }
 </style>
 {% endblock %}
@@ -532,7 +538,11 @@ input[type=text].ipt-xs {
                             <div v-bind:title="ann._fh.name"
                                 class="d-flex flex-row flex-justify-between">
                                 <div class="file-list-item-name"
+                                    v-bind:class="{'file-list-item-name-unsaved':!ann._has_saved}"
                                     v-on:click="set_ann_idx(idx)">
+                                    <i v-show="!ann._has_saved" 
+                                        class="fa fa-map-marker-alt clr-fg-unsaved mr-1">
+                                    </i>
                                     {{ ann._fh.name }}
                                 </div>
 

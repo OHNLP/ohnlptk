@@ -96,6 +96,9 @@ var app_hotpot = {
             // add this tag to ann
             this.anns[this.ann_idx].tags.push(tag);
 
+            // mark _has_saved
+            this.anns[this.ann_idx]._has_saved = false;
+
             // update the cm
             app_hotpot.cm_update_marks();
 
@@ -112,10 +115,9 @@ var app_hotpot = {
 
         popmenu_del_tag: function() {
             // delete the clicked tag id
-            app_hotpot.remove_tag_from_ann(this.clicked_tag_id, this.anns[this.ann_idx]);
-
-            // update the cm
-            app_hotpot.cm_update_marks();
+            app_hotpot.del_tag(
+                this.clicked_tag_id, this.anns[this.ann_idx]
+            );
 
             // hide the menu 
             app_hotpot.popmenu_tag.hide();
@@ -622,6 +624,9 @@ var app_hotpot = {
             ann = this.vpp.$data.anns[this.vpp.$data.ann_idx];
         }
         this.remove_tag_from_ann(tag_id, ann);
+
+        // mark _has_saved
+        this.vpp.$data.anns[this.vpp.$data.ann_idx]._has_saved = false;
 
         // update the marks
         app_hotpot.cm_update_marks();
