@@ -956,7 +956,7 @@ var app_hotpot = {
                 className: 'mark-hint mark-hint-' + hint.tag,
                 attributes: {
                     hint_id: hint.id,
-                    onclick: 'alert("yes!")'
+                    onclick: ''
                 }
             }
         );
@@ -1024,7 +1024,7 @@ var app_hotpot = {
                         className: 'mark-tag mark-tag-' + tag.tag,
                         attributes: {
                             tag_id: tag.id,
-                            onclick: 'alert("yes!")'
+                            onclick: ''
                         }
                     }
                 );
