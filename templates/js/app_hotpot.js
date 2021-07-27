@@ -20,6 +20,15 @@ var app_hotpot = {
 
         // for file name filter
         fn_pattern: '',
+
+        // cm settings
+        cm: {
+            // node / span
+            mark_mode: 'node',
+
+            // simple / smart / off
+            hint_mode: 'simple'
+        }
     },
 
     vpp_methods: {
@@ -31,7 +40,7 @@ var app_hotpot = {
             var xmlStr = ann_parser.xml2str(xmlDoc, false);
 
             // save it!
-            var p_rst = write_ann_file(
+            var p_rst = fs_write_ann_file(
                 this.anns[this.ann_idx]._fh,
                 xmlStr
             );
@@ -59,8 +68,40 @@ var app_hotpot = {
         update_tag_table: function(tag) {
             console.log('* update tag table', tag);
         },
+
+        open_dtd_file: function() {
+            // the settings for dtd file
+            var pickerOpts = {
+                types: [
+                    {
+                        description: 'DTD File',
+                        accept: {
+                            'text/dtd': ['.dtd']
+                        }
+                    },
+                ],
+                excludeAcceptAllOption: true,
+                multiple: false
+            };
+
+            // get the file handles
+            var promise_fileHandles = fs_open_files(pickerOpts);
+
+            promise_fileHandles.then(function(fileHandles) {
+                // bind the content
+                for (let i = 0; i < fileHandles.length; i++) {
+                    const fh = fileHandles[i];
+                    
+                    // read the file
+                    var p_dtd = fs_read_dtd_file_handle(fh);
+                    p_dtd.then(function(dtd) {
+                        app_hotpot.set_dtd(dtd);
+                    });
+                }
+            });
+        },
         
-        open_files: function() {
+        open_ann_files: function() {
             // the settings for annotation file
             var pickerOpts = {
                 types: [
@@ -76,7 +117,7 @@ var app_hotpot = {
             };
 
             // get the file handles
-            var promise_fileHandles = open_files(pickerOpts);
+            var promise_fileHandles = fs_open_files(pickerOpts);
 
             promise_fileHandles.then(function(fileHandles) {
                 // bind the content
@@ -84,9 +125,9 @@ var app_hotpot = {
                     const fh = fileHandles[i];
                     
                     // read the file
-                    var p_ann = read_ann_file_handle(fh);
+                    var p_ann = fs_read_ann_file_handle(fh);
                     p_ann.then(function(ann) {
-                        app_hotpot.set_ann(ann);
+                        app_hotpot.add_ann(ann);
                     });
                     
                 }
@@ -106,6 +147,21 @@ var app_hotpot = {
             }
         },
 
+        remove_all_ann_files: function() {
+            var ret = window.confirm('Are you sure to remove all annotation files?');
+            if (ret) {
+                app_hotpot.set_ann_idx(null);
+                this.anns = [];
+            }
+        },
+
+        del_tag: function(tag_id) {
+            // delete the clicked tag id
+            app_hotpot.del_tag(
+                tag_id, this.anns[this.ann_idx]
+            );
+        },
+
         on_change_attr_value: function(event) {
             // just mark current ann as unsaved
             this.anns[this.ann_idx]._has_saved = false;
@@ -115,6 +171,15 @@ var app_hotpot = {
         on_input_attr_value: function(event) {
             // just mark current ann as unsaved
             this.anns[this.ann_idx]._has_saved = false;
+        },
+
+        on_change_mark_mode: function(event) {
+            console.log(event.target.value);
+            app_hotpot.cm_update_marks();
+        },
+
+        on_change_hint_mode: function(hint_mode) {
+            this.cm.hint_mode = hint_mode;
         },
 
         /////////////////////////////////////////////////////////////////
@@ -198,6 +263,18 @@ var app_hotpot = {
                 }
             }
 
+            return false;
+        },
+
+        has_unsaved_ann_file: function() {
+            for (let i = 0; i < this.anns.length; i++) {
+                const ann = this.anns[i];
+                if (ann._has_saved) {
+
+                } else {
+                    return true;
+                }
+            }
             return false;
         }
     },
@@ -297,10 +374,13 @@ var app_hotpot = {
         this.vpp.$forceUpdate();
     },
 
-    set_ann: function(ann, is_switch_to_this_ann) {
+    add_ann: function(ann, is_switch_to_this_ann) {
         console.log("* set ann", ann);
         this.vpp.$data.has_ann = true;
         this.vpp.$data.anns.push(ann);
+
+        // update hint_dict when add new ann file
+        this.update_hint_dict();
 
         if (is_switch_to_this_ann || this.vpp.$data.anns.length == 1) {
             this.vpp.$data.ann_idx = this.vpp.$data.anns.length - 1;
@@ -327,6 +407,7 @@ var app_hotpot = {
 
             // update the marks
             this.cm_update_marks();
+
         } else {
             // update the text display
             this.codemirror.setValue(
@@ -337,6 +418,11 @@ var app_hotpot = {
             this.cm_update_marks();
         }
     },
+
+
+    /////////////////////////////////////////////////////////////////
+    // Events related
+    /////////////////////////////////////////////////////////////////
 
     bind_events: function() {
         // bind drop zone for dtd
@@ -350,6 +436,9 @@ var app_hotpot = {
 
         // bind global key event
         this.bind_keypress_event();
+
+        // bind the closing event
+        this.bind_unload_event();
     },
 
     bind_click_event: function() {
@@ -396,6 +485,17 @@ var app_hotpot = {
                 console.log('* pressed on', event);
             }
         );
+    },
+
+    bind_unload_event: function() {
+        window.addEventListener('beforeunload', function (event) {
+            if (app_hotpot.vpp.has_unsaved_ann_file()) {
+                event.preventDefault();
+                var msg = 'There are unsaved annotation files, are you sure to leave them unsaved?';
+                event.returnValue = msg;
+                return msg;
+            }
+        });
     },
 
     bind_dropzone_dtd: function() {
@@ -485,6 +585,11 @@ var app_hotpot = {
 
     },
 
+    resize: function() {
+        var h = $(window).height();
+        $('#main_ui').css('height', h - 175);
+    },
+
     parse_drop_dtd: function(fileEntry) {
         app_hotpot.read_file_async(fileEntry, function(evt) {
             var text = evt.target.result;
@@ -501,9 +606,9 @@ var app_hotpot = {
     parse_drop_ann: function(fh) {
         // get the ann file
         console.log('* ann file:', fh);
-        var p_ann = read_ann_file_handle(fh);
+        var p_ann = fs_read_ann_file_handle(fh);
         p_ann.then(function(ann) {
-            app_hotpot.set_ann(ann);
+            app_hotpot.add_ann(ann);
         });
     },
 
@@ -513,11 +618,6 @@ var app_hotpot = {
             reader.onload = callback;
             reader.readAsText(file)
         });
-    },
-
-    resize: function() {
-        var h = $(window).height();
-        $('#main_ui').css('height', h - 175);
     },
 
     /////////////////////////////////////////////////////////////////
@@ -536,7 +636,7 @@ var app_hotpot = {
         '#ff7f00',
         '#cab2d6',
         '#6a3d9a',
-        '#ffff99',
+        '#d0aa3d',
         '#b15928',
         '#8dd3c7',
         '#9c9c64',
@@ -585,7 +685,7 @@ var app_hotpot = {
 
                 // add this tag as the hint
                 style.insertRule(
-                    ".mark-tag-hint-" + tag_name + " { background-color: " + color + "66; }",
+                    ".mark-hint-" + tag_name + ":hover { background-color: " + color + "66; }",
                     0
                 );
 
@@ -664,6 +764,24 @@ var app_hotpot = {
 
         // update the marks
         app_hotpot.cm_update_marks();
+
+        // toast
+        app_hotpot.msg(
+            'Successfully deleted tag ' + tag_id,
+            ''
+        );
+    },
+
+    update_hint_dict: function() {
+        if (this.vpp.$data.anns.length == 0) {
+            return;
+        }
+        var hint_dict = ann_parser.anns2hint_dict(
+            this.vpp.$data.dtd, 
+            this.vpp.$data.anns
+        );
+        this.hint_dict = hint_dict;
+        console.log('* updated hint_dict', this.hint_dict);
     },
 
     /////////////////////////////////////////////////////////////////
@@ -755,8 +873,6 @@ var app_hotpot = {
         return tag;
     },
 
-    // cm_add_mark(tar)
-
     cm_update_marks: function() {
         // clear and add the markers
         var marks = this.codemirror.getAllMarks();
@@ -764,6 +880,36 @@ var app_hotpot = {
             marks[i].clear();
         }
 
+        // update the tag marks
+        this.cm_update_tag_marks();
+
+        // update the hint marks
+        this.cm_update_hint_marks();
+
+        // force update UI, well ... maybe not work
+        this.vpp.$forceUpdate();
+    },
+
+    cm_update_hint_marks: function() {
+        if (this.vpp.$data.ann_idx == null) {
+            // nothing to do for empty
+            return;
+        }
+
+        // find markable hints for this ann
+        var hints = ann_parser.search_hints_in_ann(
+            this.hint_dict,
+            this.vpp.$data.anns[this.vpp.$data.ann_idx]
+        );
+        console.log('* found hints', hints);
+
+        for (let i = 0; i < hints.length; i++) {
+            const hint = hints[i];
+            this.cm_mark_hint_str(hint);
+        }
+    },
+
+    cm_update_tag_marks: function() {
         if (this.vpp.$data.ann_idx == null) {
             // nothing to do for empty
             return;
@@ -774,13 +920,34 @@ var app_hotpot = {
 
         for (let i = 0; i < working_ann.tags.length; i++) {
             var tag = working_ann.tags[i];
-            this.cm_mark_obj_in_text(tag, working_ann.text);
+            this.cm_mark_ann_tag_in_text(tag, working_ann.text);
         }
-
-        this.vpp.$forceUpdate();
     },
 
-    cm_mark_obj_in_text: function(tag, text) {
+    /**
+     * Mark the hint in the code mirror
+     * @param {object} hint it contains the range for rendering
+     */
+    cm_mark_hint_str: function(hint) {
+        var ln0 = hint.range[0][0];
+        var ch0 = hint.range[0][1];
+        var ln1 = hint.range[1][0];
+        var ch1 = hint.range[1][1];
+        
+        this.codemirror.markText(
+            {line: ln0, ch: ch0},
+            {line: ln1, ch: ch1},
+            {
+                className: 'mark-hint mark-hint-' + hint.tag,
+                attributes: {
+                    hint_id: hint.id,
+                    onclick: 'alert("yes!")'
+                }
+            }
+        );
+    },
+
+    cm_mark_ann_tag_in_text: function(tag, text) {
         var raw_spans = tag['spans'];
         if (raw_spans == '' || raw_spans == null) { 
             return [-1]; 
@@ -798,41 +965,55 @@ var app_hotpot = {
             var ln1 = rst[1][0];
             var ch1 = rst[1][1];
 
-
-            // the second step is to enhance the mark tag with more info
-            var markHTML = [
-                '<span class="mark-tag mark-tag-'+tag.tag+'" id="mark-id-'+tag.id+'">',
-                '<span class="mark-tag-info">',
-                    '<span class="mark-tag-info-inline fg-tag-'+tag.tag+'">',
-                    tag.id,
+            if (this.vpp.$data.cm.mark_mode == 'node') {
+                // the second step is to enhance the mark tag with more info
+                var markHTML = [
+                    '<span class="mark-tag mark-tag-'+tag.tag+'" id="mark-id-'+tag.id+'">',
+                    '<span class="mark-tag-info">',
+                        '<span class="mark-tag-info-inline fg-tag-'+tag.tag+'">',
+                        tag.id,
+                        '</span>',
                     '</span>',
-                '</span>',
-                '<span class="mark-tag-text" tag_id="'+tag.id+'">',
-                tag.text,
-                '</span>',
-                '<span class="mark-tag-info-offset" title="Delete tag '+tag.id+'" onclick="app_hotpot.del_tag(\''+tag.id+'\');">',
-                    '<i class="fa fa-times-circle"></i>',
-                '</span>',
-                '</span>'
-            ].join('');
+                    '<span class="mark-tag-text" tag_id="'+tag.id+'">',
+                    tag.text,
+                    '</span>',
+                    '<span class="mark-tag-info-offset" title="Delete tag '+tag.id+'" onclick="app_hotpot.del_tag(\''+tag.id+'\');">',
+                        '<i class="fa fa-times-circle"></i>',
+                    '</span>',
+                    '</span>'
+                ].join('');
 
-            // convert this HTML to DOMElement
-            var placeholder = document.createElement('div');
-            placeholder.innerHTML = markHTML;
-            var markNode = placeholder.firstElementChild;
+                // convert this HTML to DOMElement
+                var placeholder = document.createElement('div');
+                placeholder.innerHTML = markHTML;
+                var markNode = placeholder.firstElementChild;
 
-            // add mark to text
-            this.codemirror.markText(
-                {line: ln0, ch: ch0},
-                {line: ln1, ch: ch1},
-                {
-                    className: 'mark-tag mark-tag-' + tag.tag,
-                    replacedWith: markNode,
-                    attributes: {
-                        tag_id: tag.id
+                // add mark to text
+                this.codemirror.markText(
+                    {line: ln0, ch: ch0},
+                    {line: ln1, ch: ch1},
+                    {
+                        className: 'mark-tag mark-tag-' + tag.tag,
+                        replacedWith: markNode,
+                        attributes: {
+                            tag_id: tag.id
+                        }
                     }
-                }
-            );
+                );
+
+            } else if (this.vpp.$data.cm.mark_mode == 'span') {
+                this.codemirror.markText(
+                    {line: ln0, ch: ch0},
+                    {line: ln1, ch: ch1},
+                    {
+                        className: 'mark-tag mark-tag-' + tag.tag,
+                        attributes: {
+                            tag_id: tag.id,
+                            onclick: 'alert("yes!")'
+                        }
+                    }
+                );
+            }
         }
 
     },

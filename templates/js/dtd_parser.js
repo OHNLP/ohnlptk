@@ -117,7 +117,7 @@ var dtd_parser = {
             
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
-                console.log(`Found entity match, group ${groupIndex}: ${match}`);
+                // console.log(`Found entity match, group ${groupIndex}: ${match}`);
                 ret = {
                     name: match,
                     type: 'entity'
@@ -148,7 +148,7 @@ var dtd_parser = {
 
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
-                console.log(`Found element match, group ${groupIndex}: ${match}`);
+                // console.log(`Found element match, group ${groupIndex}: ${match}`);
                 // group 0 is the leading line
                 if (groupIndex == 1) {
                     element.name = match;
@@ -189,7 +189,7 @@ var dtd_parser = {
             };
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
-                console.log(`Found attlist match, group ${groupIndex}: ${match}`);
+                // console.log(`Found attlist match, group ${groupIndex}: ${match}`);
                 // group 0 is the leading text
                 if (groupIndex == 1) {
                     // which is the element name
@@ -262,7 +262,7 @@ var dtd_parser = {
             var values = [];
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
-                console.log(`Found attlist values match, group ${groupIndex}: ${match}`);
+                // console.log(`Found attlist values match, group ${groupIndex}: ${match}`);
                 // group 0 is the leading text
                 if (groupIndex == 1) {
                     // which is the element name
@@ -297,7 +297,7 @@ var dtd_parser = {
 
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
-                console.log(`Found attlist require match, group ${groupIndex}: ${match}`);
+                // console.log(`Found attlist require match, group ${groupIndex}: ${match}`);
                 // group 0 is the leading text
                 if (groupIndex == 1) {
                     // which is the require name

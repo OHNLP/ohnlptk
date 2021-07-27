@@ -1,10 +1,9 @@
-async function open_files(pickerOpts) {
+async function fs_open_files(pickerOpts) {
     const fhs = await window.showOpenFilePicker(pickerOpts);
-
     return fhs;
 }
 
-async function read_ann_file_handle(fh) {
+async function fs_read_ann_file_handle(fh) {
     const file = await fh.getFile();
     const text = await file.text();
 
@@ -20,7 +19,17 @@ async function read_ann_file_handle(fh) {
     return ann;
 }
 
-async function write_ann_file(fh, contents) {
+async function fs_read_dtd_file_handle(fh) {
+    const file = await fh.getFile();
+    const text = await file.text();
+
+    // create dtd
+    var dtd = dtd_parser.parse(text);
+
+    return dtd;
+}
+
+async function fs_write_ann_file(fh, contents) {
     const writable = await fh.createWritable();
     
     // write the contents
