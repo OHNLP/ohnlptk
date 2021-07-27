@@ -146,7 +146,7 @@ var app_hotpot = {
             this.anns.splice(idx, 1);
 
             // once the file is removed, update the hint_dict
-            app_hotpot.update_hint_dict();
+            app_hotpot.update_hint_dict_by_anns();
 
             if (idx == this.ann_idx) {
                 app_hotpot.set_ann_idx(null);
@@ -246,6 +246,9 @@ var app_hotpot = {
 
             // mark _has_saved
             this.anns[this.ann_idx]._has_saved = false;
+
+            // add this new tag to hint_dict
+            app_hotpot.update_hint_dict_by_tag(tag);
 
             // update the cm
             app_hotpot.cm_update_marks();
@@ -441,7 +444,7 @@ var app_hotpot = {
         this.vpp.$data.anns.push(ann);
 
         // update hint_dict when add new ann file
-        this.update_hint_dict();
+        this.update_hint_dict_by_anns();
 
         if (is_switch_to_this_ann || this.vpp.$data.anns.length == 1) {
             this.vpp.$data.ann_idx = this.vpp.$data.anns.length - 1;
@@ -479,7 +482,6 @@ var app_hotpot = {
             this.cm_update_marks();
         }
     },
-
 
     /////////////////////////////////////////////////////////////////
     // Events related
@@ -833,7 +835,7 @@ var app_hotpot = {
         );
     },
 
-    update_hint_dict: function() {
+    update_hint_dict_by_anns: function() {
         if (this.vpp.$data.anns.length == 0) {
             this.hint_dict = {};
             return;
@@ -843,7 +845,14 @@ var app_hotpot = {
             this.vpp.$data.anns
         );
         this.hint_dict = hint_dict;
-        console.log('* updated hint_dict', this.hint_dict);
+        console.log('* updated hint_dict by anns', this.hint_dict);
+    },
+
+    update_hint_dict_by_tag: function(tag) {
+        this.hint_dict = ann_parser.add_tag_to_hint_dict(
+            tag, this.hint_dict
+        );
+        console.log('* updated hint_dict by tag', this.hint_dict, tag);
     },
 
     /////////////////////////////////////////////////////////////////

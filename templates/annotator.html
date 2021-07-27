@@ -753,7 +753,7 @@ input[type=text].ipt-xs {
 
             <div id="mui_annlist" 
                 class="d-flex flex-justify-start flex-align-start h-100">
-                <table v-if="ann_idx != null" class="tag-table w-100 mt-0 mb-0">
+                <table v-if="dtd!=null && ann_idx != null" class="tag-table w-100 mt-0 mb-0">
                     <thead>
                         <tr>
                             <th>Tag</th>
@@ -776,6 +776,7 @@ input[type=text].ipt-xs {
 
                                     <div>
                                         <button class="btn btn-xs btn-red"
+                                            title="Delete this tag"
                                             v-on:click="del_tag(tag.id)">
                                             <i class="fa fa-trash"></i>
                                         </button>

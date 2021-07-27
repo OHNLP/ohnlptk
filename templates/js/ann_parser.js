@@ -192,6 +192,39 @@ var ann_parser = {
         return hint_dict;
     },
 
+    add_tag_to_hint_dict: function(tag, hint_dict) {
+        if (!hint_dict.hasOwnProperty(tag.tag)) {
+            hint_dict[tag.tag] = {
+                text_dict: {},
+                texts: []
+            }
+        }
+        // empty text should be removed
+        var text = tag.text;
+        text = text.trim();
+        if (text == '') {
+            // just return the given hint_dict if empty text
+            return hint_dict;
+        }
+
+        // add this text
+        if (hint_dict[tag.tag].text_dict.hasOwnProperty(text)) {
+            // oh, this is NOT a new text
+            // just increase the count
+            hint_dict[tag.tag].text_dict[text] += 1;
+
+        } else {
+            // ok, this is a new text
+            // count +1
+            hint_dict[tag.tag].text_dict[text] = 1;
+
+            // save this tag
+            hint_dict[tag.tag].texts.push(text);
+        }
+
+        return hint_dict;
+    },
+
     /**
      * Search feasible hints to ranges for highlighting in codemirror
      * Those conflict / overlaped hints would be skiped
