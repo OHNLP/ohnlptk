@@ -142,6 +142,9 @@ var app_hotpot = {
             // delete this first
             this.anns.splice(idx, 1);
 
+            // once the file is removed, update the hint_dict
+            app_hotpot.update_hint_dict();
+
             if (idx == this.ann_idx) {
                 app_hotpot.set_ann_idx(null);
             }
@@ -180,6 +183,8 @@ var app_hotpot = {
 
         on_change_hint_mode: function(hint_mode) {
             this.cm.hint_mode = hint_mode;
+
+            app_hotpot.cm_update_marks();
         },
 
         /////////////////////////////////////////////////////////////////
@@ -334,6 +339,10 @@ var app_hotpot = {
             };
             console.log("* found selection:", app_hotpot.selection);
 
+            if (app_hotpot.selection.sel_txts == '') {
+                // nothing selected for tag, skip
+                return;
+            }
             // show the menu
             var mouseX = evt.clientX;
             var mouseY = evt.clientY;
@@ -774,6 +783,7 @@ var app_hotpot = {
 
     update_hint_dict: function() {
         if (this.vpp.$data.anns.length == 0) {
+            this.hint_dict = {};
             return;
         }
         var hint_dict = ann_parser.anns2hint_dict(
@@ -893,6 +903,11 @@ var app_hotpot = {
     cm_update_hint_marks: function() {
         if (this.vpp.$data.ann_idx == null) {
             // nothing to do for empty
+            return;
+        }
+
+        if (this.vpp.$data.cm.hint_mode == 'off') {
+            // nothing to do when turn off hint
             return;
         }
 
