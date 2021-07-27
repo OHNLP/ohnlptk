@@ -338,5 +338,15 @@ var dtd_parser = {
         );
 
         return ret;
+    },
+
+    ///////////////////////////////////////////////////////
+    // Utils
+    ///////////////////////////////////////////////////////
+    get_id_prefix: function(tag_name, dtd) {
+        if (dtd.tag_dict.hasOwnProperty(tag_name)) {
+            return dtd.tag_dict[tag_name].id_prefix;
+        }
+        return '';
     }
 };

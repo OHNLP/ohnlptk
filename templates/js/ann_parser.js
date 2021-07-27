@@ -280,6 +280,7 @@ var ann_parser = {
                                 id: 'hint-' + tag_name + '-' + i + '-' + j,
                                 tag: tag_name,
                                 text: str,
+                                loc: loc,
                                 range: this.loc2range(loc, ann.text)
                             })
                         }

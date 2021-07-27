@@ -30,6 +30,7 @@ html,body {
 }
 #mui_filelist {
     overflow-y: hidden;
+    width: 250px;
 }
 #mui_filelist_toolbar {
     height: 32px;
@@ -40,13 +41,17 @@ html,body {
     overflow-y: auto;
 }
 #mui_texteditor {
+    width: calc(100% - 250px); 
     height: 100%;
 }
 #mui_dtdlist {
     overflow-y: auto;
+    width: 250px;
 }
 #mui_annlist {
-
+    padding-left: 5px;
+    overflow-y: auto; 
+    width: calc(100% - 250px);
 }
 #app_hotpot {
     margin-top: 0px;
@@ -94,11 +99,56 @@ html,body {
     border-bottom: 1px solid #cccccc;
 }
 .mark-hint {
-    border-bottom: 1px dotted #999999;
     cursor: pointer;
+    border: 2px dotted #999999;
+    position: relative;
+    display: inline-block;
 }
 .mark-hint:hover {
-    border-bottom: 1px dotted #333333;
+    font-weight: bold;
+    border: 2px dotted #333333;
+}
+.mark-hint-info {
+    margin: 0 5px 0 0;
+    padding: 0px 4px;
+    color: white;
+}
+.mark-hint-text {
+
+}
+.mark-hint .mark-hint-tooltip {
+    visibility: hidden;
+    min-width: 100px;
+    width: auto;
+    background-color: #cccccc;
+    color: black;
+    text-align: center;
+    font-size: .9em;
+    font-weight: normal;
+    font-family: sans-serif;
+    border-radius: 6px;
+    padding: 1px 5px;
+    position: absolute;
+    z-index: 1;
+    top: -130%;
+    left: 50%;
+    margin-left: -50%;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+.mark-hint .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 130%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent #cccccc transparent;
+}
+.mark-hint:hover .mark-hint-tooltip {
+    visibility: visible;
+    opacity: 1;
 }
 .mark-tag {
     border-radius: 3px;
@@ -233,6 +283,10 @@ html,body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+.tag-list-row-name-id-prefix {
+    font-weight: bold;
+    text-decoration: underline;
 }
 .tag-list-row-count-0 {
     color: #bdbdbd;
@@ -577,8 +631,7 @@ input[type=text].ipt-xs {
         <div class="d-flex flex-row flex-justify-start flex-align-start w-100"
             style="height: 60%;">
             <div id="mui_filelist"
-                class="d-flex flex-column flex-justify-start flex-align-start h-100"
-                style="width: 250px;">
+                class="d-flex flex-column flex-justify-start flex-align-start h-100">
                 <div id="mui_filelist_toolbar"
                     class="d-flex flex-row flex-justify-start flex-align-center w-100">
                     <div class="d-flex flex-row flex-justify-start flex-align-center mr-1">
@@ -645,8 +698,7 @@ input[type=text].ipt-xs {
             <div class="h-100 h-splitter">
             </div>
 
-            <div id="mui_texteditor"
-                style="width: calc(100% - 250px); height: calc(100% - 10);">
+            <div id="mui_texteditor">
                 <div id="cm_editor" class="w-100">
                     
                 </div>
@@ -657,8 +709,7 @@ input[type=text].ipt-xs {
         <div class="d-flex flex-row flex-justify-start flex-align-start w-100"
             style="height: 40%;">
             <div id="mui_dtdlist" 
-                class="d-flex h-100"
-                style="width: 250px;">
+                class="d-flex h-100">
                 <ul v-if="has_dtd"
                     class="w-100 tag-list">
 
@@ -684,8 +735,8 @@ input[type=text].ipt-xs {
                                 class="badge-shortcut mr-1">
                                 {{ etag.shortcut }}
                             </span>
-                            <span>
-                                {{ etag.name }}
+                            <span v-html="make_html_bold_tag_name(etag)">
+                                
                             </span>
                         </div>
                         <div class="mr-1"
@@ -701,7 +752,6 @@ input[type=text].ipt-xs {
             </div>
 
             <div id="mui_annlist" 
-                style="overflow-y: auto; width: calc(100% - 250px);"
                 class="d-flex flex-justify-start flex-align-start h-100">
                 <table v-if="ann_idx != null" class="tag-table w-100 mt-0 mb-0">
                     <thead>

@@ -15,6 +15,9 @@ var app_hotpot = {
         ann_idx: null,
         anns: [],
 
+        // for the hints of current ann
+        hints: [],
+
         // for menu
         clicked_tag_id: null,
 
@@ -187,6 +190,47 @@ var app_hotpot = {
             app_hotpot.cm_update_marks();
         },
 
+        get_hint: function(hint_id) {
+            for (let i = 0; i < this.hints.length; i++) {
+                if (this.hints[i].id == hint_id) {
+                    return this.hints[i];
+                }
+            }
+            return null;
+        },
+
+        add_tag_by_hint: function(hint_id, tag_name) {
+            // get the hint from list 
+            var hint = this.get_hint(hint_id);
+            if (hint == null) { return; }
+
+            // convert the range to spans
+            var spans = hint.loc[0] + '~' + hint.loc[1];
+
+            // createa new ann tag
+            var _tag = {
+                'spans': spans,
+                'text': hint.text
+            }
+            var tag_def = this.dtd.tag_dict[tag_name];
+            
+            // create a new tag
+            var tag = app_hotpot.make_tag(_tag, tag_def, this.anns[this.ann_idx]);
+
+            // add this tag to ann
+            this.anns[this.ann_idx].tags.push(tag);
+
+            // mark _has_saved
+            this.anns[this.ann_idx]._has_saved = false;
+
+            // update the cm
+            app_hotpot.cm_update_marks();
+
+            // scroll the view
+            app_hotpot.scroll_annlist_to_bottom();
+
+        },
+
         /////////////////////////////////////////////////////////////////
         // Menu Related
         /////////////////////////////////////////////////////////////////
@@ -233,6 +277,14 @@ var app_hotpot = {
         /////////////////////////////////////////////////////////////////
         // Other utils
         /////////////////////////////////////////////////////////////////
+        make_html_bold_tag_name: function(tag) {
+            var html = '<span class="tag-list-row-name-id-prefix">' + tag.id_prefix + '</span>';
+            var name = tag.name;
+            name = name.replace(tag.id_prefix, '');
+            html = html += name;
+            return html;
+        },
+
         count_n_tags: function(tag) {
             if (this.ann_idx == null) {
                 return '';
@@ -694,10 +746,10 @@ var app_hotpot = {
 
                 // add this tag as the hint
                 style.insertRule(
-                    ".mark-hint-" + tag_name + ":hover { background-color: " + color + "66; }",
+                    ".mark-hint-" + tag_name + ":hover { background-color: " + color + "; }",
                     0
                 );
-
+                
                 i += 1;
             }
         }
@@ -874,7 +926,7 @@ var app_hotpot = {
             txts.push(sel_txt);
         }
         
-        // now push new ann
+        // now push new ann tag
         var tag = {
             'spans': locs.join(','),
             'text': txts.join(' ... ')
@@ -911,12 +963,20 @@ var app_hotpot = {
             return;
         }
 
+        if (!this.vpp.$data.has_dtd) {
+            // nothing to do if no dtd given
+            return;
+        }
+
         // find markable hints for this ann
         var hints = ann_parser.search_hints_in_ann(
             this.hint_dict,
             this.vpp.$data.anns[this.vpp.$data.ann_idx]
         );
         console.log('* found hints', hints);
+
+        // bind the hints to vpp
+        this.vpp.$data.hints = hints;
 
         for (let i = 0; i < hints.length; i++) {
             const hint = hints[i];
@@ -949,17 +1009,54 @@ var app_hotpot = {
         var ln1 = hint.range[1][0];
         var ch1 = hint.range[1][1];
         
-        this.codemirror.markText(
-            {line: ln0, ch: ch0},
-            {line: ln1, ch: ch1},
-            {
-                className: 'mark-hint mark-hint-' + hint.tag,
-                attributes: {
-                    hint_id: hint.id,
-                    onclick: ''
+        if (this.vpp.$data.cm.mark_mode == 'node') {
+            var hint_tag_id_prefix = dtd_parser.get_id_prefix(
+                hint.tag, 
+                this.vpp.$data.dtd
+            );
+            var markHTML = [
+                '<span class="mark-hint mark-hint-'+hint.tag+'" id="mark-id-'+hint.id+'" onclick="app_hotpot.vpp.add_tag_by_hint(\''+hint.id+'\', \''+hint.tag+'\')" title="Click to add this to tags">',
+                '<span class="mark-hint-info mark-tag-'+hint.tag+'">',
+                    hint_tag_id_prefix,
+                '</span>',
+                '<span class="mark-hint-text" hint_id="'+hint.id+'">',
+                    hint.text,
+                '</span>',
+                '<span class="mark-hint-tooltip">',
+                    hint.tag,
+                '</span>',
+                '</span>'
+            ].join('');
+
+            // convert this HTML to DOMElement
+            var placeholder = document.createElement('div');
+            placeholder.innerHTML = markHTML;
+            var markNode = placeholder.firstElementChild;
+
+            this.codemirror.markText(
+                {line: ln0, ch: ch0},
+                {line: ln1, ch: ch1},
+                {
+                    className: 'mark-hint mark-hint-' + hint.tag,
+                    replacedWith: markNode,
+                    attributes: {
+                        hint_id: hint.id
+                    }
                 }
-            }
-        );
+            );
+        } else if (this.vpp.$data.cm.mark_mode == 'span') {
+            this.codemirror.markText(
+                {line: ln0, ch: ch0},
+                {line: ln1, ch: ch1},
+                {
+                    className: 'mark-hint mark-hint-' + hint.tag,
+                    attributes: {
+                        hint_id: hint.id,
+                        onclick: ''
+                    }
+                }
+            );
+        }
     },
 
     cm_mark_ann_tag_in_text: function(tag, text) {
