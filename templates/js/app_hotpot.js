@@ -313,12 +313,13 @@ var app_hotpot = {
         on_change_attr_value: function(event) {
             // just mark current ann as unsaved
             this.anns[this.ann_idx]._has_saved = false;
-            // console.log('* changed attr to', event.target.value);
+            console.log('* changed attr in', event.target);
         },
 
         on_input_attr_value: function(event) {
             // just mark current ann as unsaved
             this.anns[this.ann_idx]._has_saved = false;
+            console.log('* changed input attr to', event.target.value);
         },
 
         on_change_mark_mode: function(event) {
@@ -364,6 +365,7 @@ var app_hotpot = {
 
             // mark _has_saved
             this.anns[this.ann_idx]._has_saved = false;
+            console.log('* added tag by hint, ' + tag_name + ' on ' + hint.text);
 
             // update the cm
             app_hotpot.cm_update_marks();
@@ -411,6 +413,7 @@ var app_hotpot = {
 
             // mark _has_saved
             this.anns[this.ann_idx]._has_saved = false;
+            console.log('* added tag by right click, ' + tag_def.name);
 
             // add this new tag to hint_dict
             app_hotpot.update_hint_dict_by_tag(tag);
@@ -1037,6 +1040,7 @@ var app_hotpot = {
 
         // mark _has_saved
         this.vpp.$data.anns[this.vpp.$data.ann_idx]._has_saved = false;
+        console.log('* deleted tag ' + tag_id);
 
         // update the marks
         app_hotpot.cm_update_marks();
