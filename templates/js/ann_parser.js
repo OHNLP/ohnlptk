@@ -332,7 +332,7 @@ var ann_parser = {
     },
 
     get_locs: function(str, text) {
-        var regex = new RegExp(str, 'gmi');
+        var regex = new RegExp('\\b' + str + '\\b', 'gmi');
 
         var m;
         var locs = [];
