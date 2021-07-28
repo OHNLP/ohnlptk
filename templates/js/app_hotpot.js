@@ -9,6 +9,11 @@ var app_hotpot = {
     vpp_data: {
         has_dtd: false,
         has_ann: false,
+
+        // for the section control
+        section: 'annotation',
+
+        // for the dtd
         dtd: null,
 
         // for the ann files
@@ -18,8 +23,14 @@ var app_hotpot = {
         // for the hints of current ann
         hints: [],
 
-        // for menu
+        // for popmenu
         clicked_tag_id: null,
+
+        // for converting the txt to xmls
+        txt_anns: [],
+        txt_xmls: [],
+        txt_xml_prefix: '',
+        txt_xml_suffix: '',
 
         // for file name filter
         fn_pattern: '',
@@ -126,7 +137,13 @@ var app_hotpot = {
                 // bind the content
                 for (let i = 0; i < fileHandles.length; i++) {
                     const fh = fileHandles[i];
-                    
+
+                    // check exists
+                    if (app_hotpot.vpp.has_included_ann_file(fh.name)) {
+                        // exists? skip this file
+                        return;
+                    }
+
                     // read the file
                     var p_ann = fs_read_ann_file_handle(fh);
                     p_ann.then(function(ann) {
@@ -134,6 +151,124 @@ var app_hotpot = {
                     });
                     
                 }
+            });
+        },
+
+        reset_corpus_all: function() {
+            this.txt_anns = [];
+            this.txt_xmls = [];
+        },
+
+        open_txt_files: function() {
+            // the settings for raw text file
+            var pickerOpts = {
+                types: [
+                    {
+                        description: 'Raw Text File',
+                        accept: {
+                            'text/txt': ['.txt']
+                        }
+                    },
+                ],
+                excludeAcceptAllOption: true,
+                multiple: true
+            };
+
+            // get the file handles
+            var promise_fileHandles = fs_open_files(pickerOpts);
+
+            promise_fileHandles.then(function(fileHandles) {
+                // bind the content
+                for (let i = 0; i < fileHandles.length; i++) {
+                    const fh = fileHandles[i];
+
+                    // check exists
+                    if (app_hotpot.vpp.has_included_txt_ann_file(fh.name)) {
+                        // exists? skip this file
+                        return;
+                    }
+                    
+                    // read the file
+                    var p_txt_ann = fs_read_txt_file_handle(fh);
+                    p_txt_ann.then(function(txt_ann) {
+                        app_hotpot.add_txt(txt_ann);
+                    });
+                    
+                }
+            });
+        },
+
+        convert_txt_anns_to_xmls: function() {
+            // clear the current txt_xmls
+            this.txt_xmls = [];
+
+            for (let i = 0; i < this.txt_anns.length; i++) {
+                const txt_ann = this.txt_anns[i];
+                
+                // create new filename
+                var fn = txt_ann._fh.name;
+
+                // get the xml string
+                var xml = ann_parser.ann2xml(txt_ann);
+                var str = ann_parser.xml2str(xml);
+
+                // create an object for display
+                var txt_xml = {
+                    fn: fn,
+                    text: str
+                };
+
+                this.txt_xmls.push(txt_xml);
+            }
+        },
+
+        get_new_xml_filename: function(fn) {
+            var prefix = this.txt_xml_prefix.trim();
+            var suffix = this.txt_xml_suffix.trim();
+            var new_fn = fn;
+
+            // add prefix
+            if (prefix == '') {
+                // nothing to do
+            } else {
+                new_fn = prefix + '_' + new_fn;
+            }
+
+            // add suffix
+            if (suffix == '') {
+                // nothing to do
+                new_fn = new_fn + '.xml';
+            } else {
+                new_fn = new_fn + '_' + suffix + '.xml';
+            }
+
+            return new_fn;
+        },
+
+        get_zipfile_folder_name: function() {
+            return this.dtd.name + '-' + this.txt_anns.length + '-xmls';
+        },
+
+        download_txt_xmls_as_zip: function() {
+            // create an empty zip pack
+            var zip = new JSZip();
+            var folder_name = this.get_zipfile_folder_name();
+
+            // add files to zip pack
+            for (let i = 0; i < this.txt_xmls.length; i++) {
+                const txt_xml = this.txt_xmls[i];
+                var fn = this.get_new_xml_filename(txt_xml.fn);
+                var ffn = folder_name + '/' + fn;
+
+                // add to zip
+                zip.file(ffn, txt_xml.text);
+                
+                console.log('* added xml file ' + fn);
+            }
+
+            // create zip file
+            zip.generateAsync({ type: "blob" }).then(function (content) {
+                saveAs(content, app_hotpot.vpp.get_zipfile_folder_name() + '.zip');
             });
         },
 
@@ -234,6 +369,18 @@ var app_hotpot = {
         /////////////////////////////////////////////////////////////////
         // Menu Related
         /////////////////////////////////////////////////////////////////
+        switch_mui: function(section) {
+            console.log('* switch to section', section);
+            this.section = section;
+
+            if (section == 'annotation') {
+                // refresh the code mirror
+                app_hotpot.set_ann_idx(this.ann_idx);
+            }
+
+            app_hotpot.resize();
+        },
+
         ctxmenu_add_tag: function(tag_def) {
             // get the basic tag
             var _tag = app_hotpot.cm_make_basic_tag_from_selection();
@@ -304,6 +451,34 @@ var app_hotpot = {
             return cnt;
         },
 
+        count_all_tags: function(anns) {
+            var n = 0;
+            for (let i = 0; i < anns.length; i++) {
+                for (let j = 0; j < anns[i].tags.length; j++) {
+                    n += 1;
+                }
+            }
+            return n;
+        },
+
+        calc_avg_tags_per_doc: function(anns) {
+            if (anns == null || anns.length == 0) {
+                return '-';
+            }
+            var t = this.count_all_tags(anns);
+            return (t/anns.length).toFixed(2);
+        },
+
+        calc_avg_tags_per_def: function(anns, dtd) {
+            if (anns == null || anns.length == 0) {
+                return '-';
+            }
+            if (dtd == null || dtd.etags.length == 0) {
+                return '-';
+            }
+            return (anns.length / dtd.etags.length).toFixed(2);
+        },
+
         is_match_filename: function(fn) {
             let p = this.fn_pattern.trim();
             if (p == '') {
@@ -319,6 +494,16 @@ var app_hotpot = {
         has_included_ann_file: function(fn) {
             for (let i = 0; i < this.anns.length; i++) {
                 if (this.anns[i]._fh.name == fn) {
+                    return true;
+                }
+            }
+
+            return false;
+        },
+
+        has_included_txt_ann_file: function(fn) {
+            for (let i = 0; i < this.txt_anns.length; i++) {
+                if (this.txt_anns[i]._fh.name == fn) {
                     return true;
                 }
             }
@@ -483,6 +668,14 @@ var app_hotpot = {
         }
     },
 
+    add_txt: function(txt_ann) {
+        // update the dtd name here
+        txt_ann.dtd_name = this.vpp.$data.dtd.name;
+
+        // put this to the list
+        this.vpp.$data.txt_anns.push(txt_ann);
+    },
+
     /////////////////////////////////////////////////////////////////
     // Events related
     /////////////////////////////////////////////////////////////////
@@ -626,6 +819,8 @@ var app_hotpot = {
                 // get this item as a FileSystemHandle Object
                 // this could be used for saving the content back
                 let item = items[i].getAsFileSystemHandle();
+
+                // read this handle
                 item.then(function(fh) {
                     if (fh.kind == 'file') {
                         // show something or 
@@ -650,7 +845,7 @@ var app_hotpot = {
 
     resize: function() {
         var h = $(window).height();
-        $('#main_ui').css('height', h - 175);
+        $('.main-ui').css('height', h - 175);
     },
 
     parse_drop_dtd: function(fileEntry) {

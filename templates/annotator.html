@@ -13,7 +13,7 @@ Annotator
 <meta name="metro4:init" content="false">
 
 <style id="app_style">
-{% include 'css/box.css' %}
+{% include 'css/box-0.2.0.css' %}
 html,body {
     overflow: hidden;
     font-size: 12px;
@@ -53,6 +53,12 @@ html,body {
     overflow-y: auto; 
     width: calc(100% - 250px);
 }
+#mui_stat_summary {
+    width: 250px;
+}
+#mui_stat_charts {
+    width: calc(100% - 250px);
+}
 #app_hotpot {
     margin-top: 0px;
 }
@@ -72,7 +78,7 @@ html,body {
     height: 70px;
     line-height: 70px;
     text-align: center;
-    font-size: 12px;
+    font-size: 1em;
     border: 1px dotted rgb(17, 61, 110);
     border-radius: 4px;
 }
@@ -81,9 +87,16 @@ html,body {
     height: 70px;
     line-height: 70px;
     text-align: center;
-    font-size: 12px;
+    font-size: 1em;
     border: 1px dotted rgb(17, 61, 110);
     border-radius: 4px;
+}
+#infozone_txt_anns{
+    width: 150px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    font-size: 1em;
 }
 .tag-list-row {
     
@@ -386,6 +399,16 @@ input[type=text].ipt-xs {
     border: 0;
     border: 1px solid #999999;
 }
+input[type=text].ipt-md {
+    font-size: 1.2em;
+    line-height: 1.2em;
+    height: 1.6em;
+    padding: 2px 3px;
+    max-width: 150px;
+    display: inline;
+    border: 0;
+    border: 1px solid #999999;
+}
 .icon-fg-unsaved {
     color: #daaf5f;
 }
@@ -421,13 +444,23 @@ input[type=text].ipt-xs {
 
     <nav data-role="ribbonmenu">
         <ul class="tabs-holder">
-            <li><a href="#section-1-1">Files</a></li>
-            <!-- <li><a href="#section-1-2">Schema</a></li> -->
+            <li v-on:click="switch_mui('annotation')">
+                <a href="#section-1-1">Annotation</a>
+            </li>
+            <li v-on:click="switch_mui('corpus')">
+                <a href="#section-1-2">Corpus</a>
+            </li>
             <!-- <li><a href="#section-1-3">IAA</a></li> -->
-            <li><a href="#section-1-4">IE Ruleset</a></li>
+            <li v-on:click="switch_mui('annotation')">
+                <a href="#section-1-4">Ruleset</a>
+            </li>
+            <li v-on:click="switch_mui('statistics')">
+                <a href="#section-1-5">Statistics</a>
+            </li>
         </ul>
 
         <div class="content-holder">
+            <!-- the section for annotation -->
             <div class="section" id="section-1-1">
 
                 <div class="group">
@@ -454,7 +487,7 @@ input[type=text].ipt-xs {
                     <span class="title">Schema DTD File (.dtd)</span>
                 </div>
 
-                <div class="group">
+                <div v-show="has_dtd" class="group">
 
                     <div id="dropzone_ann" 
                         v-bind:class="{'disabled-zone': !has_dtd, 'dropzone': has_dtd}">
@@ -464,7 +497,7 @@ input[type=text].ipt-xs {
                             {{ anns[ann_idx].tags.length }} tags
                         </div>
                         <div v-else>
-                            Drop <b>Annotation</b> File Here
+                            Drop <b>Annotation</b> File(s) Here
                         </div>
                     </div>
 
@@ -570,9 +603,82 @@ input[type=text].ipt-xs {
 
             </div>
 
-            <!-- the section for DTD schema -->
+            <!-- the section for corpus schema -->
             <div class="section" id="section-1-2">
 
+                <div class="group">
+                    <button class="ribbon-button"
+                        v-on:click="reset_corpus_all">
+                        <span class="icon">
+                            <i class="far fa-times-circle"></i>
+                        </span>
+                        <span class="caption">Reset All</span>
+                    </button>
+
+                    <span class="title">&nbsp;</span>
+                </div>
+
+                <div class="group">
+                    <button class="ribbon-button"
+                        v-on:click="open_txt_files">
+                        <span class="icon">
+                            <i class="far fa-file-code"></i>
+                        </span>
+                        <span class="caption">Open .txt Files</span>
+                    </button>
+
+                    <div id="infozone_txt_anns">
+                        <span>{{ txt_anns.length }} files</span>
+                    </div>
+
+                    <span class="title">Raw Text Files</span>
+                </div>
+                
+                <div class="group">
+                    
+                    <div class="d-flex flex-column ml-2">
+                        <div class="mt-1 mb-2">
+                            <label for="">Prefix for XML Files</label>
+                            <input type="text" class="ipt-md"
+                                v-model="txt_xml_prefix">
+                        </div>
+                        <div>
+                            <label for="">Suffix for XML Files</label>
+                            <input type="text" class="ipt-md"
+                                v-model="txt_xml_suffix">
+                        </div>
+                    </div>
+
+                    <button class="ribbon-button"
+                        :disabled="dtd == null"
+                        v-on:click="convert_txt_anns_to_xmls">
+                        <span class="icon">
+                            <i class="far fa-file-code"></i>
+                        </span>
+                        <span class="caption">Convert to XMLs</span>
+                    </button>
+
+                    <span class="title">Annotation XML File</span>
+                </div>
+                
+                <div class="group">
+
+                    <button class="ribbon-button"
+                        :disabled="txt_xmls.length == 0 || txt_xmls.length != txt_anns.length"
+                        v-on:click="download_txt_xmls_as_zip">
+                        <span class="icon">
+                            <i class="fa fa-download"></i>
+                        </span>
+                        <span class="caption">As ZIP File</span>
+                    </button>
+
+                    <span class="title">Download</span>
+                </div>
+
+            </div>
+
+            <!-- the section for IAA operations -->
+            <div class="section" id="section-1-3">
                 <div v-if="has_dtd" 
                     class="group">
 
@@ -601,13 +707,7 @@ input[type=text].ipt-xs {
 
                     <span class="title">Link Tags</span>
                 </div>
-
             </div>
-
-            <!-- the section for IAA operations -->
-            <!-- <div class="section" id="section-1-3">
-
-            </div> -->
 
             <!-- the section for IE ruleset -->
             <div class="section" id="section-1-4">
@@ -617,38 +717,57 @@ input[type=text].ipt-xs {
                         <span class="icon">
                             <i class="far fa-file-archive"></i>
                         </span>
-                        <span class="caption">Generate</span>
+                        <span class="caption">MedTagger / Backbone</span>
                     </button>
 
-                    <span class="title">Easy Ruleset</span>
+                    <span class="title">Generate Ruleset</span>
+                </div>
+            </div>
+
+
+            <!-- the section for statistics -->
+            <div class="section" id="section-1-5">
+                <div class="group">
+                    <button class="ribbon-button" 
+                        v-on:click="show_about">
+                        <span class="icon">
+                            <i class="fa fa-list-ul"></i>
+                        </span>
+                        <span class="caption">Update All</span>
+                    </button>
+                    <span class="title">Document Statistics</span>
                 </div>
             </div>
         </div>
 
     </nav>
 
-    <div id="main_ui" class="container-fluid" style="height: 200px;">
+    <!-- the ui for main annotation -->
+    <div v-show="section=='annotation'" id="main_ui" 
+        class="main-ui container-fluid">
         <div class="d-flex flex-row flex-justify-start flex-align-start w-100"
             style="height: 60%;">
             <div id="mui_filelist"
                 class="d-flex flex-column flex-justify-start flex-align-start h-100">
                 <div id="mui_filelist_toolbar"
-                    class="d-flex flex-row flex-justify-start flex-align-center w-100">
+                    class="d-flex flex-row flex-justify-between flex-align-center w-100">
                     <div class="d-flex flex-row flex-justify-start flex-align-center mr-1">
-                        <button class="btn-xs"
-                            v-on:click="remove_all_ann_files">
-                            <i class="fa fa-sign-out-alt"></i>
-                            Remove All
-                        </button>
-                    </div>
-                    <div class="d-flex flex-row flex-justify-start flex-align-center mr-1">
-                        <input type="text" class="ipt-xs"
+                        <span class="mr-1">Filter: </span>
+                        <input type="text" class="ipt-xs mr-1"
                             v-model="fn_pattern">
-                    </div>
-                    <div class="d-flex flex-row flex-justify-start flex-align-center">
+                    
                         <span v-if="anns.length > 0">
                             {{ anns.length }} files
                         </span>
+                    </div>
+
+                    <div class="d-flex flex-row flex-justify-start flex-align-center mr-1">
+                        <button class="btn-xs"
+                            title="Remove all files"
+                            v-on:click="remove_all_ann_files">
+                            <i class="fa fa-sign-out-alt"></i>
+                            All
+                        </button>
                     </div>
                 </div>
                 <div id="mui_filelist_list" 
@@ -824,9 +943,134 @@ input[type=text].ipt-xs {
                 </table>
             </div>
         </div>
-            
     </div>
-    
+
+
+    <!-- the ui for corpus -->
+    <div v-show="section=='corpus'" id="main_ui" 
+        class="main-ui container-fluid">
+        <div class="w-100 d-flex flex-row" style="height: calc(100% + 10px);">
+
+            <div class="box w-100">
+                <div class="box-header">
+                    <h4>
+                        <i class="fa fa-list-ul"></i>
+                        Corpus Files
+                    </h4>
+                </div>
+
+                <div class="box-body">
+                    <table class="table striped">
+                        <tr>
+                            <th>#</th>
+                            <th>TXT File Name</th>
+                            <th>&nbsp;</th>
+                            <th>XML File Name</th>
+                        </tr>
+                        <tr v-for="txt_ann, txt_ann_idx in txt_anns">
+                            <td>
+                                {{ txt_ann_idx + 1 }}
+                            </td>
+                            <td>
+                                <i class="far fa-file-alt"></i>
+                                {{ txt_ann._fh.name }}
+                            </td>
+                            <td>
+                                <span>
+                                    <i class="fa fa-arrow-right"></i>
+                                </span>
+                            </td>
+                            <td>
+                                <span v-if="txt_xmls.length > txt_ann_idx">
+                                    <i class="far fa-file-code"></i>
+                                    {{ get_new_xml_filename(txt_xmls[txt_ann_idx].fn) }}
+                                </span>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <!-- /.box -->
+            
+
+        </div>
+    </div>
+
+
+    <!-- the ui for statistics -->
+    <div v-show="section=='statistics'" id="main_ui" 
+        class="main-ui container-fluid">
+        <div class="w-100 d-flex flex-row" style="height: calc(100% + 10px);">
+
+            <div id="mui_stat_summary" class="d-flex h-100">
+                <div class="box w-100">
+                    <div class="box-header">
+                        <h4>
+                            <i class="fa fa-list-ul"></i>
+                            Summary
+                        </h4>
+                    </div>
+
+                    <div class="box-body">
+                        <div class="box-body-item d-flex flex-row flex-justify-between">
+                            <div>
+                                # of documents: 
+                            </div>
+                            <div class="mr-2">
+                                {{ anns.length }}
+                            </div>
+                        </div>
+
+                        <div class="box-body-item d-flex flex-row flex-justify-between">
+                            <div>
+                                # of tags in DTD: 
+                            </div>
+                            <div v-if="dtd != null" class="mr-2">
+                                {{ dtd.etags.length }}
+                            </div>
+                            <div v-else class="mr-2">
+                                0
+                            </div>
+                        </div>
+
+                        <div class="box-body-item d-flex flex-row flex-justify-between">
+                            <div>
+                                # of annotations: 
+                            </div>
+                            <div class="mr-2">
+                                {{ count_all_tags(anns) }}
+                            </div>
+                        </div>
+
+                        <div class="box-body-item d-flex flex-row flex-justify-between">
+                            <div>
+                                # of annotations per tag: 
+                            </div>
+                            <div class="mr-2">
+                                {{ calc_avg_tags_per_def(anns, dtd) }}
+                            </div>
+                        </div>
+
+                        <div class="box-body-item d-flex flex-row flex-justify-between">
+                            <div>
+                                # of annotations per document: 
+                            </div>
+                            <div class="mr-2">
+                                {{ calc_avg_tags_per_doc(anns) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.box -->
+            </div>
+            <div class="h-splitter"></div>
+            <div id="mui_stat_charts" class="d-flex">
+
+        </div>
+
+        </div>
+    </div>
+
 
     <!-- the context menu -->
     <div v-if="has_dtd"
@@ -900,7 +1144,7 @@ if (isIE) {
 <!-- jszip -->
 <script src="https://stuk.github.io/jszip/dist/jszip.js"></script>
 <!-- filesaver -->
-<script src="./static/lib/filesaver/FileSaver.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.0/FileSaver.min.js"></script>
 <!-- dayjs -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dayjs/1.8.36/dayjs.min.js"></script>
 <!-- brat -->

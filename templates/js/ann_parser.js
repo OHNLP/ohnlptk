@@ -15,13 +15,19 @@
  */
 var ann_parser = {
 
-    parse: function(fn, text) {
-        var ann = this.xml2ann(fn, text);
+    parse: function(text) {
+        var ann = this.xml2ann(text);
         return ann;
     },
 
     txt2ann: function(dtd_name, txt) {
+        var ann = {
+            text: txt,
+            dtd_name: dtd_name,
+            tags: []
+        };
 
+        return ann;
     },
 
     xml2ann: function(text) {
@@ -371,5 +377,17 @@ var ann_parser = {
         var ch1 = ch0 + (loc[1] - loc[0]);
 
         return [ [ln0, ch0], [ln1, ch1] ];
+    },
+
+    hash: function(str, seed = 0) {
+        let h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed;
+        for (let i = 0, ch; i < str.length; i++) {
+            ch = str.charCodeAt(i);
+            h1 = Math.imul(h1 ^ ch, 2654435761);
+            h2 = Math.imul(h2 ^ ch, 1597334677);
+        }
+        h1 = Math.imul(h1 ^ (h1>>>16), 2246822507) ^ Math.imul(h2 ^ (h2>>>13), 3266489909);
+        h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
+        return 4294967296 * (2097151 & h2) + (h1>>>0);
     }
 };
