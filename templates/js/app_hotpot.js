@@ -23,6 +23,9 @@ var app_hotpot = {
         // for the hints of current ann
         hints: [],
 
+        // for all of the hints
+        hint_dict: {},
+
         // for popmenu
         clicked_tag_id: null,
 
@@ -380,11 +383,24 @@ var app_hotpot = {
         /////////////////////////////////////////////////////////////////
         // Ruleset Related
         /////////////////////////////////////////////////////////////////
+        get_ruleset_base_name: function() {
+            var fn = this.dtd.name + '-' + this.anns.length;
+            return fn;
+        },
+
         download_ruleset_medtagger_zip: function() {
             erp_toolkit.download_anns_as_zip(
                 this.anns,
                 this.dtd,
-                'ruleset-' + this.get_zipfile_folder_name() + '.zip'
+                'ruleset-medtagger-' + this.get_ruleset_base_name() + '.zip'
+            );
+        },
+
+        download_ruleset_spacy_jsonl: function() {
+            spacy_toolkit.download_anns_as_jsonl(
+                this.anns,
+                this.dtd,
+                'ruleset-spacy-' + this.get_ruleset_base_name() + '.jsonl'
             );
         },
 
@@ -1056,22 +1072,22 @@ var app_hotpot = {
 
     update_hint_dict_by_anns: function() {
         if (this.vpp.$data.anns.length == 0) {
-            this.hint_dict = {};
+            this.vpp.hint_dict = {};
             return;
         }
         var hint_dict = ann_parser.anns2hint_dict(
             this.vpp.$data.dtd, 
             this.vpp.$data.anns
         );
-        this.hint_dict = hint_dict;
-        console.log('* updated hint_dict by anns', this.hint_dict);
+        this.vpp.hint_dict = hint_dict;
+        console.log('* updated hint_dict by anns', this.vpp.hint_dict);
     },
 
     update_hint_dict_by_tag: function(tag) {
-        this.hint_dict = ann_parser.add_tag_to_hint_dict(
-            tag, this.hint_dict
+        this.vpp.hint_dict = ann_parser.add_tag_to_hint_dict(
+            tag, this.vpp.hint_dict
         );
-        console.log('* updated hint_dict by tag', this.hint_dict, tag);
+        console.log('* updated hint_dict by tag', this.vpp.hint_dict, tag);
     },
 
     /////////////////////////////////////////////////////////////////
@@ -1198,7 +1214,7 @@ var app_hotpot = {
 
         // find markable hints for this ann
         var hints = ann_parser.search_hints_in_ann(
-            this.hint_dict,
+            this.vpp.hint_dict,
             this.vpp.$data.anns[this.vpp.$data.ann_idx]
         );
         console.log('* found hints', hints);
