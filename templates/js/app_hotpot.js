@@ -374,6 +374,17 @@ var app_hotpot = {
         },
 
         /////////////////////////////////////////////////////////////////
+        // Ruleset Related
+        /////////////////////////////////////////////////////////////////
+        download_ruleset_medtagger_zip: function() {
+            erp_toolkit.download_anns_as_zip(
+                this.anns,
+                this.dtd,
+                'ruleset-' + this.get_zipfile_folder_name() + '.zip'
+            );
+        },
+
+        /////////////////////////////////////////////////////////////////
         // Menu Related
         /////////////////////////////////////////////////////////////////
         switch_mui: function(section) {
