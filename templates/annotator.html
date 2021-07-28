@@ -984,6 +984,15 @@ input[type=text].ipt-md {
                                 <span v-if="txt_xmls.length > txt_ann_idx">
                                     <i class="far fa-file-code"></i>
                                     {{ get_new_xml_filename(txt_xmls[txt_ann_idx].fn) }}
+
+                                    <span>
+                                        <a href="javascript:void(0);"
+                                            v-on:click="download_txt_xml(txt_ann_idx)"
+                                            v-bind:title="'Download ' + get_new_xml_filename(txt_xmls[txt_ann_idx].fn)">
+                                            <i class="fa fa-download"></i>
+                                            Download
+                                        </a>
+                                    </span>
                                 </span>
                             </td>
                         </tr>

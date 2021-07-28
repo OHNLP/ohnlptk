@@ -249,6 +249,13 @@ var app_hotpot = {
             return this.dtd.name + '-' + this.txt_anns.length + '-xmls';
         },
 
+        download_txt_xml: function(txt_ann_idx) {
+            var txt_xml = this.txt_xmls[txt_ann_idx];
+            var fn = this.get_new_xml_filename(txt_xml.fn);
+            var blob = new Blob([txt_xml.text], {type: "text/xml;charset=utf-8"});
+            saveAs(blob, fn);
+        },
+
         download_txt_xmls_as_zip: function() {
             // create an empty zip pack
             var zip = new JSZip();
