@@ -288,6 +288,32 @@ var app_hotpot = {
             app_hotpot.set_ann_idx(idx);
         },
 
+        show_ann_file: function(fn) {
+            // first, find the ann_idx
+            var idx = this.fn2idx(fn);
+
+            if (idx < 0) {
+                // no such file
+                app_hotpot.msg('Not found ' + fn + ' file', 'bg-yellow');
+                return;
+            }
+
+            // then switch to annotation
+            this.switch_mui('annotation');
+
+            // then show the idx
+            this.set_ann_idx(idx);
+        },
+
+        fn2idx: function(fn) {
+            for (let i = 0; i < this.anns.length; i++) {
+                if (this.anns[i]._fh.name == fn) {
+                    return i;
+                }                
+            }
+            return -1;
+        },
+
         remove_ann_file: function(idx) {
             // delete this first
             this.anns.splice(idx, 1);

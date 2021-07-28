@@ -800,8 +800,7 @@ input[type=text].ipt-md {
                             <div v-bind:title="ann._fh.name"
                                 class="d-flex flex-row flex-justify-between">
                                 <div class="file-list-item-name"
-                                    v-bind:class="{'file-list-item-name-unsaved':!ann._has_saved}"
-                                    v-on:click="set_ann_idx(idx)">
+                                    v-bind:class="{'file-list-item-name-unsaved':!ann._has_saved}">
                                     <a href="javascript:void(0);"
                                         v-show="!ann._has_saved" 
                                         v-on:click="save_xml"
@@ -809,7 +808,7 @@ input[type=text].ipt-md {
                                         class="icon-fg-unsaved mr-1">
                                         <i class="fa fa-save"></i>
                                     </a>
-                                    <span>
+                                    <span v-on:click="set_ann_idx(idx)">
                                         {{ ann._fh.name }}
                                     </span>
                                 </div>
@@ -1032,8 +1031,11 @@ input[type=text].ipt-md {
                 <div class="box-header">
                     <h4>
                         <i class="fa fa-list-ul"></i>
-                        Auto Generated Rules
+                        Generated Rules
                     </h4>
+                </div>
+                <div class="box-body" style="overflow-y: auto;">
+
                 </div>
             </div>
         </div>
