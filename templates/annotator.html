@@ -23,6 +23,11 @@ html,body {
     height: 100%;
     background-color: #e9e9e9;
 }
+.h-splitter-menu {
+    width: 1px;
+    height: 64px;
+    background-color: #dadbdc;
+}
 .v-splitter {
     width: 100%;
     height: 5px;
@@ -445,7 +450,8 @@ input[type=text].ipt-md {
     <nav data-role="ribbonmenu">
         <ul class="tabs-holder">
             <li v-on:click="switch_mui('annotation')">
-                <a href="#section-1-1">Annotation</a>
+                <a href="#section-1-1">
+                 Annotation</a>
             </li>
             <li v-on:click="switch_mui('corpus')">
                 <a href="#section-1-2">Corpus</a>
@@ -713,17 +719,23 @@ input[type=text].ipt-md {
 
             <!-- the section for IE ruleset -->
             <div class="section" id="section-1-4">
-                <div class="group">
-                    <button class="ribbon-button" 
-                        v-on:click="download_ruleset_medtagger_zip">
-                        <span class="icon">
-                            <i class="far fa-file-archive"></i>
-                        </span>
-                        <span class="caption">MedTagger / Backbone</span>
-                    </button>
+                <button class="ribbon-button" 
+                    v-on:click="download_ruleset_medtagger_zip">
+                    <span class="icon">
+                        <i class="far fa-file-archive"></i>
+                    </span>
+                    <span class="caption">MedTagger / Backbone</span>
+                </button>
 
-                    <span class="title">Generate Ruleset</span>
-                </div>
+                <div class="h-splitter-menu ml-2 mr-2">&nbsp;</div>
+
+                <button class="ribbon-button" 
+                    v-on:click="download_ruleset_medtagger_zip">
+                    <span class="icon">
+                        <i class="far fa-file-archive"></i>
+                    </span>
+                    <span class="caption">MedTagger / Backbone</span>
+                </button>
             </div>
 
 
@@ -961,7 +973,7 @@ input[type=text].ipt-md {
                     </h4>
                 </div>
 
-                <div class="box-body">
+                <div class="box-body" style="overflow-y: auto;">
                     <table class="table striped">
                         <tr>
                             <th>#</th>

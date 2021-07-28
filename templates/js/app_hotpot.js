@@ -222,7 +222,7 @@ var app_hotpot = {
             }
         },
 
-        get_new_xml_filename: function(fn) {
+        get_new_xml_filename: function(fn, ext='.xml') {
             var prefix = this.txt_xml_prefix.trim();
             var suffix = this.txt_xml_suffix.trim();
             var new_fn = fn;
@@ -237,16 +237,18 @@ var app_hotpot = {
             // add suffix
             if (suffix == '') {
                 // nothing to do
-                new_fn = new_fn + '.xml';
+                new_fn = new_fn + ext;
             } else {
-                new_fn = new_fn + '_' + suffix + '.xml';
+                new_fn = new_fn + '_' + suffix + ext;
             }
 
             return new_fn;
         },
 
         get_zipfile_folder_name: function() {
-            return this.dtd.name + '-' + this.txt_anns.length + '-xmls';
+            var fn = this.dtd.name + '-' + this.txt_anns.length;
+            fn = this.get_new_xml_filename(fn, '');
+            return fn + '-xmls';
         },
 
         download_txt_xml: function(txt_ann_idx) {
@@ -914,7 +916,7 @@ var app_hotpot = {
         '#fdbf6f',
         '#ff7f00',
         '#cab2d6',
-        '#6a3d9a',
+        '#9654dc',
         '#d0aa3d',
         '#b15928',
         '#8dd3c7',
