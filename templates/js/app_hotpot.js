@@ -302,7 +302,10 @@ var app_hotpot = {
             this.switch_mui('annotation');
 
             // then show the idx
-            this.set_ann_idx(idx);
+            app_hotpot.set_ann_idx(idx);
+
+            // trick for cm late update
+            this.is_expire_cm = true;
         },
 
         fn2idx: function(fn) {
@@ -398,6 +401,12 @@ var app_hotpot = {
             this.anns[this.ann_idx]._has_saved = false;
             console.log('* added tag by hint, ' + tag_name + ' on ' + hint.text);
 
+            // update the hint_dict
+            app_hotpot.update_hint_dict_by_tag(
+                this.anns[this.ann_idx],
+                tag
+            );
+
             // update the cm
             app_hotpot.cm_update_marks();
 
@@ -409,6 +418,10 @@ var app_hotpot = {
         /////////////////////////////////////////////////////////////////
         // Ruleset Related
         /////////////////////////////////////////////////////////////////
+        update_hint_dict: function() {
+            app_hotpot.update_hint_dict_by_anns();
+        },
+
         get_ruleset_base_name: function() {
             var fn = this.dtd.name + '-' + this.anns.length;
             return fn;
@@ -460,7 +473,7 @@ var app_hotpot = {
             console.log('* added tag by right click, ' + tag_def.name);
 
             // add this new tag to hint_dict
-            app_hotpot.update_hint_dict_by_tag(tag);
+            app_hotpot.update_hint_dict_by_tag(this.anns[this.ann_idx], tag);
 
             // update the cm
             app_hotpot.cm_update_marks();
@@ -608,9 +621,22 @@ var app_hotpot = {
             data: this.vpp_data,
             methods: this.vpp_methods,
 
-            mounted: function () {
+            mounted: function() {
                 Metro.init();
             },
+
+            updated: function() {
+                this.$nextTick(function () {
+                    // Code that will run only after the
+                    // entire view has been re-rendered
+                    if (this.section == 'annotation') {
+                        if (this.is_expire_cm) {
+                            app_hotpot.set_ann_idx(this.ann_idx);
+                            this.is_expire_cm = false;
+                        }
+                    }
+                });
+            }
         });
 
         // the code mirror
@@ -1002,6 +1028,10 @@ var app_hotpot = {
                     0
                 );
                 style.insertRule(
+                    ".border-tag-" + tag_name + " { border-color: " + color + " !important; }",
+                    0
+                );
+                style.insertRule(
                     ".fg-tag-" + tag_name + " { color: " + color + " !important; }",
                     0
                 );
@@ -1109,9 +1139,9 @@ var app_hotpot = {
         console.log('* updated hint_dict by anns', this.vpp.hint_dict);
     },
 
-    update_hint_dict_by_tag: function(tag) {
+    update_hint_dict_by_tag: function(ann, tag) {
         this.vpp.hint_dict = ann_parser.add_tag_to_hint_dict(
-            tag, this.vpp.hint_dict
+            ann, tag, this.vpp.hint_dict
         );
         console.log('* updated hint_dict by tag', this.vpp.hint_dict, tag);
     },
