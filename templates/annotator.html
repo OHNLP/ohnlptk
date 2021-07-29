@@ -65,7 +65,7 @@ html,body {
     width: calc(100% - 250px);
 }
 #app_hotpot {
-    margin-top: 0px;
+    margin-top: 2px;
 }
 .dropzone:hover {
   border-color: rgb(0, 89, 255);
@@ -120,7 +120,7 @@ html,body {
     cursor: pointer;
     border: 2px dotted #999999;
     position: relative;
-    display: inline-block;
+    /* display: inline-block; */
 }
 .mark-hint:hover {
     font-weight: bold;
@@ -147,8 +147,8 @@ html,body {
     border-radius: 6px;
     padding: 1px 5px;
     position: absolute;
-    z-index: 1;
-    top: -130%;
+    z-index: 999;
+    top: -135%;
     left: 50%;
     margin-left: -50%;
     opacity: 0;
@@ -465,6 +465,10 @@ input[type=text].ipt-md {
     padding: 0px 2px;
     background-color: #eaeaea;
 }
+/* fix for metro */
+.radio .caption, .radio .check {
+    font-size: 1em;
+}
 </style>
 {% endblock %}
 
@@ -480,7 +484,7 @@ input[type=text].ipt-md {
 
 <div id="app_hotpot">
 
-    <div class="container-fluid bg-cyan fg-white mb-1">
+    <!-- <div class="container-fluid bg-cyan fg-white mb-1">
         <div class="row">
             <div class="cell">
                 <i class="fa fa-code"></i>
@@ -490,14 +494,16 @@ input[type=text].ipt-md {
 
             </div>
         </div>
-    </div>
+    </div> -->
 
     <nav data-role="ribbonmenu">
         <ul class="tabs-holder">
             <li v-on:click="switch_mui('annotation')"
                 v-bind:class="{'active': section=='annotation'}">
                 <a id="tab_link_annotation" href="#section-1-1">
-                 Annotation</a>
+                    <i class="fa fa-highlighter"></i>
+                    Annotation
+                </a>
             </li>
             <li v-on:click="switch_mui('corpus')"
                 v-bind:class="{'active': section=='corpus'}">
@@ -680,6 +686,7 @@ input[type=text].ipt-md {
 
                 <div class="group">
                     <button class="ribbon-button"
+                        :disabled="dtd == null"
                         v-on:click="open_txt_files">
                         <span class="icon">
                             <i class="far fa-file-code"></i>
@@ -729,7 +736,7 @@ input[type=text].ipt-md {
                         <span class="icon">
                             <i class="fa fa-download"></i>
                         </span>
-                        <span class="caption">As ZIP File</span>
+                        <span class="caption">All as a ZIP</span>
                     </button>
 
                     <span class="title">Download</span>
@@ -813,16 +820,15 @@ input[type=text].ipt-md {
             <!-- the section for statistics -->
             <div class="section" id="section-1-5"
                 v-bind:class="{'active': section=='statistics'}">
-                <div class="group">
-                    <button class="ribbon-button" 
-                        v-on:click="show_about">
-                        <span class="icon">
-                            <i class="fa fa-list-ul"></i>
-                        </span>
-                        <span class="caption">Update All</span>
-                    </button>
-                    <span class="title">Document Statistics</span>
-                </div>
+                <button class="ribbon-button" 
+                    :disabled="dtd == null"
+                    v-on:click="show_about">
+                    <span class="icon">
+                        <i class="fa fa-list-ul"></i>
+                    </span>
+                    <span class="caption">Update All</span>
+                </button>
+                
             </div>
         </div>
 
@@ -1349,7 +1355,7 @@ var jarvis = {
         if (isIE) { return 0; }
 
         if (!isCHROME) { 
-            this.ssmsg('Please use latest Google Chrome Browser');
+            this.ssmsg('Please use the latest Google Chrome browser');
             return 0; 
         }
 

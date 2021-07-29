@@ -943,7 +943,7 @@ var app_hotpot = {
 
     resize: function() {
         var h = $(window).height();
-        $('.main-ui').css('height', h - 175);
+        $('.main-ui').css('height', h - 145);
     },
 
     parse_drop_dtd: function(fileEntry) {
