@@ -715,6 +715,13 @@ var app_hotpot = {
     },
 
     add_ann: function(ann, is_switch_to_this_ann) {
+        // check the schema first
+        if (ann.dtd_name != this.vpp.$data.dtd.name) {
+            console.log('* skip unmatched ann', ann);
+            jarvis.msg('Skipped unmatched file ' + ann._fh.name, 'warning');
+            return;
+        }
+
         console.log("* set ann", ann);
         this.vpp.$data.has_ann = true;
         this.vpp.$data.anns.push(ann);
