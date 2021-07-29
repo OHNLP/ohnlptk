@@ -183,7 +183,11 @@ var ann_parser = {
                     // oh, this is NOT a new text
                     // just increase the count
                     hint_dict[tag.tag].text_dict[text].count += 1;
-                    hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] = 1;
+                    if (hint_dict[tag.tag].text_dict[text].ann_fn_dict.hasOwnProperty(ann._fh.name)) {
+                        hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] += 1;
+                    } else {
+                        hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] = 1;
+                    }
 
                 } else {
                     // ok, this is a new text

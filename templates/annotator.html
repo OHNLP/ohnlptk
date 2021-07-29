@@ -430,6 +430,7 @@ input[type=text].ipt-md {
 }
 .ruleset-tag-name {
     width: 180px;
+    min-width: 180px;
     border-left: 5px solid;
 }
 .ruleset-tag-text {
@@ -459,6 +460,10 @@ input[type=text].ipt-md {
 .ruleset-tag-text-filelist-item:hover {
     color: rgb(1, 84, 207);
     background-color: #efefef;
+}
+.ruleset-tag-text-filelist-item-count {
+    padding: 0px 2px;
+    background-color: #eaeaea;
 }
 </style>
 {% endblock %}
@@ -1117,9 +1122,9 @@ input[type=text].ipt-md {
                             </div>
 
                             <div v-if="hint_dict.hasOwnProperty(tagDef.name)"
-                                class="ruleset-tag-info d-flex flex-row">
+                                class="ruleset-tag-info d-flex flex-row flex-wrap">
                                 <div v-for="(text_info, text) in hint_dict[tagDef.name].text_dict"
-                                    class="ruleset-tag-text mr-2 d-flex flex-column">
+                                    class="ruleset-tag-text mr-2 mb-2 d-flex flex-column">
                                     <div v-on:click="hint_dict[tagDef.name].text_dict[text]._is_shown = !hint_dict[tagDef.name].text_dict[text]._is_shown">
                                         <span class="ruleset-tag-text-count"
                                             v-bind:title="'Annotated ' + text_info.count + ' times'">
@@ -1138,8 +1143,11 @@ input[type=text].ipt-md {
                                         <div v-for="(fn_v, fn) in text_info.ann_fn_dict"
                                             v-on:click="show_ann_file(fn)"
                                             class="ruleset-tag-text-filelist-item">
+                                            <span class="ruleset-tag-text-filelist-item-count">
+                                                {{ fn_v }}
+                                            </span>
+                                            <i class="fa fa-angle-right ml-1 mr-1"></i>
                                             <span>
-                                                <i class="far fa-file mr-1"></i>
                                                 {{ fn }}
                                             </span>
                                         </div>
