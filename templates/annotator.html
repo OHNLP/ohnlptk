@@ -1091,18 +1091,27 @@ input[type=text].ipt-md {
                 <div class="box-header">
                     <h4>
                         <i class="fa fa-list-ul"></i>
-                        Generated Rules
+                        Annotated Texts
                     </h4>
                 </div>
-                <div v-if="dtd != null"
+                <div v-if="dtd != null && anns.length > 0"
                     class="box-body" style="overflow-y: auto;">
                     <div class="d-flex flex-column w-100 h-100">
 
                         <div v-for="(tagDef, tagDef_idx) in dtd.etags"
                             class="ruleset-tag-item d-flex flex-row mb-1 pt-1 pb-1">
-                            <div class="ruleset-tag-name pl-2"
+                            <div class="ruleset-tag-name pl-2 d-flex flex-row flex-justify-between"
                                 v-bind:class="'border-tag-' + tagDef.name">
-                                {{ tagDef.name }}
+                                <div>
+                                    {{ tagDef.name }}
+                                </div>
+                                <div v-if="hint_dict.hasOwnProperty(tagDef.name)"
+                                    class="mr-2">
+                                    {{ hint_dict[tagDef.name].texts.length }}
+                                </div>
+                                <div v-else>
+                                    -
+                                </div>
                             </div>
 
                             <div v-if="hint_dict.hasOwnProperty(tagDef.name)"
