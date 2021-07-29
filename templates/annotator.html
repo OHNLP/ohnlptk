@@ -304,7 +304,7 @@ html,body {
 }
 .tag-list-row-name-id-prefix {
     font-weight: bold;
-    text-decoration: underline;
+    /* text-decoration: underline; */
 }
 .tag-list-row-count-0 {
     color: #bdbdbd;
@@ -1247,10 +1247,10 @@ input[type=text].ipt-md {
     <div v-if="has_dtd"
         id="ctxmenu_sel">
         <!-- <li class="ui-widget-header"
-            v-on:click="ctxmenu_close">Tags:</li> -->
+            v-on:click="close_ctxmenu">Tags:</li> -->
         <li class="ctxmenu-item"
             v-for="etag, tag_idx in dtd.etags"
-            v-on:click="ctxmenu_add_tag(etag)">
+            v-on:click="add_tag_by_ctxmenu(etag)">
             <div v-bind:id="'ctxmenu-item-' + etag.name">
                 <i v-bind:class="'fa fa-tag fg-tag-' + etag.name"></i>
                 <span v-if="etag.hasOwnProperty('shortcut')"
@@ -1272,7 +1272,7 @@ input[type=text].ipt-md {
     <div v-if="has_dtd"
         id="popmenu_tag">
         <li class="ui-widget-header"
-            v-on:click="ctxmenu_close">
+            v-on:click="close_popmenu">
             TAG <i class="fa fa-tag"></i>
             <b>{{ clicked_tag_id }}</b>
         </li>

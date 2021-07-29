@@ -67,14 +67,13 @@ var dtd_parser = {
         }
 
         // split the tags
-        
         for (const name in dtd.tag_dict) {
             if (Object.hasOwnProperty.call(dtd.tag_dict, name)) {
                 // now, create a attlist_dict for each tag
                 dtd.tag_dict[name].attlist_dict = this.make_attlist_dict(dtd.tag_dict[name]);
 
                 // last, put this tag to list
-                const element = dtd.tag_dict[name];
+                var element = dtd.tag_dict[name];
                 if (element.type == 'etag') {
                     dtd.etags.push(element);
                 } else {

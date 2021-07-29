@@ -415,6 +415,77 @@ var app_hotpot = {
 
         },
 
+        add_tag_by_ctxmenu: function(tag_def) {
+
+            // get the basic tag
+            var _tag = app_hotpot.cm_make_basic_tag_from_selection();
+
+            // then call the general add_tag process
+            this.add_tag(_tag, tag_def);
+
+            // clear the selection to avoid stick keys
+            app_hotpot.cm_clear_selection();
+
+            // for ctxmenu, we need to remove the ctx after click
+            app_hotpot.ctxmenu_sel.hide();
+
+            // scroll the view
+            app_hotpot.scroll_annlist_to_bottom();
+
+            console.log('* added tag by right click, ' + tag_def.name);
+        },
+
+        add_tag_by_shortcut_key: function(key) {
+            // first, get selection
+            var selection = app_hotpot.cm_get_selection();
+            if (selection.sel_txts == '') {
+                // nothing selected for tag, skip
+                return;
+            }
+
+            // then get the tag_def by the given key
+            var tag_def = null;
+            for (let i = 0; i < this.dtd.etags.length; i++) {
+                if (this.dtd.etags[i].shortcut == key) {
+                    // found!
+                    tag_def = this.dtd.etags[i];
+                    break
+                }
+            }
+            if (tag_def == null) {
+                // oh, this shortcut is not registered
+                return;
+            }
+
+            // get a basic tag
+            var _tag = app_hotpot.cm_make_basic_tag_from_selection();
+
+            // then call the general add_tag process
+            this.add_tag(_tag, tag_def);
+
+            // clear the selection to avoid stick keys
+            app_hotpot.cm_clear_selection();
+
+            console.log('* added tag by shortcut, ' + tag_def.name + ' on ' + _tag.text);
+        },
+
+        add_tag: function(basic_tag, tag_def) {
+            // create a new tag
+            var tag = app_hotpot.make_tag(basic_tag, tag_def, this.anns[this.ann_idx]);
+
+            // add this tag to ann
+            this.anns[this.ann_idx].tags.push(tag);
+
+            // mark _has_saved
+            this.anns[this.ann_idx]._has_saved = false;
+
+            // add this new tag to hint_dict
+            app_hotpot.update_hint_dict_by_tag(this.anns[this.ann_idx], tag);
+
+            // update the cm
+            app_hotpot.cm_update_marks();
+        },
+
         /////////////////////////////////////////////////////////////////
         // Ruleset Related
         /////////////////////////////////////////////////////////////////
@@ -458,35 +529,12 @@ var app_hotpot = {
             app_hotpot.resize();
         },
 
-        ctxmenu_add_tag: function(tag_def) {
-            // get the basic tag
-            var _tag = app_hotpot.cm_make_basic_tag_from_selection();
-
-            // create a new tag
-            var tag = app_hotpot.make_tag(_tag, tag_def, this.anns[this.ann_idx]);
-
-            // add this tag to ann
-            this.anns[this.ann_idx].tags.push(tag);
-
-            // mark _has_saved
-            this.anns[this.ann_idx]._has_saved = false;
-            console.log('* added tag by right click, ' + tag_def.name);
-
-            // add this new tag to hint_dict
-            app_hotpot.update_hint_dict_by_tag(this.anns[this.ann_idx], tag);
-
-            // update the cm
-            app_hotpot.cm_update_marks();
-
-            // after 
+        close_ctxmenu: function() {
             app_hotpot.ctxmenu_sel.hide();
-
-            // scroll the view
-            app_hotpot.scroll_annlist_to_bottom();
         },
 
-        ctxmenu_close: function() {
-            app_hotpot.ctxmenu_sel.hide();
+        close_popmenu: function() {
+            app_hotpot.popmenu_tag.hide();
         },
 
         popmenu_del_tag: function() {
@@ -664,13 +712,8 @@ var app_hotpot = {
             evt.preventDefault();
 
             // update the selection texts
-            app_hotpot.selection = {
-                sel_txts: inst.getSelections(),
-                sel_locs: inst.listSelections()
-            };
-            console.log("* found selection:", app_hotpot.selection);
-
-            if (app_hotpot.selection.sel_txts == '') {
+            var selection = app_hotpot.cm_get_selection(inst);
+            if (selection.sel_txts == '') {
                 // nothing selected for tag, skip
                 return;
             }
@@ -679,6 +722,30 @@ var app_hotpot = {
             var mouseY = evt.clientY;
             app_hotpot.show_tag_ctxmenu(mouseX, mouseY);
         });
+    },
+
+    cm_get_selection: function(inst) {
+        if (typeof(inst) == 'undefined') {
+            inst = this.codemirror;
+        }
+        // update the selection
+        var selection = {
+            sel_txts: inst.getSelections(),
+            sel_locs: inst.listSelections()
+        };
+        this.selection = selection;
+        console.log("* found selection:", app_hotpot.selection);
+        return selection;
+    },
+
+    cm_clear_selection: function(to_anchor=true) {
+        var new_anchor = null;
+        if (to_anchor) {
+            new_anchor = this.selection.sel_locs[0].anchor;
+        } else {
+            new_anchor = this.selection.sel_locs[0].head;
+        }
+        this.codemirror.setSelection(new_anchor);
     },
 
     /**
@@ -837,6 +904,11 @@ var app_hotpot = {
             "keypress",
             function(event) {
                 console.log('* pressed on', event);
+
+                // first, check if there is any selection
+                app_hotpot.vpp.add_tag_by_shortcut_key(
+                    event.key.toLocaleLowerCase()
+                );
             }
         );
     },
@@ -1080,7 +1152,10 @@ var app_hotpot = {
     update_tag_shortcuts: function() {
         for (let i = 0; i < this.vpp.dtd.etags.length; i++) {
             if (i < this.app_shortcuts.length) {
+                // assign a key to this etag
                 this.vpp.dtd.etags[i].shortcut = this.app_shortcuts[i];
+                
+                // now, we need to update the tag_dict
             }
         }
     },
