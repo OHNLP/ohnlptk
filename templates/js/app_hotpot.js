@@ -723,6 +723,14 @@ var app_hotpot = {
                 }
             }
             return false;
+        },
+
+        get_tag_def: function(tag_name) {
+            if (this.dtd.tag_dict.hasOwnProperty(tag_name)) {
+                return this.dtd.tag_dict[tag_name];
+            } else {
+                return null;
+            }
         }
     },
 
@@ -862,6 +870,9 @@ var app_hotpot = {
 
         // bind drop zone for anns
         this.bind_dropzone_ann();
+
+        // bind drop zone for anns
+        this.bind_dropzone_txt();
 
         // bind global click event
         this.bind_click_event();
@@ -1017,6 +1028,48 @@ var app_hotpot = {
 
         }, false);
 
+    },
+
+    bind_dropzone_txt: function() {
+        let dropzone = document.getElementById("dropzone_txt");
+
+        dropzone.addEventListener("dragover", function(event) {
+            event.preventDefault();
+        }, false);
+
+        dropzone.addEventListener("drop", function(event) {
+            let items = event.dataTransfer.items;
+            // stop the download event
+            event.preventDefault();
+
+            for (let i=0; i<items.length; i++) {
+                // let item = items[i].webkitGetAsEntry();
+                let item = items[i].getAsFileSystemHandle();
+        
+                item.then(function(fh) {
+                    if (fh.kind == 'file') {
+                        // check exists
+                        if (app_hotpot.vpp.has_included_txt_ann_file(fh.name)) {
+                            // exists? skip this file
+                            return;
+                        }
+
+                        // read the file
+                        var p_txt_ann = fs_read_txt_file_handle(fh);
+                        p_txt_ann.then(function(txt_ann) {
+                            app_hotpot.vpp.add_txt(txt_ann);
+                        });
+                        
+                    } else {
+                        // what to do with a directory
+                    }
+                })
+                .catch(function(error) {
+                    console.log('* error when drop txt', error);
+                });
+            }
+
+        }, false);
     },
 
     resize: function() {
@@ -1398,7 +1451,8 @@ var app_hotpot = {
 
         for (let i = 0; i < working_ann.tags.length; i++) {
             var tag = working_ann.tags[i];
-            this.cm_mark_ann_tag_in_text(tag, working_ann.text);
+            var tag_def = this.vpp.get_tag_def(tag.tag);
+            this.cm_mark_ann_tag_in_text(tag, tag_def, working_ann.text);
         }
     },
 
@@ -1462,7 +1516,18 @@ var app_hotpot = {
         }
     },
 
-    cm_mark_ann_tag_in_text: function(tag, text) {
+    cm_mark_ann_tag_in_text: function(tag, tag_def, text) {
+        if (tag_def.type == 'etag') {
+            this.cm_mark_ann_etag_in_text(tag, tag_def, text);
+        } else {
+            this.cm_mark_ann_ltag_in_text(tag, tag_def, text);
+        }
+    },
+
+    cm_mark_ann_ltag_in_text: function(tag, tag_def, text) {
+    },
+
+    cm_mark_ann_etag_in_text: function(tag, tag_def, text) {
         var raw_spans = tag['spans'];
         if (raw_spans == '' || raw_spans == null) { 
             return [-1]; 
@@ -1606,14 +1671,14 @@ var app_hotpot = {
         if (typeof(cls) == 'undefined') {
             cls = 'info';
         }
-        s = '<i class="fa fa-info-circle"></i> ' + s; 
+        msg = '<i class="fa fa-info-circle"></i> ' + msg; 
         var notify = Metro.notify;
         notify.setup({
             width: 300,
             timeout: 3000,
             animation: 'swing'
         });
-        notify.create(s, null, { 
+        notify.create(msg, null, { 
             cls: cls
         });
     }

@@ -184,7 +184,7 @@ var dtd_parser = {
                 vtype: '',
                 require: '',
                 values: [],
-                default_value: ''
+                default_value: null
             };
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {

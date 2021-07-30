@@ -173,6 +173,10 @@ var ann_parser = {
                 }
 
                 // empty text should be removed
+                if (!tag.hasOwnProperty('text')) {
+                    // which means it's a link tag
+                    continue;
+                }
                 var text = tag.text;
                 text = text.trim();
                 if (text == '') {
@@ -218,6 +222,10 @@ var ann_parser = {
             }
         }
         // empty text should be removed
+        if (!tag.hasOwnProperty('text')) {
+            // which means it's a link tag
+            return;
+        }
         var text = tag.text;
         text = text.trim();
         if (text == '') {
@@ -291,6 +299,10 @@ var ann_parser = {
         // first, put existed ann tags in to mark dict
         for (let i = 0; i < ann.tags.length; i++) {
             const tag = ann.tags[i];
+            if (!tag.hasOwnProperty('spans')) {
+                // which means it's a link tag
+                continue;
+            }
             var spans = tag.spans.split(',');
             for (let j = 0; j < spans.length; j++) {
                 const span = spans[j];
