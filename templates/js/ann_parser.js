@@ -352,6 +352,7 @@ var ann_parser = {
     },
 
     get_locs: function(str, text) {
+        // convert str to lower for ignore case?
         var regex = new RegExp('\\b' + str + '\\b', 'gmi');
 
         var m;

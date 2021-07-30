@@ -148,7 +148,7 @@ html,body {
     padding: 1px 5px;
     position: absolute;
     z-index: 999;
-    top: -135%;
+    top: 135%;
     left: 50%;
     margin-left: -50%;
     opacity: 0;
@@ -545,7 +545,7 @@ input[type=text].ipt-md {
                     <div id="dropzone_dtd" class="dropzone">
                         <div v-if="dtd != null" class="zone-text">
                             <b>{{ dtd.name }}</b><br>
-                            {{ dtd.etags.length }} NC Extend Tags<br>
+                            {{ dtd.etags.length }} Entity Tags<br>
                             {{ dtd.ltags.length }} Link Tags
                         </div>
                         <div v-else>
@@ -686,11 +686,11 @@ input[type=text].ipt-md {
 
                 <div class="group">
                     <button class="ribbon-button"
-                        v-on:click="reset_corpus_all">
+                        v-on:click="clear_corpus_all">
                         <span class="icon">
                             <i class="far fa-times-circle"></i>
                         </span>
-                        <span class="caption">Reset All</span>
+                        <span class="caption">Clear All</span>
                     </button>
 
                     <span class="title">&nbsp;</span>

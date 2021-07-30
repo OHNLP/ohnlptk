@@ -426,7 +426,7 @@ var app_hotpot = {
         // Corpus menu related functions
         /////////////////////////////////////////////////////////////////
 
-        reset_corpus_all: function() {
+        clear_corpus_all: function() {
             this.txt_anns = [];
             this.txt_xmls = [];
         },
@@ -1471,9 +1471,11 @@ var app_hotpot = {
         // the spans may contains multiple parts
         // split them first
         var spans_arr = raw_spans.split(',');
+        var text_arr = tag.text.split('...');
         
         for (let i = 0; i < spans_arr.length; i++) {
             const spans = spans_arr[i];
+            const spans_text = text_arr[i];
             var rst = this._calc_spans2range(spans, text);
             var ln0 = rst[0][0];
             var ch0 = rst[0][1];
@@ -1490,7 +1492,7 @@ var app_hotpot = {
                         '</span>',
                     '</span>',
                     '<span class="mark-tag-text" tag_id="'+tag.id+'">',
-                    tag.text,
+                        spans_text,
                     '</span>',
                     '<span class="mark-tag-info-offset" title="Delete tag '+tag.id+'" onclick="app_hotpot.del_tag(\''+tag.id+'\');">',
                         '<i class="fa fa-times-circle"></i>',
