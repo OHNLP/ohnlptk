@@ -162,52 +162,7 @@ var ann_parser = {
             const ann = anns[i];
             for (let j = 0; j < ann.tags.length; j++) {
                 const tag = ann.tags[j];
-                // create the tagDef if not exists
-                if (!hint_dict.hasOwnProperty(tag.tag)) {
-                    // the text_dict is for searching
-                    // the texts is for storing
-                    hint_dict[tag.tag] = {
-                        text_dict: {},
-                        texts: []
-                    };
-                }
-
-                // empty text should be removed
-                if (!tag.hasOwnProperty('text')) {
-                    // which means it's a link tag
-                    continue;
-                }
-                var text = tag.text;
-                text = text.trim();
-                if (text == '') {
-                    continue;
-                }
-
-                if (hint_dict[tag.tag].text_dict.hasOwnProperty(text)) {
-                    // oh, this is NOT a new text
-                    // just increase the count
-                    hint_dict[tag.tag].text_dict[text].count += 1;
-                    if (hint_dict[tag.tag].text_dict[text].ann_fn_dict.hasOwnProperty(ann._fh.name)) {
-                        hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] += 1;
-                    } else {
-                        hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] = 1;
-                    }
-
-                } else {
-                    // ok, this is a new text
-                    // count +1
-                    hint_dict[tag.tag].text_dict[text] = {
-                        count: 1,
-                        ann_fn_dict: {},
-                        _is_shown: false
-                    };
-
-                    // save this tag
-                    hint_dict[tag.tag].texts.push(text);
-
-                    // save this ann file name
-                    hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] = 1;
-                }
+                this.add_tag_to_hint_dict(ann, tag, hint_dict);
             }
         }
 
@@ -238,7 +193,11 @@ var ann_parser = {
             // oh, this is NOT a new text
             // just increase the count
             hint_dict[tag.tag].text_dict[text].count += 1;
-            hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] = 1;
+            if (hint_dict[tag.tag].text_dict[text].ann_fn_dict.hasOwnProperty(ann._fh.name)) {
+                hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] += 1;
+            } else {
+                hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] = 1;
+            }
 
         } else {
             // ok, this is a new text
