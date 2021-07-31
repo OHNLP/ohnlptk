@@ -788,7 +788,7 @@ var app_hotpot = {
                 lineNumbers: true,
                 lineWrapping: true,
                 readOnly: true,
-                styleActiveLine: true
+                // styleActiveLine: true
             }
         );
 
@@ -1452,7 +1452,7 @@ var app_hotpot = {
         for (let i = 0; i < working_ann.tags.length; i++) {
             var tag = working_ann.tags[i];
             var tag_def = this.vpp.get_tag_def(tag.tag);
-            this.cm_mark_ann_tag_in_text(tag, tag_def, working_ann.text);
+            this.cm_mark_ann_tag_in_text(tag, tag_def, working_ann.text)
         }
     },
 
@@ -1600,10 +1600,10 @@ var app_hotpot = {
 
     },
 
-    _calc_range2spans: function(sel_loc, full_txt) {
+    _calc_range2spans: function(sel_loc, full_text) {
         console.log('* calc_range2spans: ');
         console.log(sel_loc);
-        var lines = full_txt.split('\n');
+        var lines = full_text.split('\n');
         var span0 = 0;
         for (let i = 0; i < sel_loc.anchor.line; i++) {
             span0 += lines[i].length + 1;
@@ -1623,30 +1623,123 @@ var app_hotpot = {
         }
     },
 
-    _calc_spans2range: function(spans, text) {
+    _calc_spans2range: function(spans, full_text) {
         var span_pos_0 = parseInt(spans.split('~')[0]);
         var span_pos_1 = parseInt(spans.split('~')[1]);
 
         // calculate the line number
-        var ln0 = text.substring(0, span_pos_0).split('\n').length - 1;
-        var ln1 = text.substring(0, span_pos_1).split('\n').length - 1;
+        var ln0 = full_text.substring(0, span_pos_0).split('\n').length - 1;
+        var ln1 = full_text.substring(0, span_pos_1).split('\n').length - 1;
 
         // calculate the char location
         var ch0 = span_pos_0;
         for (let i = 1; i < span_pos_0; i++) {
-            if (text[span_pos_0 - i] == '\n') {
+            if (full_text[span_pos_0 - i] == '\n') {
                 ch0 = i - 1;
                 break;
             }
         }
+
+        // TODO fix the potential cross lines bug
         var ch1 = ch0 + (span_pos_1 - span_pos_0);
 
         return [ [ln0, ch0], [ln1, ch1] ];
     },
 
+    cm_spans2coords: function(spans, full_text) {
+        var range = this._calc_spans2range(spans, full_text);
+
+        var coords_l = this.codemirror.charCoords(
+            { line: range[0][0], ch: range[0][1] },
+            'local'
+        );
+        var coords_r = this.codemirror.charCoords(
+            { line: range[1][0], ch: range[1][1] },
+            'local'
+        );
+
+        return { l:coords_l, r:coords_r };
+    },
+
     scroll_annlist_to_bottom: function() {
         var objDiv = document.getElementById("mui_annlist");
         objDiv.scrollTop = objDiv.scrollHeight;
+    },
+
+    cm_draw_polyline: function(tag_a, tag_b, full_text) {
+        // first, check if there is a layer for the plots
+        if ($('.CodeMirror-plots').length == 0) {
+            $('.CodeMirror-lines').before(
+                '<div class="CodeMirror-plots"><svg id="cm_svg_plots"></svg></div>'
+            );
+        }
+
+        // then get the coords of both tags
+        var coords_a = this.cm_spans2coords(tag_a.spans, full_text);
+        var coords_b = this.cm_spans2coords(tag_b.spans, full_text);
+
+        // the setting for the polyline
+        var delta_height = 3;
+        var delta_width = 0;
+
+        // get the upper coords, which is the lower one
+        var upper_top = coords_a.l.top < coords_b.l.top ? 
+            coords_a.l.top : coords_b.l.top;
+        upper_top = upper_top - delta_height;
+
+        // get the sign for relative location
+        var sign = coords_b.l.left - coords_a.l.left > 0 ? 1 : -1;
+
+        // then calc the points for the polyline
+        var points = [];
+
+        // point, start
+        points.push(
+            (coords_a.l.left + coords_a.r.left)/2 + 
+            ',' + 
+            (coords_a.l.top + 4)
+        );
+
+        // point joint 1
+        points.push(
+            ((coords_a.l.left + coords_a.r.left)/2 + sign * delta_width) + 
+            ',' + 
+            upper_top
+        );
+
+        // point, joint 2
+        points.push(
+            ((coords_b.l.left + coords_b.r.left)/2 - sign * delta_width) + 
+            ',' + 
+            upper_top
+        );
+
+        // point, end
+        points.push(
+            (coords_b.l.left + coords_b.r.left)/2 + 
+            ',' + 
+            (coords_b.l.top + 4)
+        );
+
+        // convert to a string
+        points = points.join(' ');
+
+        // create a poly line and add to svg
+        // Thanks to the post!
+        // https://stackoverflow.com/questions/15980648/jquery-added-svg-elements-do-not-show-up
+        var svg_polyline = document.createElementNS(
+            'http://www.w3.org/2000/svg', 'polyline'
+        );
+        svg_polyline.setAttribute('points', points);
+        svg_polyline.setAttribute('class', "tag-polyline");
+
+        $('#cm_svg_plots').append(
+            svg_polyline
+        );
+    },
+
+    cm_calc_points: function(coords_a, coords_b) {
+
     },
     
     /////////////////////////////////////////////////////////////////

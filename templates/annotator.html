@@ -227,9 +227,26 @@ html,body {
 .CodeMirror {
     height: 100%;
     font-size: 14px;
+    line-height: 2em;
 }
 .CodeMirror-activeline-background {
     background-color: #e3f3fb;
+}
+.CodeMirror-plots {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+#cm_svg_plots {
+    width: 100%;
+    height: 100%;
+}
+.tag-polyline {
+	fill: none;
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 4, 2;
+    opacity: .7;
 }
 /* for the pop menu */
 #popmenu_tag {
@@ -1021,7 +1038,12 @@ input[type=text].ipt-md {
                             <td>
                                 <div class="d-flex flex-row flex-justify-between">
                                     <div>
-                                        <i class="fa fa-tag"
+                                        <i v-if="get_tag_def(tag.tag).type == 'etag'" 
+                                            class="fa fa-tag"
+                                            v-bind:class="'fg-tag-' + tag.tag">
+                                        </i>
+                                        <i v-else class="fa fa-link"
+                                            class="fa fa-tag"
                                             v-bind:class="'fg-tag-' + tag.tag">
                                         </i>
                                         {{ tag.tag }}
