@@ -1231,6 +1231,8 @@ input[type=text].ipt-md {
                                     </div>
                                 </div>
                             </div>
+
+
                         </div>
 
                     </div>
@@ -1347,6 +1349,15 @@ input[type=text].ipt-md {
             TAG <i class="fa fa-tag"></i>
             <b>{{ clicked_tag_id }}</b>
         </li>
+
+        <li class="ctxmenu-item"
+            v-on:click="popmenu_del_tag()">
+            <div>
+                <i class="far fa-trash-alt"></i>
+                Delete this tag
+            </div>
+        </li>
+        <li class="ctxmenu-divider"></li>
         <li class="ctxmenu-item"
             v-on:click="popmenu_del_tag()">
             <div>

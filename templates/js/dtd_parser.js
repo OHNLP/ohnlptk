@@ -4,7 +4,8 @@ var dtd_parser = {
         element: /^\<\!ELEMENT\s+([a-zA-Z\-0-9\_]+)\s.+/gmi,
         attlist: /^\<\!ATTLIST\s+([a-zA-Z\-0-9\_]+)\s([a-zA-Z0-9\_]+)\s+(\S+)\s/gmi,
         attlist_values: /\(([a-zA-Z0-9\_\ \|]+)\)/gmi,
-        attlist_require: /#([A-Z]+)+(\b["a-zA-Z0-9\-\_\ ]+|\>)/gm
+        attlist_require: /#([A-Z]+)+(\b["a-zA-Z0-9\-\_\ ]+|\>)/gm,
+        attlist_prefix: /prefix="([a-zA-Z0-9\_]+)"/gm,
     },
 
     parse: function(text) {
@@ -65,12 +66,27 @@ var dtd_parser = {
                 // what???
             }
         }
+        
+        // post processing for the link tag
+        for (const name in dtd.tag_dict) {
+            if (Object.hasOwnProperty.call(dtd.tag_dict, name)) {
+                if (dtd.tag_dict[name].type == 'etag') { 
+                    // at present, no need to post-process etag
+                    continue; 
+                }
+
+                // for link tag, need to check how many attlists are found
+                dtd.tag_dict[name]
+            }
+        }
 
         // split the tags
         for (const name in dtd.tag_dict) {
             if (Object.hasOwnProperty.call(dtd.tag_dict, name)) {
                 // now, create a attlist_dict for each tag
-                dtd.tag_dict[name].attlist_dict = this.make_attlist_dict(dtd.tag_dict[name]);
+                dtd.tag_dict[name].attlist_dict = this.make_attlist_dict(
+                    dtd.tag_dict[name]
+                );
 
                 // last, put this tag to list
                 var element = dtd.tag_dict[name];
@@ -320,6 +336,34 @@ var dtd_parser = {
         return ret;
     },
 
+    get_attlist_prefix: function(line) {
+        let m;
+        var ret = null;
+        let regex = this.regex.attlist_prefix;
+
+        while ((m = regex.exec(line)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+
+            // the final values?
+            var p = null;
+
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                if (groupIndex == 1) {
+                    // which is the prefix text
+                    p = match;
+                }
+            });
+
+            ret = p;
+        }
+        
+        return ret;
+    },    
+
     make_attlist_dict: function(tag) {
         let attlist_dict = {};
 
@@ -347,5 +391,14 @@ var dtd_parser = {
             return dtd.tag_dict[tag_name].id_prefix;
         }
         return '';
+    },
+
+    is_argN: function(name) {
+        if (name.startsWith('arg')) {
+            if (/^\d+$/.test(name.substring(3))) {
+                return true;
+            }
+        }
+        return false;
     }
 };
