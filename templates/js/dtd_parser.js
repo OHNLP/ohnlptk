@@ -76,7 +76,24 @@ var dtd_parser = {
                 }
 
                 // for link tag, need to check how many attlists are found
-                dtd.tag_dict[name]
+                var cnt_idrefs = 0;
+                for (let i = 0; i < dtd.tag_dict[name].attlists.length; i++) {
+                    if (dtd.tag_dict[name].attlists[i].vtype == 'idref') {
+                        cnt_idrefs += 1;
+                    }
+                }
+
+                // if there is not idref, just create two:
+                if (cnt_idrefs == 0) {
+                    // create from and to
+                    var attlist_from = this.mk_attlist(name, 'from', 'idref');
+                    var attlist_to = this.mk_attlist(name, 'to', 'idref');
+                    dtd.tag_dict[name].attlists = [attlist_from, attlist_to].concat(
+                        dtd.tag_dict[name].attlists
+                    );
+                    console.log('* added from+to to the attlist of ' + name);
+                }
+                
             }
         }
 
@@ -193,15 +210,7 @@ var dtd_parser = {
             if (m.index === regex.lastIndex) {
                 regex.lastIndex++;
             }
-            var attlist = {
-                element: '',
-                name: '',
-                type: 'attr',
-                vtype: '',
-                require: '',
-                values: [],
-                default_value: null
-            };
+            var attlist = this.mk_attlist();
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
                 // console.log(`Found attlist match, group ${groupIndex}: ${match}`);
@@ -236,6 +245,23 @@ var dtd_parser = {
                         // it's an attr for link tag
                         attlist.vtype = 'idref';
 
+                        if (this.is_argN(attlist.name)) {
+                            // ok
+                        } else {
+                            // IDREF's default name must argX
+                            // but ... why?
+                            console.error('* error name for this "', line, '", attlist name should be argX format');
+                        }
+
+                        // then, check if there is prefix
+                        var prefix = this.get_attlist_prefix(line);
+                        if (prefix == null) {
+                            // which means this attlist doesn't have a prefix
+                            // for renaming the extraction
+                        } else {
+                            // use the prefix to replace this name
+                            attlist.name = prefix;
+                        }
                     }
                 } else {
                     // what?
@@ -400,5 +426,17 @@ var dtd_parser = {
             }
         }
         return false;
+    },
+
+    mk_attlist: function(element='', name='', vtype='') {
+        return {
+            element: element,
+            name: name,
+            type: 'attr',
+            vtype: vtype,
+            require: '',
+            values: [],
+            default_value: null,
+        };
     }
 };

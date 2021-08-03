@@ -269,6 +269,11 @@ html,body {
 .ctxmenu-item:hover {
     background-color: rgb(221, 221, 221);
 }
+.ctxmenu-divider {
+    height: 2px;
+    margin: 2px 0;
+    background-color: #dfdfdf;
+}
 .ui-widget-header {
     border: 0;
     height: 2em;
@@ -1350,13 +1355,24 @@ input[type=text].ipt-md {
             <b>{{ clicked_tag_id }}</b>
         </li>
 
-        <li class="ctxmenu-item"
-            v-on:click="popmenu_del_tag()">
-            <div>
-                <i class="far fa-trash-alt"></i>
-                Delete this tag
-            </div>
-        </li>
+        <div v-if="is_linking">
+        </div>
+
+        <div v-else>
+            <li class="ctxmenu-item"
+                v-for="ltag, ltag_idx in dtd.ltags"
+                v-on:click="popmenu_start_linking()">
+                <div>
+                    <i class="fa fa-link"
+                        v-bind:class="'fg-tag-' + ltag.name">
+                    </i>
+                    <b>{{ ltag.name }}</b>
+                    -
+                    <i>{{ get_first_idref_attlist(ltag).name }}</i>
+                </div>
+            </li>
+        </div>
+
         <li class="ctxmenu-divider"></li>
         <li class="ctxmenu-item"
             v-on:click="popmenu_del_tag()">

@@ -26,6 +26,10 @@ var app_hotpot = {
         // for popmenu
         clicked_tag_id: null,
 
+        // a flag for showing which mode we are working
+        is_linking: false,
+        linking_tag: null,
+
         // for converting the txt to xmls
         txt_anns: [],
         txt_xmls: [],
@@ -731,6 +735,15 @@ var app_hotpot = {
             } else {
                 return null;
             }
+        },
+
+        get_first_idref_attlist: function(ltag) {
+            for (let i = 0; i < ltag.attlists.length; i++) {
+                if (ltag.attlists[i].vtype == 'idref') {
+                    return ltag.attlists[i];
+                }
+            }
+            return null;
         }
     },
 
