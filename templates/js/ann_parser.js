@@ -381,5 +381,19 @@ var ann_parser = {
         h1 = Math.imul(h1 ^ (h1>>>16), 2246822507) ^ Math.imul(h2 ^ (h2>>>13), 3266489909);
         h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
         return 4294967296 * (2097151 & h2) + (h1>>>0);
+    },
+
+    get_next_tag_id: function(ann, tag_def) {
+        var n = 0;
+        for (let i = 0; i < ann.tags.length; i++) {
+            if (ann.tags[i].tag == tag_def.name) {
+                // get the id number of this tag
+                var _id = parseInt(ann.tags[i].id.replace(tag_def.id_prefix, ''));
+                if (_id >= n) {
+                    n = _id + 1;
+                }
+            }
+        }
+        return tag_def.id_prefix + n;
     }
 };

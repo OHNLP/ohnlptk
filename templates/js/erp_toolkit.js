@@ -150,7 +150,7 @@ var erp_toolkit = {
             const ann = anns[i];
             for (let j = 0; j < ann.tags.length; j++) {
                 const tag = ann.tags[j];
-                // create the tagDef if not exists
+                // create the tag_def if not exists
                 if (!text_dict.hasOwnProperty(tag.tag)) {
                     // the text_dict is for searching
                     // the texts is for storing

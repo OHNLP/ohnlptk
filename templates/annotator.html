@@ -243,10 +243,23 @@ html,body {
 }
 .tag-polyline {
 	fill: none;
+    stroke: black;
     stroke-width: 1;
     vector-effect: non-scaling-stroke;
     stroke-dasharray: 4, 2;
     opacity: .7;
+}
+.tag-polyline:hover {
+    opacity: .95;
+}
+.tag-linktext {
+    font-size: 10px;
+    padding: 0 3px;
+}
+.tag-linktext-bg {
+    stroke-width: 0;
+    rx: 3px;
+    opacity: 1;
 }
 /* for the pop menu */
 #popmenu_tag {
@@ -1187,34 +1200,34 @@ input[type=text].ipt-md {
                     class="box-body" style="overflow-y: auto;">
                     <div class="d-flex flex-column w-100 h-100">
 
-                        <div v-for="(tagDef, tagDef_idx) in dtd.etags"
+                        <div v-for="(tag_def, tag_def_idx) in dtd.etags"
                             class="ruleset-tag-item d-flex flex-row mb-1 pt-1 pb-1">
                             <div class="ruleset-tag-name pl-2 d-flex flex-row flex-justify-between"
-                                v-bind:class="'border-tag-' + tagDef.name">
+                                v-bind:class="'border-tag-' + tag_def.name">
                                 <div>
-                                    {{ tagDef.name }}
+                                    {{ tag_def.name }}
                                 </div>
-                                <div v-if="hint_dict.hasOwnProperty(tagDef.name)"
+                                <div v-if="hint_dict.hasOwnProperty(tag_def.name)"
                                     class="mr-2">
-                                    {{ hint_dict[tagDef.name].texts.length }}
+                                    {{ hint_dict[tag_def.name].texts.length }}
                                 </div>
                                 <div v-else>
                                     -
                                 </div>
                             </div>
 
-                            <div v-if="hint_dict.hasOwnProperty(tagDef.name)"
+                            <div v-if="hint_dict.hasOwnProperty(tag_def.name)"
                                 class="ruleset-tag-info d-flex flex-row flex-wrap">
-                                <div v-for="(text_info, text) in hint_dict[tagDef.name].text_dict"
+                                <div v-for="(text_info, text) in hint_dict[tag_def.name].text_dict"
                                     class="ruleset-tag-text mr-2 mb-2 d-flex flex-column">
-                                    <div v-on:click="hint_dict[tagDef.name].text_dict[text]._is_shown = !hint_dict[tagDef.name].text_dict[text]._is_shown">
+                                    <div v-on:click="hint_dict[tag_def.name].text_dict[text]._is_shown = !hint_dict[tag_def.name].text_dict[text]._is_shown">
                                         <span class="ruleset-tag-text-count"
                                             v-bind:title="'Annotated ' + text_info.count + ' times'">
                                             <i v-if="text_info._is_shown"
                                                 class="fa fa-caret-down"></i>
                                             <i v-else
                                                 class="fa fa-caret-right"></i>
-                                            {{ hint_dict[tagDef.name].text_dict[text].count }}
+                                            {{ hint_dict[tag_def.name].text_dict[text].count }}
                                         </span>
                                         <span class="ruleset-tag-text-str">
                                             {{ text }}
@@ -1356,19 +1369,31 @@ input[type=text].ipt-md {
         </li>
 
         <div v-if="is_linking">
+            <li v-for="att, att_idx in linking_atts"
+                v-on:click="popmenu_set_linking(att_idx)"
+                class="ctxmenu-item">
+                <div>
+                    <i class="fa fa-link"
+                        v-bind:class="'fg-tag-' + linking_tag_def.name">
+                    </i>
+                    <b>{{ linking_tag_def.name }}</b>
+                    -
+                    <i>{{ att.name }}</i>
+                </div>
+            </li>
         </div>
 
         <div v-else>
             <li class="ctxmenu-item"
                 v-for="ltag, ltag_idx in dtd.ltags"
-                v-on:click="popmenu_start_linking()">
+                v-on:click="popmenu_start_linking(ltag)">
                 <div>
                     <i class="fa fa-link"
                         v-bind:class="'fg-tag-' + ltag.name">
                     </i>
                     <b>{{ ltag.name }}</b>
                     -
-                    <i>{{ get_first_idref_attlist(ltag).name }}</i>
+                    <i>{{ get_idref_attlist_by_seq(ltag).name }}</i>
                 </div>
             </li>
         </div>

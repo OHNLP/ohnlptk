@@ -28,7 +28,9 @@ var app_hotpot = {
 
         // a flag for showing which mode we are working
         is_linking: false,
+        linking_tag_def: null,
         linking_tag: null,
+        linking_atts: [],
 
         // for converting the txt to xmls
         txt_anns: [],
@@ -46,6 +48,9 @@ var app_hotpot = {
 
             // simple / smart / off
             hint_mode: 'simple',
+
+            // display the links
+            
 
             // for updating the codemirror instance
             is_expire: false
@@ -325,7 +330,7 @@ var app_hotpot = {
             var tag_def = this.dtd.tag_dict[tag_name];
             
             // create a new tag
-            var tag = app_hotpot.make_tag(_tag, tag_def, this.anns[this.ann_idx]);
+            var tag = app_hotpot.make_etag(_tag, tag_def, this.anns[this.ann_idx]);
 
             // add this tag to ann
             this.anns[this.ann_idx].tags.push(tag);
@@ -404,7 +409,7 @@ var app_hotpot = {
 
         add_tag: function(basic_tag, tag_def) {
             // create a new tag
-            var tag = app_hotpot.make_tag(basic_tag, tag_def, this.anns[this.ann_idx]);
+            var tag = app_hotpot.make_etag(basic_tag, tag_def, this.anns[this.ann_idx]);
 
             // add this tag to ann
             this.anns[this.ann_idx].tags.push(tag);
@@ -617,6 +622,17 @@ var app_hotpot = {
             app_hotpot.popmenu_tag.hide();
         },
 
+        on_click_tag: function(event, tag_id) {
+            // set the clicked tag_id
+            this.clicked_tag_id = tag_id;
+
+            var mouseX = event.clientX;
+            var mouseY = event.clientY;
+
+            // then show the popmenu
+            app_hotpot.show_tag_popmenu(mouseX, mouseY);
+        },
+
         popmenu_del_tag: function() {
             // delete the clicked tag id
             app_hotpot.del_tag(
@@ -628,6 +644,77 @@ var app_hotpot = {
 
             // reset the clicked tag id
             this.clicked_tag_id = null;
+        },
+
+        popmenu_start_linking: function(ltag_def) {
+            // first, set the working mode
+            this.is_linking = true;
+
+            // set the linking tag_def
+            this.linking_tag_def = ltag_def;
+
+            // create a ltag
+            this.linking_tag = app_hotpot.make_empty_ltag_by_tag_def(ltag_def);
+
+            // then get the linking atts for this ltag
+            // this list contains all atts for this ltag
+            // and during the linking, we will remove those linked att out
+            this.linking_atts = this.get_idref_attlists(ltag_def);
+
+            // let's set the first idref attlist
+            // pop the first att from atts
+            var att = this.linking_atts[0];
+            this.linking_atts.splice(0, 1)
+            this.linking_tag[att.name] = this.clicked_tag_id;
+            
+            // maybe we could show a float panel
+            // for showing the current annotation
+            console.log('* start linking', ltag_def.name, 
+                'on attr [', att.name,
+                '] =', this.clicked_tag_id
+            );
+        },
+
+        popmenu_set_linking: function(att_idx) {
+            // pop the target idx att from atts
+            var att = this.linking_atts[att_idx];
+            this.linking_atts.splice(att_idx, 1);
+
+            // set current tag to this att
+            this.linking_tag[att.name] = this.clicked_tag_id;
+            
+            console.log('* set linking', this.linking_tag_def.name, 
+                'on attr [', att.name,
+                '] =', this.clicked_tag_id
+            );
+
+            // final check the left?
+            if (this.linking_atts.length == 0) {
+                // which means we have tagged all idrefs
+                // we could append this linking tag to ann
+                var tag_id = ann_parser.get_next_tag_id(
+                    this.anns[this.ann_idx],
+                    this.linking_tag_def
+                );
+                this.linking_tag.id = tag_id;
+                this.anns[this.ann_idx].tags.push(this.linking_tag);
+
+                // then, we could show this new link in cm
+                app_hotpot.cm_draw_ltag(
+                    this.linking_tag,
+                    this.linking_tag_def,
+                    this.anns[this.ann_idx]
+                );
+
+                // we could reset linking status
+                this.is_linking = false;
+                this.linking_tag_def = null;
+                this.linking_tag = null;
+
+            } else {
+                // not finished yet?
+                // keep working on it
+            }
         },
 
         /////////////////////////////////////////////////////////////////
@@ -729,6 +816,15 @@ var app_hotpot = {
             return false;
         },
 
+        get_tag_by_tag_id: function(tag_id, ann) {
+            for (let i = 0; i < ann.tags.length; i++) {
+                if (ann.tags[i].id == tag_id) {
+                    return ann.tags[i];
+                }                
+            }
+            return null;
+        },
+
         get_tag_def: function(tag_name) {
             if (this.dtd.tag_dict.hasOwnProperty(tag_name)) {
                 return this.dtd.tag_dict[tag_name];
@@ -737,13 +833,29 @@ var app_hotpot = {
             }
         },
 
-        get_first_idref_attlist: function(ltag) {
-            for (let i = 0; i < ltag.attlists.length; i++) {
-                if (ltag.attlists[i].vtype == 'idref') {
-                    return ltag.attlists[i];
+        get_idref_attlist_by_seq: function(ltag_def, seq=0) {
+            var cnt = -1;
+            for (let i = 0; i < ltag_def.attlists.length; i++) {
+                if (ltag_def.attlists[i].vtype == 'idref') {
+                    cnt += 1;
+                    if (cnt == seq) {
+                        // great! we get the attlist we want
+                        return ltag_def.attlists[i];
+                    }
                 }
             }
             return null;
+        },
+
+        get_idref_attlists: function(ltag_def) {
+            var attlists = [];
+            for (let i = 0; i < ltag_def.attlists.length; i++) {
+                const att = ltag_def.attlists[i];
+                if (att.vtype == 'idref') {
+                    attlists.push(att);
+                }
+            }
+            return attlists;
         }
     },
 
@@ -903,12 +1015,12 @@ var app_hotpot = {
             function(event) {
                 console.log('* clicked on', event.target);
 
-                var dom = event.target;
-                var obj = $(dom);
+                // var dom = event.target;
+                // var obj = $(dom);
 
-                // show the menu
-                var mouseX = event.clientX;
-                var mouseY = event.clientY;
+                // // show the menu
+                // var mouseX = event.clientX;
+                // var mouseY = event.clientY;
 
                 // close the right click menu
                 if (app_hotpot.ctxmenu_sel != null) {
@@ -918,18 +1030,18 @@ var app_hotpot = {
                     app_hotpot.popmenu_tag.hide();
                 }
 
-                if (obj.hasClass('mark-tag-text')) {
-                    // this is a mark in code mirror
-                    var tag_id = dom.getAttribute('tag_id');
+                // if (obj.hasClass('mark-tag-text')) {
+                //     // this is a mark in code mirror
+                //     var tag_id = dom.getAttribute('tag_id');
 
-                    // set the clicked tag_id
-                    app_hotpot.vpp.$data.clicked_tag_id = tag_id;
+                //     // set the clicked tag_id
+                //     app_hotpot.vpp.$data.clicked_tag_id = tag_id;
 
-                    // show the menu
-                    app_hotpot.show_tag_popmenu(mouseX, mouseY);
-                } else {
-                    // what to do?
-                }
+                //     // show the menu
+                //     app_hotpot.show_tag_popmenu(mouseX, mouseY);
+                // } else {
+                //     // what to do?
+                // }
             }
         );
     },
@@ -1088,6 +1200,11 @@ var app_hotpot = {
     resize: function() {
         var h = $(window).height();
         $('.main-ui').css('height', h - 145);
+
+        // due the svg issue, when resizing the window,
+        // redraw all ltag marks
+        this.cm_clear_ltag_marks();
+        this.cm_update_ltag_marks();
     },
 
     parse_drop_dtd: function(fileEntry) {
@@ -1173,6 +1290,7 @@ var app_hotpot = {
                 }
                 
                 // add this tag as the given color
+                // set this color for related css rules
                 style.insertRule(
                     ".mark-tag-" + tag_name + " { background-color: " + color + "; }",
                     0
@@ -1183,6 +1301,12 @@ var app_hotpot = {
                 );
                 style.insertRule(
                     ".fg-tag-" + tag_name + " { color: " + color + " !important; }",
+                    0
+                );
+
+                // add this for svg
+                style.insertRule(
+                    ".svgmark-tag-" + tag_name + " { fill: " + color + "; }",
                     0
                 );
 
@@ -1302,22 +1426,23 @@ var app_hotpot = {
     /////////////////////////////////////////////////////////////////
     // Tag Related
     /////////////////////////////////////////////////////////////////
-    make_tag: function(basic_tag, tag_def, ann) {
+    make_etag: function(basic_tag, tag_def, ann) {
         // first, add the tag name
         basic_tag['tag'] = tag_def.name;
 
         // find the id number
-        var n = 0;
-        for (let i = 0; i < ann.tags.length; i++) {
-            if (ann.tags[i].tag == tag_def.name) {
-                // get the id number of this tag
-                var _id = parseInt(ann.tags[i].id.replace(tag_def.id_prefix, ''));
-                if (_id >= n) {
-                    n = _id + 1;
-                }
-            }
-        }
-        basic_tag['id'] = tag_def.id_prefix + n;
+        // var n = 0;
+        // for (let i = 0; i < ann.tags.length; i++) {
+        //     if (ann.tags[i].tag == tag_def.name) {
+        //         // get the id number of this tag
+        //         var _id = parseInt(ann.tags[i].id.replace(tag_def.id_prefix, ''));
+        //         if (_id >= n) {
+        //             n = _id + 1;
+        //         }
+        //     }
+        // }
+        // basic_tag['id'] = tag_def.id_prefix + n;
+        basic_tag['id'] = ann_parser.get_next_tag_id(ann, tag_def);
 
         // add other attr
         for (let i = 0; i < tag_def.attlists.length; i++) {
@@ -1332,6 +1457,31 @@ var app_hotpot = {
         }
 
         return basic_tag;
+    },
+
+    make_ltag: function() {
+
+    },
+
+    make_empty_ltag_by_tag_def: function(tag_def) {
+        var ltag = {
+            id: '',
+            tag: tag_def.name
+        };
+
+        // then add other attr
+        for (let i = 0; i < tag_def.attlists.length; i++) {
+            const att = tag_def.attlists[i];
+
+            if (att.name == 'spans') {
+                // special rule for spans attr
+            } else {
+                // set the default value
+                ltag[att.name] = att.default_value;
+            }
+        }
+
+        return ltag;
     },
     
     remove_tag_from_ann: function(tag_id, ann) {
@@ -1405,20 +1555,38 @@ var app_hotpot = {
     },
 
     cm_update_marks: function() {
-        // clear and add the markers
-        var marks = this.codemirror.getAllMarks();
-        for (let i = 0; i < marks.length; i++) {
-            marks[i].clear();
-        }
+        // clear all etag markers
+        this.cm_clear_etag_marks();
 
-        // update the tag marks
-        this.cm_update_tag_marks();
+        // clear all link tags
+        this.cm_clear_ltag_marks();
 
         // update the hint marks
         this.cm_update_hint_marks();
 
+        // update the tag marks
+        this.cm_update_tag_marks();
+
         // force update UI, well ... maybe not work
         this.vpp.$forceUpdate();
+    },
+
+    cm_clear_etag_marks: function() {
+        var marks = this.codemirror.getAllMarks();
+        for (let i = 0; i < marks.length; i++) {
+            marks[i].clear();
+        }
+    },
+
+    cm_clear_ltag_marks: function() {
+        // first, check if there is a layer for the plots
+        if ($('#cm_svg_plots').length == 0) {
+            $('.CodeMirror-lines').before(
+                '<div class="CodeMirror-plots"><svg id="cm_svg_plots"></svg></div>'
+            );
+        } else {
+            $('#cm_svg_plots').empty();
+        }
     },
 
     cm_update_hint_marks: function() {
@@ -1459,13 +1627,44 @@ var app_hotpot = {
             return;
         }
 
+        // to ensure the link tag could be draw correctly,
+        // draw the etags first
+        this.cm_update_etag_marks();
+
+        // since all etags have been rendered,
+        // it's safe to render the link tags
+        this.cm_update_ltag_marks();
+    },
+
+    cm_update_etag_marks: function() {
+        if (this.vpp.$data.ann_idx == null) {
+            // nothing to do for empty
+            return;
+        }
         // update the new marks
         var working_ann = this.vpp.$data.anns[this.vpp.$data.ann_idx];
-
         for (let i = 0; i < working_ann.tags.length; i++) {
             var tag = working_ann.tags[i];
             var tag_def = this.vpp.get_tag_def(tag.tag);
-            this.cm_mark_ann_tag_in_text(tag, tag_def, working_ann.text)
+            if (tag_def.type == 'etag') {
+                this.cm_mark_ann_etag_in_text(tag, tag_def, working_ann);
+            }
+        }
+    },
+
+    cm_update_ltag_marks: function() {
+        if (this.vpp.$data.ann_idx == null) {
+            // nothing to do for empty
+            return;
+        }
+        // update the new marks
+        var working_ann = this.vpp.$data.anns[this.vpp.$data.ann_idx];
+        for (let i = 0; i < working_ann.tags.length; i++) {
+            var tag = working_ann.tags[i];
+            var tag_def = this.vpp.get_tag_def(tag.tag);
+            if (tag_def.type == 'ltag') {
+                this.cm_mark_ann_ltag_in_text(tag, tag_def, working_ann);
+            }
         }
     },
 
@@ -1529,18 +1728,19 @@ var app_hotpot = {
         }
     },
 
-    cm_mark_ann_tag_in_text: function(tag, tag_def, text) {
+    cm_mark_ann_tag_in_text: function(tag, tag_def, ann) {
         if (tag_def.type == 'etag') {
-            this.cm_mark_ann_etag_in_text(tag, tag_def, text);
+            this.cm_mark_ann_etag_in_text(tag, tag_def, ann);
         } else {
-            this.cm_mark_ann_ltag_in_text(tag, tag_def, text);
+            this.cm_mark_ann_ltag_in_text(tag, tag_def, ann);
         }
     },
 
-    cm_mark_ann_ltag_in_text: function(tag, tag_def, text) {
+    cm_mark_ann_ltag_in_text: function(tag, tag_def, ann) {
+        this.cm_draw_ltag(tag, tag_def, ann);
     },
 
-    cm_mark_ann_etag_in_text: function(tag, tag_def, text) {
+    cm_mark_ann_etag_in_text: function(tag, tag_def, ann) {
         var raw_spans = tag['spans'];
         if (raw_spans == '' || raw_spans == null) { 
             return [-1]; 
@@ -1554,7 +1754,7 @@ var app_hotpot = {
         for (let i = 0; i < spans_arr.length; i++) {
             const spans = spans_arr[i];
             const spans_text = text_arr[i];
-            var rst = this._calc_spans2range(spans, text);
+            var rst = this._calc_spans2range(spans, ann.text);
             var ln0 = rst[0][0];
             var ch0 = rst[0][1];
             var ln1 = rst[1][0];
@@ -1563,13 +1763,13 @@ var app_hotpot = {
             if (this.vpp.$data.cm.mark_mode == 'node') {
                 // the second step is to enhance the mark tag with more info
                 var markHTML = [
-                    '<span class="mark-tag mark-tag-'+tag.tag+'" id="mark-id-'+tag.id+'">',
+                    '<span class="mark-tag mark-tag-'+tag.tag+'" id="mark-etag-id-'+tag.id+'">',
                     '<span class="mark-tag-info">',
                         '<span class="mark-tag-info-inline fg-tag-'+tag.tag+'">',
                         tag.id,
                         '</span>',
                     '</span>',
-                    '<span class="mark-tag-text" tag_id="'+tag.id+'">',
+                    '<span class="mark-tag-text" tag_id="'+tag.id+'" onclick="app_hotpot.vpp.on_click_tag(event, \''+tag.id+'\')">',
                         spans_text,
                     '</span>',
                     '<span class="mark-tag-info-offset" title="Delete tag '+tag.id+'" onclick="app_hotpot.del_tag(\''+tag.id+'\');">',
@@ -1591,7 +1791,8 @@ var app_hotpot = {
                         className: 'mark-tag mark-tag-' + tag.tag,
                         replacedWith: markNode,
                         attributes: {
-                            tag_id: tag.id
+                            tag_id: tag.id,
+                            onclick: ''
                         }
                     }
                 );
@@ -1604,7 +1805,7 @@ var app_hotpot = {
                         className: 'mark-tag mark-tag-' + tag.tag,
                         attributes: {
                             tag_id: tag.id,
-                            onclick: ''
+                            onclick: 'app_hotpot.vpp.on_click_tag(event, \''+tag.id+'\')'
                         }
                     }
                 );
@@ -1679,20 +1880,38 @@ var app_hotpot = {
         objDiv.scrollTop = objDiv.scrollHeight;
     },
 
-    cm_draw_polyline: function(tag_a, tag_b, full_text) {
-        // first, check if there is a layer for the plots
-        if ($('.CodeMirror-plots').length == 0) {
-            $('.CodeMirror-lines').before(
-                '<div class="CodeMirror-plots"><svg id="cm_svg_plots"></svg></div>'
-            );
-        }
+    cm_draw_ltag: function(ltag, ltag_def, ann) {
+        // for showing the polyline, we need:
+        // 1. the att_a and att_b for accessing the ltag
+        // 2. the values of att_a and att_b, which are tag_id for etag
+        // 3. get the tag, then call cm_draw_polyline
 
+        // so, get the att_a and att_b first
+        var att_a = this.vpp.get_idref_attlist_by_seq(ltag_def, 0);
+        var att_b = this.vpp.get_idref_attlist_by_seq(ltag_def, 1);
+        console.log('* draw line between', att_a, '-', att_b);
+
+        // next, get the values
+        var etag_a_id = ltag[att_a.name];
+        var etag_b_id = ltag[att_b.name];
+
+        // convert the tag_id to tag
+        var tag_a = this.vpp.get_tag_by_tag_id(etag_a_id, ann);
+        var tag_b = this.vpp.get_tag_by_tag_id(etag_b_id, ann);
+
+        // last, draw!
+        this.cm_draw_polyline(
+            ltag, tag_a, tag_b, ann.text
+        );
+    },
+
+    cm_draw_polyline: function(ltag, tag_a, tag_b, full_text) {
         // then get the coords of both tags
         var coords_a = this.cm_spans2coords(tag_a.spans, full_text);
         var coords_b = this.cm_spans2coords(tag_b.spans, full_text);
 
         // the setting for the polyline
-        var delta_height = 3;
+        var delta_height = 0;
         var delta_width = 0;
 
         // get the upper coords, which is the lower one
@@ -1707,32 +1926,32 @@ var app_hotpot = {
         var points = [];
 
         // point, start
-        points.push(
-            (coords_a.l.left + coords_a.r.left)/2 + 
-            ',' + 
+        var p0 = [
+            (coords_a.l.left + coords_a.r.left)/2,
             (coords_a.l.top + 4)
-        );
+        ];
+        points.push(p0[0] + ',' + p0[1]);
 
         // point joint 1
-        points.push(
-            ((coords_a.l.left + coords_a.r.left)/2 + sign * delta_width) + 
-            ',' + 
+        var p1 = [
+            (coords_a.l.left + coords_a.r.left)/2 + sign * delta_width,
             upper_top
-        );
+        ];
+        points.push(p1[0] + ',' + p1[1]);
 
         // point, joint 2
-        points.push(
-            ((coords_b.l.left + coords_b.r.left)/2 - sign * delta_width) + 
-            ',' + 
+        var p2 = [
+            ((coords_b.l.left + coords_b.r.left)/2 - sign * delta_width),
             upper_top
-        );
+        ];
+        points.push(p2[0] + ',' + p2[1]);
 
         // point, end
-        points.push(
-            (coords_b.l.left + coords_b.r.left)/2 + 
-            ',' + 
+        var p3 = [
+            (coords_b.l.left + coords_b.r.left)/2,
             (coords_b.l.top + 4)
-        );
+        ];
+        points.push(p3[0] + ',' + p3[1]);
 
         // convert to a string
         points = points.join(' ');
@@ -1743,12 +1962,32 @@ var app_hotpot = {
         var svg_polyline = document.createElementNS(
             'http://www.w3.org/2000/svg', 'polyline'
         );
+        svg_polyline.setAttribute('id', 'mark-link-line-id-' + ltag.id);
         svg_polyline.setAttribute('points', points);
         svg_polyline.setAttribute('class', "tag-polyline");
 
         $('#cm_svg_plots').append(
             svg_polyline
         );
+
+        // NEXT, draw a text
+        var svg_text = document.createElementNS(
+            'http://www.w3.org/2000/svg', 'text'
+        );
+        svg_text.setAttribute('id', 'mark-link-text-id-' + ltag.id);
+        svg_text.setAttribute('text-anchor', 'middle');
+        svg_text.setAttribute('alignment-baseline', 'middle');
+        svg_text.setAttribute('x', (p0[0] + p3[0]) / 2);
+        svg_text.setAttribute('y', p1[1]);
+        svg_text.setAttribute('class', "tag-linktext");
+        svg_text.append(document.createTextNode(ltag.id));
+
+        $('#cm_svg_plots').append(
+            svg_text
+        );
+
+        // then create a background color
+        this.make_svg_text_bg(svg_text, 'svgmark-tag-' + ltag.tag);
     },
 
     cm_calc_points: function(coords_a, coords_b) {
@@ -1787,5 +2026,31 @@ var app_hotpot = {
         notify.create(msg, null, { 
             cls: cls
         });
+    },
+
+    make_svg_text_bg: function(elem, cls) {
+        // get the bounding box for this text
+        var bounds = elem.getBBox();
+
+        // create a background
+        var bg = document.createElementNS(
+            "http://www.w3.org/2000/svg", 
+            "rect"
+        );
+
+        var style = getComputedStyle(elem)
+        var padding_top = parseInt(style["padding-top"])
+        var padding_left = parseInt(style["padding-left"])
+        var padding_right = parseInt(style["padding-right"])
+        var padding_bottom = parseInt(style["padding-bottom"])
+
+        // set the attributes of this bg
+        bg.setAttribute("x", bounds.x - parseInt(style["padding-left"]));
+        bg.setAttribute("y", bounds.y - parseInt(style["padding-top"]));
+        bg.setAttribute("width", bounds.width + padding_left + padding_right);
+        bg.setAttribute("height", bounds.height + padding_top + padding_bottom);
+        bg.setAttribute("class", 'tag-linktext-bg ' + cls);
+
+        elem.parentNode.insertBefore(bg, elem);
     }
 };
