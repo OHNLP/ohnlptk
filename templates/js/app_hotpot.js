@@ -1581,7 +1581,7 @@ var app_hotpot = {
     cm_clear_ltag_marks: function() {
         // first, check if there is a layer for the plots
         if ($('#cm_svg_plots').length == 0) {
-            $('.CodeMirror-lines').before(
+            $('.CodeMirror-sizer').prepend(
                 '<div class="CodeMirror-plots"><svg id="cm_svg_plots"></svg></div>'
             );
         } else {
@@ -1889,7 +1889,7 @@ var app_hotpot = {
         // so, get the att_a and att_b first
         var att_a = this.vpp.get_idref_attlist_by_seq(ltag_def, 0);
         var att_b = this.vpp.get_idref_attlist_by_seq(ltag_def, 1);
-        console.log('* draw line between', att_a, '-', att_b);
+        console.log('* draw line ['+ltag.id+'] between', att_a.name, '-', att_b.name);
 
         // next, get the values
         var etag_a_id = ltag[att_a.name];
