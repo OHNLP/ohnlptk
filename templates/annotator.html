@@ -515,6 +515,11 @@ input[type=text].ipt-md {
     padding: 0px 2px;
     background-color: #eaeaea;
 }
+
+/* for text display */
+.clr-red {
+    color: red;
+}
 /* fix for metro */
 .radio .caption, .radio .check {
     font-size: 1em;
@@ -1091,6 +1096,13 @@ input[type=text].ipt-md {
                                     class="tag-attr-box mr-1 d-flex flex-column">
                                     <div class="tag-attr-name">
                                         {{ attlist.name }}
+                                        <span v-if="attlist.require == 'REQUIRED'"
+                                            class="clr-red">
+                                            *
+                                        </span>
+                                        <span v-else>
+                                            &nbsp;
+                                        </span>
                                     </div>
                                     
                                     <div v-if="attlist.vtype == 'list'">
@@ -1108,6 +1120,20 @@ input[type=text].ipt-md {
                                             class="tag-attr-input"
                                             v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
                                             @input="on_input_attr_value">
+                                    </div>
+                                    <div v-else-if="attlist.vtype == 'idref'">
+                                        <select class="tag-attr-select"
+                                            v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
+                                            @change="on_change_attr_value">
+                                            <option v-for="s_etag, s_etag_idx in get_tags_by_type(anns[ann_idx], dtd, 'etag')"
+                                                v-bind:value="s_etag.id">
+                                                {{ s_etag.id }}
+                                                |
+                                                {{ s_etag.tag }}
+                                                -
+                                                {{ s_etag.text }}
+                                            </option>
+                                        </select>
                                     </div>
                                     <div v-else>
                                         <input type="text"

@@ -822,6 +822,17 @@ var app_hotpot = {
             return false;
         },
 
+        get_tags_by_type: function(ann, dtd, type='etag') {
+            var tags = [];
+            for (let i = 0; i < ann.tags.length; i++) {
+                const tag = ann.tags[i];
+                if (dtd.tag_dict[tag.tag].type==type) {
+                    tags.push(tag);
+                }
+            }
+            return tags;
+        },
+
         get_tag_by_tag_id: function(tag_id, ann) {
             for (let i = 0; i < ann.tags.length; i++) {
                 if (ann.tags[i].id == tag_id) {
@@ -2026,7 +2037,7 @@ var app_hotpot = {
             timeout: timeout,
             clsToast: cls
         };
-        toast(msg, null, null, null, options);
+        Metro.toast.create(msg, null, null, null, options);
     },
 
     msg: function(msg, cls) {
