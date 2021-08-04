@@ -1157,6 +1157,7 @@ input[type=text].ipt-md {
                                     
                                     <div v-if="attlist.vtype == 'list'">
                                         <select class="tag-attr-select"
+                                            v-bind:id="'form-'+ann_idx+'-' + anns[ann_idx].tags[tag_idx].id + '-' + attlist.name"
                                             v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
                                             @change="on_change_attr_value">
                                             <option v-for="val in attlist.values"
@@ -1168,11 +1169,13 @@ input[type=text].ipt-md {
                                     <div v-else-if="attlist.vtype == 'text'">
                                         <input type="text"
                                             class="tag-attr-input"
+                                            v-bind:id="'form-'+ann_idx+'-' + anns[ann_idx].tags[tag_idx].id + '-' + attlist.name"
                                             v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
                                             @input="on_input_attr_value">
                                     </div>
                                     <div v-else-if="attlist.vtype == 'idref'">
                                         <select class="tag-attr-select"
+                                            v-bind:id="'form-'+ann_idx+'-' + anns[ann_idx].tags[tag_idx].id + '-' + attlist.name" 
                                             v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
                                             @change="on_change_idref_value">
                                             <option v-for="s_etag, s_etag_idx in get_tags_by_type(anns[ann_idx], dtd, 'etag')"
@@ -1188,6 +1191,7 @@ input[type=text].ipt-md {
                                     <div v-else>
                                         <input type="text"
                                             class="tag-attr-input"
+                                            v-bind:id="'form-'+ann_idx+'-' + anns[ann_idx].tags[tag_idx].id + '-' + attlist.name" 
                                             v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
                                             @input="on_input_attr_value">
                                     </div>
