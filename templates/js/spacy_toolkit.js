@@ -35,7 +35,26 @@ var spacy_toolkit = {
                 }
                 
                 // create a pharse pattern
+
+                // but first check the text itself
+                if (!tag.hasOwnProperty('text')) {
+                    // what?
+                    continue;
+                }
                 var text = tag.text;
+
+                if (text == null) { 
+                    // what?
+                    continue;
+                }
+
+                // remove blank
+                text = text.trim();
+
+                if (text == '') {
+                    // what??
+                    continue;
+                }
                 
                 // change to lower
                 text = text.toLocaleLowerCase();

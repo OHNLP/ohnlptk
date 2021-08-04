@@ -161,6 +161,13 @@ var erp_toolkit = {
                 }
 
                 // empty text should be removed
+
+                // but first check the text itself
+                if (!tag.hasOwnProperty('text')) {
+                    // what?
+                    continue;
+                }
+
                 var text = tag.text;
                 text = text.trim();
                 if (text == '') {

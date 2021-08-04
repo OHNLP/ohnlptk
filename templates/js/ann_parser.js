@@ -90,7 +90,7 @@ var ann_parser = {
                     } else {
                         // what??? ok, this is just a normal but weird attr
                         // just save it later
-                        
+
                     }
                 } else if (attr.endsWith('Text')) {
                     // I guess we could skip this one
@@ -475,4 +475,40 @@ var ann_parser = {
         }
         return null;
     },
+
+    get_linked_ltags: function(tag_id, ann) {
+        var tags = [];
+        for (let i = 0; i < ann.tags.length; i++) {
+            const tag = ann.tags[i];
+            
+            // check if this is itself
+            if (tag.id == tag_id) {
+                // skip this tag_id itself
+                continue;
+            }
+
+            for (const attr in tag) {
+                if (Object.hasOwnProperty.call(tag, attr)) {
+                    if (attr == 'id'   || 
+                        attr == 'tag'  ||
+                        attr == 'text' ||
+                        attr == 'spans'
+                    ) {
+                        // skip those special attrs
+                        continue;
+                    }
+                    const val = tag[attr];
+                    if (val == tag_id) {
+                        // ok, this a link ... I guess 
+                        tags.push(tag);
+
+                        // then, we don't need to check other attr
+                        // just go to next tag
+                        break;
+                    }
+                }
+            }
+        }
+        return tags;
+    }
 };

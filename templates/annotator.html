@@ -245,15 +245,15 @@ html,body {
 	fill: none;
     stroke: black;
     stroke-width: 1;
-    vector-effect: non-scaling-stroke;
-    stroke-dasharray: 4, 2;
-    opacity: .7;
+    /* vector-effect: non-scaling-stroke; */
+    /* stroke-dasharray: 2, 1; */
+    opacity: .5;
 }
 .tag-polyline:hover {
     opacity: .95;
 }
 .tag-linktext {
-    font-size: 10px;
+    font-size: 9px;
     padding: 0 3px;
 }
 .tag-linktext-bg {
@@ -524,6 +524,9 @@ input[type=text].ipt-md {
 .radio .caption, .radio .check {
     font-size: 1em;
 }
+.switch .caption, .switch .check {
+    font-size: 1em;
+}
 </style>
 {% endblock %}
 
@@ -706,6 +709,43 @@ input[type=text].ipt-md {
                     </div>
     
                     <span class="title">Hint Mode</span>
+                </div>
+                
+                <div class="group">
+                    <div>
+                        <input type="checkbox" 
+                            class="check"
+                            data-role="switch" 
+                            data-caption="Show Links"
+                            v-model="cm.enabled_links"
+                            @change="on_change_link_settings">
+                    </div>
+
+                    <div>
+                        <input type="checkbox" 
+                            class="check"
+                            data-role="switch" 
+                            data-caption="Link Name"
+                            v-model="cm.enabled_link_name"
+                            @change="on_change_link_settings">
+                        <br>
+                        <input type="checkbox" 
+                            class="check"
+                            data-role="switch" 
+                            data-caption="Complex Links"
+                            v-model="cm.enabled_link_complex"
+                            @change="on_change_link_settings">
+                    </div>
+                    <div v-show="is_linking">
+                        <button class="ribbon-button"
+                            v-on:click="cancel_linking">
+                            <span class="icon">
+                                <span class="far fa-times-circle"></span>
+                            </span>
+                            <span class="caption">Cancel Linking</span>
+                        </button>
+                    </div>
+                    <span class="title">Link Marks</span>
                 </div>
 
                 <div class="group">
@@ -1031,9 +1071,19 @@ input[type=text].ipt-md {
                                 
                             </span>
                         </div>
-                        <div class="mr-1"
-                            v-bind:class="'tag-list-row-count-'+count_n_tags(ltag)">
-                            {{ count_n_tags(ltag) }}
+                        <div class="mr-1 d-flex flex-row">
+                            <div v-if="ann_idx != null"
+                                class="mr-2">
+                                <button class="btn-xs"
+                                    title="Add an empty link tag"
+                                    v-on:click="add_empty_ltag(ltag)">
+                                    <i class="fa fa-plus"></i>
+                                    Add
+                                </button>
+                            </div>
+                            <div v-bind:class="'tag-list-row-count-'+count_n_tags(ltag)">
+                                {{ count_n_tags(ltag) }}
+                            </div>
                         </div>
 
                     </li>
@@ -1124,7 +1174,7 @@ input[type=text].ipt-md {
                                     <div v-else-if="attlist.vtype == 'idref'">
                                         <select class="tag-attr-select"
                                             v-model="anns[ann_idx].tags[tag_idx][attlist.name]"
-                                            @change="on_change_attr_value">
+                                            @change="on_change_idref_value">
                                             <option v-for="s_etag, s_etag_idx in get_tags_by_type(anns[ann_idx], dtd, 'etag')"
                                                 v-bind:value="s_etag.id">
                                                 {{ s_etag.id }}
@@ -1231,6 +1281,9 @@ input[type=text].ipt-md {
                             <div class="ruleset-tag-name pl-2 d-flex flex-row flex-justify-between"
                                 v-bind:class="'border-tag-' + tag_def.name">
                                 <div>
+                                    <i class="fa fa-tag"
+                                        v-bind:class="'fg-tag-' + tag_def.name">
+                                    </i>
                                     {{ tag_def.name }}
                                 </div>
                                 <div v-if="hint_dict.hasOwnProperty(tag_def.name)"
@@ -1405,6 +1458,15 @@ input[type=text].ipt-md {
                     <b>{{ linking_tag_def.name }}</b>
                     -
                     <i>{{ att.name }}</i>
+                </div>
+            </li>
+
+            <li class="ctxmenu-divider"></li>
+            <li class="ctxmenu-item"
+                v-on:click="cancel_linking()">
+                <div>
+                    <i class="far fa-times-circle"></i>
+                    Cancel current linking
                 </div>
             </li>
         </div>

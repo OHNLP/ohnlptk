@@ -50,7 +50,13 @@ var app_hotpot = {
             hint_mode: 'simple',
 
             // display the links
-            
+            enabled_links: true,
+
+            // display the link name
+            enabled_link_name: true,
+
+            // display complex link
+            enabled_link_complex: true,
 
             // for updating the codemirror instance
             is_expire: false
@@ -294,6 +300,12 @@ var app_hotpot = {
             console.log('* changed attr in', event.target);
         },
 
+        on_change_idref_value: function(event) {
+            this.anns[this.ann_idx]._has_saved = false;
+            // then, need to update this value
+            this.on_change_link_settings(event);
+        },
+
         on_input_attr_value: function(event) {
             // just mark current ann as unsaved
             this.anns[this.ann_idx]._has_saved = false;
@@ -309,6 +321,12 @@ var app_hotpot = {
             this.cm.hint_mode = hint_mode;
 
             app_hotpot.cm_update_marks();
+        },
+
+        on_change_link_settings: function(event) {
+            console.log(event.target.value);
+            app_hotpot.cm_clear_ltag_marks();
+            app_hotpot.cm_update_ltag_marks();
         },
 
         get_hint: function(hint_id) {
@@ -428,6 +446,25 @@ var app_hotpot = {
 
             // update the cm
             app_hotpot.cm_update_marks();
+        },
+
+        add_empty_ltag: function(ltag_def) {
+            var ltag = app_hotpot.make_empty_ltag_by_tag_def(ltag_def);
+
+            // create an tag_id
+            var tag_id = ann_parser.get_next_tag_id(
+                this.anns[this.ann_idx],
+                ltag_def
+            );
+            ltag.id = tag_id;
+
+            // add to list
+            this.anns[this.ann_idx].tags.push(ltag);
+
+            // mark _has_saved
+            this.anns[this.ann_idx]._has_saved = false;
+
+            // ok, that's all?
         },
 
         del_tag: function(tag_id) {
@@ -704,6 +741,8 @@ var app_hotpot = {
                 );
                 this.linking_tag.id = tag_id;
                 this.anns[this.ann_idx].tags.push(this.linking_tag);
+                // mark _has_saved
+                this.anns[this.ann_idx]._has_saved = false;
 
                 // then, we could show this new link in cm
                 app_hotpot.cm_draw_ltag(
@@ -713,14 +752,20 @@ var app_hotpot = {
                 );
 
                 // we could reset linking status
-                this.is_linking = false;
-                this.linking_tag_def = null;
-                this.linking_tag = null;
+                this.cancel_linking();
 
             } else {
                 // not finished yet?
                 // keep working on it
             }
+        },
+
+        cancel_linking: function() {
+            // so, user doesn't want to continue current linking
+            this.is_linking = false;
+            this.linking_tag_def = null;
+            this.linking_tag = null;
+            this.linking_atts = [];
         },
 
         /////////////////////////////////////////////////////////////////
@@ -1400,18 +1445,57 @@ var app_hotpot = {
         });
     },
 
-    del_tag: function(tag_id, ann) {
+    del_tag: function(tag_id, ann, is_check_ltag=true, is_update_marks=true) {
         if (typeof(ann) == 'undefined') {
             ann = this.vpp.$data.anns[this.vpp.$data.ann_idx];
         }
-        this.remove_tag_from_ann(tag_id, ann);
+
+        if (is_check_ltag) {
+            // when deleting etag, need to check if there is linked ltag
+            var linked_ltags = ann_parser.get_linked_ltags(tag_id, ann);
+
+            if (linked_ltags.length == 0) {
+                // great! no links!
+                // just keep going
+            } else {
+                // ok, are you sure?
+                // let's make a long message
+                var msg = ['There are ' + linked_ltags.length + ' link tag(s) related to [' + tag_id + ']:\n'];
+                for (let i = 0; i < linked_ltags.length; i++) {
+                    const ltag = linked_ltags[i];
+                    msg.push('- ' + ltag.id + ' (' + ltag.tag + ') ' + '\n');
+                }
+                msg.push('\nDeleting [' + tag_id + '] will also delete the above link tag(s).\n');
+                msg.push('Are you sure to continue?');
+                msg = msg.join('');
+
+                var ret = this.confirm(msg);
+
+                if (ret) {
+                    // ok, let's delete the links first
+                    for (let i = 0; i < linked_ltags.length; i++) {
+                        const ltag = linked_ltags[i];
+                        // save some time when running this inner deletion
+                        this.del_tag(ltag.id, ann, false, false);
+                    }
+                } else {
+                    // nice choice! keep them all!
+                    return;
+                }
+            }
+        }
+
+        // just remove this tag now
+        this.vpp.$data.anns[this.vpp.$data.ann_idx] = this.remove_tag_from_ann(tag_id, ann);
 
         // mark _has_saved
         this.vpp.$data.anns[this.vpp.$data.ann_idx]._has_saved = false;
         console.log('* deleted tag ' + tag_id);
 
         // update the marks
-        app_hotpot.cm_update_marks();
+        if (is_update_marks) {
+            app_hotpot.cm_update_marks();
+        }
 
         // toast
         app_hotpot.toast(
@@ -1674,6 +1758,13 @@ var app_hotpot = {
             // nothing to do for empty
             return;
         }
+        if (this.vpp.$data.cm.enabled_links) {
+            // ok! show links
+        } else {
+            // well, if user doesn't want to show links,
+            // it's ok
+            return;
+        }
         // update the new marks
         var working_ann = this.vpp.$data.anns[this.vpp.$data.ann_idx];
         for (let i = 0; i < working_ann.tags.length; i++) {
@@ -1781,13 +1872,15 @@ var app_hotpot = {
                 // the second step is to enhance the mark tag with more info
                 var markHTML = [
                     '<span class="mark-tag mark-tag-'+tag.tag+'" id="mark-etag-id-'+tag.id+'">',
+                    '<span onclick="app_hotpot.vpp.on_click_tag(event, \''+tag.id+'\')">',
                     '<span class="mark-tag-info">',
                         '<span class="mark-tag-info-inline fg-tag-'+tag.tag+'">',
                         tag.id,
                         '</span>',
                     '</span>',
-                    '<span class="mark-tag-text" tag_id="'+tag.id+'" onclick="app_hotpot.vpp.on_click_tag(event, \''+tag.id+'\')">',
+                    '<span class="mark-tag-text" tag_id="'+tag.id+'">',
                         spans_text,
+                    '</span>',
                     '</span>',
                     '<span class="mark-tag-info-offset" title="Delete tag '+tag.id+'" onclick="app_hotpot.del_tag(\''+tag.id+'\');">',
                         '<i class="fa fa-times-circle"></i>',
@@ -1951,35 +2044,38 @@ var app_hotpot = {
         var sign = coords_b.l.left - coords_a.l.left > 0 ? 1 : -1;
 
         // then calc the points for the polyline
+        var xys = [
+            // point, start
+            [
+                (coords_a.l.left + coords_a.r.left)/2,
+                (coords_a.l.top + 4)
+            ],
+            // point joint 1
+            [
+                (coords_a.l.left + coords_a.r.left)/2 + sign * delta_width,
+                upper_top
+            ],
+            // point, joint 2
+            [
+                ((coords_b.l.left + coords_b.r.left)/2 - sign * delta_width),
+                upper_top
+            ],
+            // point, end
+            [
+                (coords_b.l.left + coords_b.r.left)/2,
+                (coords_b.l.top + 4)
+            ]
+        ];
+
+        // put all points togather
         var points = [];
-
-        // point, start
-        var p0 = [
-            (coords_a.l.left + coords_a.r.left)/2,
-            (coords_a.l.top + 4)
-        ];
-        points.push(p0[0] + ',' + p0[1]);
-
-        // point joint 1
-        var p1 = [
-            (coords_a.l.left + coords_a.r.left)/2 + sign * delta_width,
-            upper_top
-        ];
-        points.push(p1[0] + ',' + p1[1]);
-
-        // point, joint 2
-        var p2 = [
-            ((coords_b.l.left + coords_b.r.left)/2 - sign * delta_width),
-            upper_top
-        ];
-        points.push(p2[0] + ',' + p2[1]);
-
-        // point, end
-        var p3 = [
-            (coords_b.l.left + coords_b.r.left)/2,
-            (coords_b.l.top + 4)
-        ];
-        points.push(p3[0] + ',' + p3[1]);
+        for (let i = 0; i < xys.length; i++) {
+            const xy = xys[i];
+            // convert to int for better display
+            var x = Math.floor(xy[0]);
+            var y = Math.floor(xy[1]);
+            points.push(x + ',' + y);
+        }
 
         // convert to a string
         points = points.join(' ');
@@ -2005,10 +2101,16 @@ var app_hotpot = {
         svg_text.setAttribute('id', 'mark-link-text-id-' + ltag.id);
         svg_text.setAttribute('text-anchor', 'middle');
         svg_text.setAttribute('alignment-baseline', 'middle');
-        svg_text.setAttribute('x', (p0[0] + p3[0]) / 2);
-        svg_text.setAttribute('y', p1[1]);
+        svg_text.setAttribute('x', (xys[0][0] + xys[3][0]) / 2);
+        svg_text.setAttribute('y', xys[1][1]);
         svg_text.setAttribute('class', "tag-linktext");
-        svg_text.append(document.createTextNode(ltag.id));
+
+        // put the text
+        var text_node_content = ltag.id;
+        if (this.vpp.$data.cm.enabled_link_name) {
+            text_node_content = ltag.tag + ': ' + ltag.id;
+        }
+        svg_text.append(document.createTextNode(text_node_content));
 
         $('#cm_svg_plots').append(
             svg_text
@@ -2054,6 +2156,30 @@ var app_hotpot = {
         notify.create(msg, null, { 
             cls: cls
         });
+    },
+
+    confirm: function(msg) {
+        return window.confirm(msg);
+        // Metro.dialog.create({
+        //     title: "Use Windows location service?",
+        //     content: "<div>Bassus abactors ducunt ad triticum...</div>",
+        //     actions: [
+        //         {
+        //             caption: "Agree",
+        //             cls: "js-dialog-close alert",
+        //             onclick: function(){
+        //                 alert("You clicked Agree action");
+        //             }
+        //         },
+        //         {
+        //             caption: "Disagree",
+        //             cls: "js-dialog-close",
+        //             onclick: function(){
+        //                 alert("You clicked Disagree action");
+        //             }
+        //         }
+        //     ]
+        // });
     },
 
     make_svg_text_bg: function(elem, cls) {
