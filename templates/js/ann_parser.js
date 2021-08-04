@@ -73,6 +73,30 @@ var ann_parser = {
             for (let j = 0; j < attrs.length; j++) {
                 var attr = attrs[j];
                 var value = elem.getAttribute(attr);
+
+                // there are exceptions
+                if (attr.endsWith('ID')) {
+                    // omg, this may be a link tag
+                    // let's check if there is a xxxText attr
+                    var attr_prefix_name = attr.substring(0, attr.length-2);
+                    var attrText_name = attr_prefix_name + 'Text';
+                    if (attrs.indexOf(attrText_name)>=0) {
+                        // ok, I'm sure this is a idref att
+                        // the value is the etag id
+                        // let's save it and goto next
+                        tag[attr_prefix_name] = value;
+                        continue;
+
+                    } else {
+                        // what??? ok, this is just a normal but weird attr
+                        // just save it later
+                    }
+                } else if (attr.endsWith('Text')) {
+                    // I guess we could skip this one
+
+                } else {
+                    // other special rule? maybe
+                }
                 
                 // put this value into tag
                 tag[attr] = value;

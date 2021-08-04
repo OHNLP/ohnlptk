@@ -1889,15 +1889,26 @@ var app_hotpot = {
         // so, get the att_a and att_b first
         var att_a = this.vpp.get_idref_attlist_by_seq(ltag_def, 0);
         var att_b = this.vpp.get_idref_attlist_by_seq(ltag_def, 1);
-        console.log('* draw line ['+ltag.id+'] between', att_a.name, '-', att_b.name);
 
         // next, get the values
         var etag_a_id = ltag[att_a.name];
         var etag_b_id = ltag[att_b.name];
+        console.log(
+            '* draw line ['+ltag.id+'] between', 
+            att_a.name, '['+etag_a_id+']-', 
+            att_b.name, '['+etag_b_id+']'
+        );
+
+        // if the value is null or empty, just skip
+        if (etag_a_id == null || etag_a_id == '') { return; }
+        if (etag_b_id == null || etag_b_id == '') { return; }
 
         // convert the tag_id to tag
         var tag_a = this.vpp.get_tag_by_tag_id(etag_a_id, ann);
         var tag_b = this.vpp.get_tag_by_tag_id(etag_b_id, ann);
+
+        // if the tag is not available, just skip
+        if (tag_a == null || tag_b == null) { return; }
 
         // last, draw!
         this.cm_draw_polyline(
