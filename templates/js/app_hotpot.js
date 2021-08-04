@@ -64,7 +64,10 @@ var app_hotpot = {
 
         save_xml: function() {
             // convert to xml
-            var xmlDoc = ann_parser.ann2xml(this.anns[this.ann_idx]);
+            var xmlDoc = ann_parser.ann2xml(
+                this.anns[this.ann_idx],
+                this.dtd
+            );
 
             // convert to text
             var xmlStr = ann_parser.xml2str(xmlDoc, false);
@@ -94,7 +97,10 @@ var app_hotpot = {
         
         save_as_xml: function() {
             // convert to xml
-            var xmlDoc = ann_parser.ann2xml(this.anns[this.ann_idx]);
+            var xmlDoc = ann_parser.ann2xml(
+                this.anns[this.ann_idx],
+                this.dtd
+            );
 
             // convert to text
             var xmlStr = ann_parser.xml2str(xmlDoc, false);
@@ -498,7 +504,7 @@ var app_hotpot = {
                 var fn = txt_ann._fh.name;
 
                 // get the xml string
-                var xml = ann_parser.ann2xml(txt_ann);
+                var xml = ann_parser.ann2xml(txt_ann, this.dtd);
                 var str = ann_parser.xml2str(xml);
 
                 // create an object for display
@@ -2020,7 +2026,7 @@ var app_hotpot = {
             timeout: timeout,
             clsToast: cls
         };
-        this.toast(msg, null, null, null, options);
+        toast(msg, null, null, null, options);
     },
 
     msg: function(msg, cls) {

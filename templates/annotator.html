@@ -605,7 +605,7 @@ input[type=text].ipt-md {
                 <div v-show="dtd != null" class="group">
 
                     <div id="dropzone_ann" 
-                        v-bind:class="{'disabled-zone': !dtd != null, 'dropzone': dtd != null}">
+                        v-bind:class="{'disabled-zone': dtd == null, 'dropzone': dtd != null}">
                         <div v-if="ann_idx != null" class="zone-text">
                             <b>{{ anns[ann_idx]._fh.name }}</b><br>
                             {{ anns[ann_idx].text.length }} chars<br>

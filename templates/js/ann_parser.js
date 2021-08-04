@@ -90,9 +90,11 @@ var ann_parser = {
                     } else {
                         // what??? ok, this is just a normal but weird attr
                         // just save it later
+                        
                     }
                 } else if (attr.endsWith('Text')) {
                     // I guess we could skip this one
+                    continue;
 
                 } else {
                     // other special rule? maybe
@@ -109,7 +111,7 @@ var ann_parser = {
         return ann;
     },
 
-    ann2xml: function(ann) {
+    ann2xml: function(ann, dtd) {
         // create the root document
         var xmlDoc = document.implementation.createDocument(
             null, ann.dtd_name
@@ -138,8 +140,52 @@ var ann_parser = {
                     // skip the tag name itself
                     continue;
                 }
-                // bind this node_attr to the node_tag
-                node_tag.setAttribute(attr, tag[attr]);
+
+                if (attr == 'id') {
+                    // quick save this attr
+                    node_tag.setAttribute(attr, tag[attr]);
+                    continue;
+                }
+
+                if (dtd.tag_dict[tag.tag].type == 'etag') {
+                    node_tag.setAttribute(attr, tag[attr]);
+                    continue;
+
+                } else if (dtd.tag_dict[tag.tag].type == 'ltag') {
+                    // for link tag, spans and text are not required
+                    if (attr == 'spans') { continue; }
+                    if (attr == 'text') { continue; }
+                
+                    // for those link tag, need to check 
+                    if (dtd.tag_dict[tag.tag].attlist_dict[attr].vtype == 'idref') {
+                        // so, this attr is a id ref,
+                        // the value is a tag_id of an etag
+                        // to be compatible with MAE format,
+                        // we need to set 2 attributes if the value is not null
+                        if (tag[attr] == null || tag[attr] == '') {
+                            // if the value is empty, just skip this
+                            continue;
+                        }
+                        // first, the xxxID
+                        // second, the xxxText
+                        // so, let's get the text first
+                        var etag = this.get_tag_by_tag_id(tag[attr], ann);
+                        if (etag == null) {
+                            // ??? how could it be?
+                            // well...skip this one
+                            console.log('* not found etag [', attr, '] in ', tag);
+                            continue;
+                        }
+
+                        // great! the etag is not null
+                        node_tag.setAttribute(attr + 'ID', tag[attr]);
+                        node_tag.setAttribute(attr + 'Text', etag.text);
+
+                    } else {
+                        // bind this node_attr to the node_tag
+                        node_tag.setAttribute(attr, tag[attr]);
+                    }
+                }
             }
 
             // append this node to TAGS
@@ -419,5 +465,14 @@ var ann_parser = {
             }
         }
         return tag_def.id_prefix + n;
-    }
+    },
+
+    get_tag_by_tag_id: function(tag_id, ann) {
+        for (let i = 0; i < ann.tags.length; i++) {
+            if (ann.tags[i].id == tag_id) {
+                return ann.tags[i];
+            }                
+        }
+        return null;
+    },
 };
