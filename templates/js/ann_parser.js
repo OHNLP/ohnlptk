@@ -141,6 +141,11 @@ var ann_parser = {
                     continue;
                 }
 
+                if (tag[attr] == null) {
+                    // skip those null values in xml
+                    continue;
+                }
+
                 if (attr == 'id') {
                     // quick save this attr
                     node_tag.setAttribute(attr, tag[attr]);

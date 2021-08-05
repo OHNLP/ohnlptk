@@ -1050,9 +1050,18 @@ input[type=text].ipt-md {
                                 
                             </span>
                         </div>
-                        <div class="mr-1"
-                            v-bind:class="'tag-list-row-count-'+count_n_tags(etag)">
-                            {{ count_n_tags(etag) }}
+                        <div class="mr-1 d-flex flex-row">
+                            <div v-if="ann_idx != null && etag.is_non_consuming"
+                                class="mr-2">
+                                <button class="btn-xs"
+                                    title="Add an empty entity tag"
+                                    v-on:click="add_empty_etag(etag)">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                            <div v-bind:class="'tag-list-row-count-'+count_n_tags(etag)">
+                                {{ count_n_tags(etag) }}
+                            </div>
                         </div>
                     </li>
 
@@ -1078,7 +1087,6 @@ input[type=text].ipt-md {
                                     title="Add an empty link tag"
                                     v-on:click="add_empty_ltag(ltag)">
                                     <i class="fa fa-plus"></i>
-                                    Add
                                 </button>
                             </div>
                             <div v-bind:class="'tag-list-row-count-'+count_n_tags(ltag)">
@@ -1424,7 +1432,7 @@ input[type=text].ipt-md {
             v-on:click="close_ctxmenu">Tags:</li> -->
         <li class="ctxmenu-item"
             v-for="etag, tag_idx in dtd.etags"
-            v-on:click="add_tag_by_ctxmenu(etag)">
+            v-on:click="add_etag_by_ctxmenu(etag)">
             <div v-bind:id="'ctxmenu-item-' + etag.name">
                 <i v-bind:class="'fa fa-tag fg-tag-' + etag.name"></i>
                 <span v-if="etag.hasOwnProperty('shortcut')"
@@ -1543,6 +1551,8 @@ if (isIE) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.0/codemirror.min.js"></script>
 <!-- code mirror addon -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/selection/active-line.min.js"></script>
+<!-- numjs -->
+<script src="https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js"></script>
 
 <script>
 

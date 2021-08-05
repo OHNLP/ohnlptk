@@ -377,13 +377,13 @@ var app_hotpot = {
 
         },
 
-        add_tag_by_ctxmenu: function(tag_def) {
+        add_etag_by_ctxmenu: function(tag_def) {
 
             // get the basic tag
             var _tag = app_hotpot.cm_make_basic_tag_from_selection();
 
-            // then call the general add_tag process
-            this.add_tag(_tag, tag_def);
+            // then call the general add_etag process
+            this.add_etag(_tag, tag_def);
 
             // clear the selection to avoid stick keys
             app_hotpot.cm_clear_selection();
@@ -397,7 +397,7 @@ var app_hotpot = {
             console.log('* added tag by right click, ' + tag_def.name);
         },
 
-        add_tag_by_shortcut_key: function(key) {
+        add_etag_by_shortcut_key: function(key) {
             // first, get selection
             var selection = app_hotpot.cm_get_selection();
             if (selection.sel_txts == '') {
@@ -422,8 +422,8 @@ var app_hotpot = {
             // get a basic tag
             var _tag = app_hotpot.cm_make_basic_tag_from_selection();
 
-            // then call the general add_tag process
-            this.add_tag(_tag, tag_def);
+            // then call the general add_etag process
+            this.add_etag(_tag, tag_def);
 
             // clear the selection to avoid stick keys
             app_hotpot.cm_clear_selection();
@@ -431,7 +431,7 @@ var app_hotpot = {
             console.log('* added tag by shortcut, ' + tag_def.name + ' on ' + _tag.text);
         },
 
-        add_tag: function(basic_tag, tag_def) {
+        add_etag: function(basic_tag, tag_def) {
             // create a new tag
             var tag = app_hotpot.make_etag(basic_tag, tag_def, this.anns[this.ann_idx]);
 
@@ -446,6 +446,24 @@ var app_hotpot = {
 
             // update the cm
             app_hotpot.cm_update_marks();
+        },
+
+        add_empty_etag: function(etag_def) {
+            var etag = app_hotpot.make_empty_etag_by_tag_def(etag_def);
+            // create an tag_id
+            var tag_id = ann_parser.get_next_tag_id(
+                this.anns[this.ann_idx],
+                etag_def
+            );
+            etag.id = tag_id;
+            
+            // add to list
+            this.anns[this.ann_idx].tags.push(etag);
+
+            // mark _has_saved
+            this.anns[this.ann_idx]._has_saved = false;
+
+            // ok, that's all?
         },
 
         add_empty_ltag: function(ltag_def) {
@@ -1115,7 +1133,7 @@ var app_hotpot = {
                 console.log('* pressed on', event);
 
                 // first, check if there is any selection
-                app_hotpot.vpp.add_tag_by_shortcut_key(
+                app_hotpot.vpp.add_etag_by_shortcut_key(
                     event.key.toLocaleLowerCase()
                 );
             }
@@ -1564,6 +1582,30 @@ var app_hotpot = {
 
     },
 
+    make_empty_etag_by_tag_def: function(tag_def) {
+        var etag = {
+            id: '',
+            tag: tag_def.name,
+            spans: '',
+            text: ''
+        };
+
+        // then add other attr
+        for (let i = 0; i < tag_def.attlists.length; i++) {
+            const att = tag_def.attlists[i];
+
+            if (att.name == 'spans') {
+                // special rule for spans attr
+                etag.spans = dtd_parser.NON_CONSUMING_SPANS;
+            } else {
+                // set the default value
+                etag[att.name] = att.default_value;
+            }
+        }
+
+        return etag;
+    },
+
     make_empty_ltag_by_tag_def: function(tag_def) {
         var ltag = {
             id: '',
@@ -2004,7 +2046,7 @@ var app_hotpot = {
         var etag_a_id = ltag[att_a.name];
         var etag_b_id = ltag[att_b.name];
         console.log(
-            '* draw line ['+ltag.id+'] between', 
+            '* try to draw line ['+ltag.id+'] between', 
             att_a.name, '['+etag_a_id+']-', 
             att_b.name, '['+etag_b_id+']'
         );
@@ -2019,6 +2061,12 @@ var app_hotpot = {
 
         // if the tag is not available, just skip
         if (tag_a == null || tag_b == null) { return; }
+
+        // if one of the tags is non-consuming tag, just skip
+        if (tag_a.spans == dtd_parser.NON_CONSUMING_SPANS ||
+            tag_b.spans == dtd_parser.NON_CONSUMING_SPANS) {
+            return;
+        }
 
         // last, draw!
         this.cm_draw_polyline(

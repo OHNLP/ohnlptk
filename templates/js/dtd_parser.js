@@ -6,7 +6,10 @@ var dtd_parser = {
         attlist_values: /\(([a-zA-Z0-9\_\ \|]+)\)/gmi,
         attlist_require: /#([A-Z]+)+(\b["a-zA-Z0-9\-\_\ ]+|\>)/gm,
         attlist_prefix: /prefix="([a-zA-Z0-9\_]+)"/gm,
+        attlist_cdata_default_value: /(?<=").*?(?=")/gm
     },
+
+    NON_CONSUMING_SPANS: '-1~-1',
 
     parse: function(text) {
         var lines = text.split('\n');
@@ -67,31 +70,38 @@ var dtd_parser = {
             }
         }
         
-        // post processing for the link tag
+        // post processing for all tags
         for (const name in dtd.tag_dict) {
             if (Object.hasOwnProperty.call(dtd.tag_dict, name)) {
                 if (dtd.tag_dict[name].type == 'etag') { 
-                    // at present, no need to post-process etag
-                    continue; 
-                }
+                    // check the attlist to make sure no missing
+                    for (let i = 0; i < dtd.tag_dict[name].attlists.length; i++) {
+                        if (dtd.tag_dict[name].attlists[i].vtype == 'dfix') {
+                            // which means this is a non-consuming tag
+                            dtd.tag_dict[name].is_non_consuming = true;
+                        }
+                    } 
 
-                // for link tag, need to check how many attlists are found
-                var cnt_idrefs = 0;
-                for (let i = 0; i < dtd.tag_dict[name].attlists.length; i++) {
-                    if (dtd.tag_dict[name].attlists[i].vtype == 'idref') {
-                        cnt_idrefs += 1;
+                }  else {
+
+                    // for link tag, need to check how many attlists are found
+                    var cnt_idrefs = 0;
+                    for (let i = 0; i < dtd.tag_dict[name].attlists.length; i++) {
+                        if (dtd.tag_dict[name].attlists[i].vtype == 'idref') {
+                            cnt_idrefs += 1;
+                        }
                     }
-                }
 
-                // if there is not idref, just create two:
-                if (cnt_idrefs == 0) {
-                    // create from and to
-                    var attlist_from = this.mk_attlist(name, 'from', 'idref');
-                    var attlist_to = this.mk_attlist(name, 'to', 'idref');
-                    dtd.tag_dict[name].attlists = [attlist_from, attlist_to].concat(
-                        dtd.tag_dict[name].attlists
-                    );
-                    console.log('* added from+to to the attlist of ' + name);
+                    // if there is not idref, just create two:
+                    if (cnt_idrefs == 0) {
+                        // create from and to
+                        var attlist_from = this.mk_attlist(name, 'from', 'idref');
+                        var attlist_to = this.mk_attlist(name, 'to', 'idref');
+                        dtd.tag_dict[name].attlists = [attlist_from, attlist_to].concat(
+                            dtd.tag_dict[name].attlists
+                        );
+                        console.log('* added from+to to the attlist of ' + name);
+                    }
                 }
                 
             }
@@ -227,12 +237,16 @@ var dtd_parser = {
                     if (match == 'spans') {
                         // for attr `spans`, need to update the elememt
                         attlist.vtype = 'dfix';
+                        attlist.default_value = this.NON_CONSUMING_SPANS;
                     }
 
                 } else if (groupIndex == 3) {
                     if (match == 'CDATA') {
                         // ok, it's just a text content
                         attlist.vtype = 'text';
+                        
+                        // then get the default value
+                        attlist.default_value = this.get_attlist_cdata_default_value(line);
 
                     } else if (match == '(') {
                         // this is a list
@@ -379,6 +393,34 @@ var dtd_parser = {
             // The result can be accessed through the `m`-variable.
             m.forEach((match, groupIndex) => {
                 if (groupIndex == 1) {
+                    // which is the prefix text
+                    p = match;
+                }
+            });
+
+            ret = p;
+        }
+        
+        return ret;
+    },    
+
+    get_attlist_cdata_default_value: function(line) {
+        let m;
+        var ret = null;
+        let regex = this.regex.attlist_cdata_default_value;
+
+        while ((m = regex.exec(line)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+
+            // the final values?
+            var p = null;
+
+            // The result can be accessed through the `m`-variable.
+            m.forEach((match, groupIndex) => {
+                if (groupIndex == 0) {
                     // which is the prefix text
                     p = match;
                 }
