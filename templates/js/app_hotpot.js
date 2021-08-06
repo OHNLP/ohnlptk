@@ -49,7 +49,7 @@ var app_hotpot = {
 
         // cm settings
         cm: {
-            // document / sentence
+            // document / sentences
             display_mode: 'document',
 
             // node / span
@@ -241,15 +241,15 @@ var app_hotpot = {
 
             if (idx == null) {
                 // which means remove the content
-                app_hotpot.codemirror.setValue('');
+                app_hotpot.cm_set_ann(null);
 
                 // update the marks
                 app_hotpot.cm_update_marks();
 
             } else {
                 // update the text display
-                app_hotpot.codemirror.setValue(
-                    this.anns[this.ann_idx].text
+                app_hotpot.cm_set_ann(
+                    this.anns[this.ann_idx]
                 );
 
                 // update the marks
@@ -326,6 +326,11 @@ var app_hotpot = {
 
         on_change_display_mode: function(event) {
             console.log(event.target.value);
+            // need to set ann again,
+            // it will display according to the mode
+            app_hotpot.cm_set_ann(
+                this.anns[this.ann_idx]
+            );
             app_hotpot.cm_update_marks();
         },
 
@@ -1072,8 +1077,8 @@ var app_hotpot = {
             this.vpp.$data.ann_idx = this.vpp.$data.anns.length - 1;
 
             // update the text display
-            this.codemirror.setValue(
-                this.vpp.$data.anns[this.vpp.$data.ann_idx].text
+            this.cm_set_ann(
+                this.vpp.$data.anns[this.vpp.$data.ann_idx]
             );
     
             // update the marks
@@ -1669,6 +1674,28 @@ var app_hotpot = {
     /////////////////////////////////////////////////////////////////
     // Code Mirror Related
     /////////////////////////////////////////////////////////////////
+    cm_set_ann: function(ann) {
+        // first, if ann is null, just remove everything in the editor
+        if (ann == null) {
+            this.codemirror.setValue('');
+            return;
+        }
+
+        // if the current mode is 
+        if (this.vpp.$data.cm.display_mode == 'document') {
+            this.codemirror.setValue(
+                ann.text
+            );
+
+        } else if (this.vpp.$data.cm.display_mode == 'sentences') {
+            this.codemirror.setValue(
+                ann._sentences_text
+            );
+        } else {
+            this.codemirror.setValue('');
+        }
+    },
+
     cm_get_selection: function(inst) {
         if (typeof(inst) == 'undefined') {
             inst = this.codemirror;
@@ -1696,13 +1723,15 @@ var app_hotpot = {
     cm_make_basic_tag_from_selection: function() {
         var locs = [];
         var txts = [];
+
+        // usually there is only one tag
         for (let i = 0; i < app_hotpot.selection.sel_locs.length; i++) {
             var sel_loc = app_hotpot.selection.sel_locs[i];
             var sel_txt = app_hotpot.selection.sel_txts[i];
             locs.push(
-                app_hotpot._calc_range2spans(
+                app_hotpot.cm_range2spans(
                     sel_loc, 
-                    this.vpp.$data.anns[this.vpp.$data.ann_idx].text
+                    this.vpp.$data.anns[this.vpp.$data.ann_idx]
                 )
             );
             txts.push(sel_txt);
@@ -1924,11 +1953,7 @@ var app_hotpot = {
         for (let i = 0; i < spans_arr.length; i++) {
             const spans = spans_arr[i];
             const spans_text = text_arr[i];
-            var rst = this._calc_spans2range(spans, ann.text);
-            var ln0 = rst[0][0];
-            var ch0 = rst[0][1];
-            var ln1 = rst[1][0];
-            var ch1 = rst[1][1];
+            var range = this.cm_spans2range(spans, ann);
 
             if (this.vpp.$data.cm.mark_mode == 'node') {
                 // the second step is to enhance the mark tag with more info
@@ -1957,8 +1982,8 @@ var app_hotpot = {
 
                 // add mark to text
                 this.codemirror.markText(
-                    {line: ln0, ch: ch0},
-                    {line: ln1, ch: ch1},
+                    range.anchor,
+                    range.head,
                     {
                         className: 'mark-tag mark-tag-' + tag.tag,
                         replacedWith: markNode,
@@ -1971,8 +1996,8 @@ var app_hotpot = {
 
             } else if (this.vpp.$data.cm.mark_mode == 'span') {
                 this.codemirror.markText(
-                    {line: ln0, ch: ch0},
-                    {line: ln1, ch: ch1},
+                    range.anchor,
+                    range.head,
                     {
                         className: 'mark-tag mark-tag-' + tag.tag,
                         attributes: {
@@ -1986,8 +2011,73 @@ var app_hotpot = {
 
     },
 
-    _calc_range2spans: function(sel_loc, full_text) {
-        console.log('* calc_range2spans: ');
+    cm_spans2range: function(spans, ann) {
+        // if the current mode is 
+        if (this.vpp.$data.cm.display_mode == 'document') {
+            return this.cm_doc_spans2range(spans, ann);
+
+        } else if (this.vpp.$data.cm.display_mode == 'sentences') {
+            return this.cm_sen_spans2range(spans, ann);
+
+        } else {
+            return this.cm_doc_spans2range(spans, ann);
+        }
+    },
+
+    cm_range2spans: function(spans, ann) {
+        // if the current mode is 
+        if (this.vpp.$data.cm.display_mode == 'document') {
+            return this.cm_doc_range2spans(spans, ann);
+
+        } else if (this.vpp.$data.cm.display_mode == 'sentences') {
+            return this.cm_sen_range2spans(spans, ann);
+
+        } else {
+            return this.cm_doc_range2spans(spans, ann);
+        }
+    },
+
+    cm_sen_range2spans: function(sel_loc, ann) {
+        var span0 = 0;
+
+        // first, get the start span of this line
+        var line_span0 = ann._sentences[
+            sel_loc.anchor.line
+        ].spans.start;
+        var line_span1 = ann._sentences[
+            sel_loc.head.line
+        ].spans.start;
+
+        // then move to the span of this line
+        span0 = line_span0 + sel_loc.anchor.ch;
+        span1 = line_span1 + sel_loc.head.ch;
+
+        // the selection maybe from different direction
+        if (span0 <= span1) {
+            return span0 + '~' + span1;
+        } else {
+            return span1 + '~' + span0;
+        }
+    },
+
+    cm_sen_spans2range: function(spans, ann) {
+
+        var span_pos_0 = parseInt(spans.split('~')[0]);
+        var span_pos_1 = parseInt(spans.split('~')[1]);
+
+        // find the line number of span0
+        var anchor = nlp_toolkit.find_linech(span_pos_0, ann._sentences);
+        var head = nlp_toolkit.find_linech(span_pos_1, ann._sentences);
+
+        return {
+            anchor: anchor,
+            head: head
+        }
+    },
+
+    cm_doc_range2spans: function(sel_loc, ann) {
+        var full_text = ann.text;
+        console.log('* calc doc range2spans: ');
         console.log(sel_loc);
         var lines = full_text.split('\n');
         var span0 = 0;
@@ -2009,7 +2099,9 @@ var app_hotpot = {
         }
     },
 
-    _calc_spans2range: function(spans, full_text) {
+    cm_doc_spans2range: function(spans, ann) {
+        var full_text = ann.text;
+        console.log('* calc doc spans2range: ');
         var span_pos_0 = parseInt(spans.split('~')[0]);
         var span_pos_1 = parseInt(spans.split('~')[1]);
 
@@ -2029,22 +2121,31 @@ var app_hotpot = {
         // TODO fix the potential cross lines bug
         var ch1 = ch0 + (span_pos_1 - span_pos_0);
 
-        return [ [ln0, ch0], [ln1, ch1] ];
+        // return [ [ln0, ch0], [ln1, ch1] ];
+        return {
+            anchor: {line: ln0, ch: ch0},
+            head:   {line: ln1, ch: ch1}
+        }
     },
 
-    cm_spans2coords: function(spans, full_text) {
-        var range = this._calc_spans2range(spans, full_text);
+    cm_spans2coords: function(spans, ann) {
+        var range = this.cm_spans2range(spans, ann);
 
         var coords_l = this.codemirror.charCoords(
-            { line: range[0][0], ch: range[0][1] },
+            // { line: range[0][0], ch: range[0][1] },
+            range.anchor,
             'local'
         );
         var coords_r = this.codemirror.charCoords(
-            { line: range[1][0], ch: range[1][1] },
+            // { line: range[1][0], ch: range[1][1] },
+            range.head,
             'local'
         );
 
-        return { l:coords_l, r:coords_r };
+        return { 
+            l: coords_l, 
+            r: coords_r 
+        };
     },
 
     scroll_annlist_to_bottom: function() {
@@ -2090,14 +2191,14 @@ var app_hotpot = {
 
         // last, draw!
         this.cm_draw_polyline(
-            ltag, tag_a, tag_b, ann.text
+            ltag, tag_a, tag_b, ann
         );
     },
 
-    cm_draw_polyline: function(ltag, tag_a, tag_b, full_text) {
+    cm_draw_polyline: function(ltag, tag_a, tag_b, ann) {
         // then get the coords of both tags
-        var coords_a = this.cm_spans2coords(tag_a.spans, full_text);
-        var coords_b = this.cm_spans2coords(tag_b.spans, full_text);
+        var coords_a = this.cm_spans2coords(tag_a.spans, ann);
+        var coords_b = this.cm_spans2coords(tag_b.spans, ann);
 
         // the setting for the polyline
         var delta_height = 0;

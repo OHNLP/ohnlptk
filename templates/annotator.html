@@ -699,7 +699,7 @@ input[type=text].ipt-md {
                             v-model="cm.display_mode"
                             @change="on_change_display_mode">
                         <br>
-                        <input type="radio" name="display_mode" value="sentence" 
+                        <input type="radio" name="display_mode" value="sentences" 
                             data-role="radio" 
                             data-caption="<i class='fa fa-list'></i> Sentences" 
                             v-model="cm.display_mode"
@@ -1696,6 +1696,9 @@ if (isIE) {
 
 // The IAA Calculator
 {% include 'js/iaa_calculator.js' %}
+
+// The NLP toolkit
+{% include 'js/nlp_toolkit.js' %}
 
 // The Vue APP
 {% include 'js/app_hotpot.js' %}

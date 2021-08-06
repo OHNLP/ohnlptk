@@ -32,6 +32,11 @@ async function fs_read_ann_file_handle(fh, dtd) {
     // bind a status
     ann._has_saved = true;
 
+    // bind the sentences
+    var result = nlp_toolkit.sent_tokenize(ann.text);
+    ann._sentences = result.sentences;
+    ann._sentences_text = result.sentences_text;
+
     return ann;
 }
 
