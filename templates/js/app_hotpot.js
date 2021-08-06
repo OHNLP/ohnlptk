@@ -41,8 +41,17 @@ var app_hotpot = {
         // for file name filter
         fn_pattern: '',
 
+        // for iaa comp
+        iaa_ann_list: [
+            [], // for annotator A
+            []  // for annotator B
+        ],
+
         // cm settings
         cm: {
+            // document / sentence
+            display_mode: 'document',
+
             // node / span
             mark_mode: 'node',
 
@@ -313,6 +322,11 @@ var app_hotpot = {
             // just mark current ann as unsaved
             this.anns[this.ann_idx]._has_saved = false;
             console.log('* changed input attr to', event.target.value);
+        },
+
+        on_change_display_mode: function(event) {
+            console.log(event.target.value);
+            app_hotpot.cm_update_marks();
         },
 
         on_change_mark_mode: function(event) {
