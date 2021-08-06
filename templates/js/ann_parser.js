@@ -382,6 +382,7 @@ var ann_parser = {
                     // if this str exists, just skip
                     if (str_dict.hasOwnProperty(str)) { 
                         if (str_dict[str].tags.hasOwnProperty(tag_name)) {
+
                         } else {
                             str_dict[str].tags[tag_name] = 1;
                         }
@@ -412,8 +413,7 @@ var ann_parser = {
                                 id: 'hint-' + tag_name + '-' + i + '-' + j,
                                 tag: tag_name,
                                 text: str,
-                                loc: loc,
-                                range: this.loc2range(loc, ann.text)
+                                spans: this.loc2span(loc)
                             })
                         }
                     }
@@ -455,22 +455,8 @@ var ann_parser = {
         ];
     },
 
-    loc2range: function(loc, text) {
-        // calculate the line number
-        var ln0 = text.substring(0, loc[0]).split('\n').length - 1;
-        var ln1 = text.substring(0, loc[1]).split('\n').length - 1;
-
-        // calculate the char location
-        var ch0 = loc[0];
-        for (let i = 1; i < loc[0]; i++) {
-            if (text[loc[0] - i] == '\n') {
-                ch0 = i - 1;
-                break;
-            }
-        }
-        var ch1 = ch0 + (loc[1] - loc[0]);
-
-        return [ [ln0, ch0], [ln1, ch1] ];
+    loc2span: function(loc) {
+        return loc[0] + '~' + loc[1];
     },
 
     hash: function(str, seed = 0) {

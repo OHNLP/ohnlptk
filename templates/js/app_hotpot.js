@@ -365,12 +365,9 @@ var app_hotpot = {
             var hint = this.get_hint(hint_id);
             if (hint == null) { return; }
 
-            // convert the range to spans
-            var spans = hint.loc[0] + '~' + hint.loc[1];
-
             // createa new ann tag
             var _tag = {
-                'spans': spans,
+                'spans': hint.spans,
                 'text': hint.text
             }
             var tag_def = this.dtd.tag_dict[tag_name];
@@ -1675,6 +1672,13 @@ var app_hotpot = {
     // Code Mirror Related
     /////////////////////////////////////////////////////////////////
     cm_set_ann: function(ann) {
+        // make sure all clear
+        // clear all etag markers
+        this.cm_clear_etag_marks();
+
+        // clear all link tags
+        this.cm_clear_ltag_marks();
+
         // first, if ann is null, just remove everything in the editor
         if (ann == null) {
             this.codemirror.setValue('');
@@ -1765,7 +1769,7 @@ var app_hotpot = {
 
     cm_clear_etag_marks: function() {
         var marks = this.codemirror.getAllMarks();
-        for (let i = 0; i < marks.length; i++) {
+        for (let i = marks.length - 1; i > 0; i--) {
             marks[i].clear();
         }
     },
@@ -1809,7 +1813,10 @@ var app_hotpot = {
 
         for (let i = 0; i < hints.length; i++) {
             const hint = hints[i];
-            this.cm_mark_hint_str(hint);
+            this.cm_mark_hint_in_text(
+                hint,
+                this.vpp.$data.anns[this.vpp.$data.ann_idx]
+            );
         }
     },
 
@@ -1871,11 +1878,8 @@ var app_hotpot = {
      * Mark the hint in the code mirror
      * @param {object} hint it contains the range for rendering
      */
-    cm_mark_hint_str: function(hint) {
-        var ln0 = hint.range[0][0];
-        var ch0 = hint.range[0][1];
-        var ln1 = hint.range[1][0];
-        var ch1 = hint.range[1][1];
+    cm_mark_hint_in_text: function(hint, ann) {
+        var range = this.cm_spans2range(hint.spans, ann);
         
         if (this.vpp.$data.cm.mark_mode == 'node') {
             var hint_tag_id_prefix = dtd_parser.get_id_prefix(
@@ -1902,8 +1906,8 @@ var app_hotpot = {
             var markNode = placeholder.firstElementChild;
 
             this.codemirror.markText(
-                {line: ln0, ch: ch0},
-                {line: ln1, ch: ch1},
+                range.anchor,
+                range.head,
                 {
                     className: 'mark-hint mark-hint-' + hint.tag,
                     replacedWith: markNode,
@@ -1914,8 +1918,8 @@ var app_hotpot = {
             );
         } else if (this.vpp.$data.cm.mark_mode == 'span') {
             this.codemirror.markText(
-                {line: ln0, ch: ch0},
-                {line: ln1, ch: ch1},
+                range.anchor,
+                range.head,
                 {
                     className: 'mark-hint mark-hint-' + hint.tag,
                     attributes: {
