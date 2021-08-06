@@ -7,16 +7,22 @@
  *  _has_saved: true/false,
  *  text: '',
  *  dtd_name: '',
- *  tags: []
+ *  tags: [{
+ *    id: '',
+ *    tag: '',
+ *    spans: '', // this may not be available
+ *    text: '',  // this may not be available
+ * 
+ *  }]
  * }
  * 
  * the `_fh` is added outside of parser.
  * the `_has_saved` is added outside
  */
 var ann_parser = {
-
-    parse: function(text) {
-        var ann = this.xml2ann(text);
+    
+    parse: function(text, dtd) {
+        var ann = this.xml2ann(text, dtd);
         return ann;
     },
 
@@ -30,7 +36,7 @@ var ann_parser = {
         return ann;
     },
 
-    xml2ann: function(text) {
+    xml2ann: function(text, dtd) {
         // create a new DOM parser
         var parser = new DOMParser();
 
@@ -47,6 +53,13 @@ var ann_parser = {
         // first, get the dtd name
         var dtd_name = xmlDoc.children[0].tagName;
         ann.dtd_name = dtd_name;
+
+        if (dtd.name != ann.dtd_name) {
+            throw {
+                name: 'Not match given DTD',
+                message: 'The dtd (' + ann.dtd_name + ') does NOT match the given DTD (' + dtd.name + ')'
+            };
+        }
 
         // then get the text content
         var textContent = xmlDoc.getElementsByTagName('TEXT')[0].textContent;
@@ -103,6 +116,20 @@ var ann_parser = {
                 // put this value into tag
                 tag[attr] = value;
             }
+
+            // one more step, sometimes the attr in XML doesn't contain
+            // what defined int dtd, so we need to give a value
+            for (let k = 0; k < dtd.tag_dict[tag_name].attlists.length; k++) {
+                const att = dtd.tag_dict[tag_name].attlists[k];
+                if (tag.hasOwnProperty(att.name)) {
+                    // ok, that's what it should be
+                } else {
+                    // also ok, that's what it actually is sometimes
+                    tag[att.name] = att.default_value;
+                    console.log('* fixed missing', att.name);
+                }
+            }
+            console.log('* add tag', tag);
 
             // then, put this new tag to the ann tags list
             ann.tags.push(tag);

@@ -719,23 +719,16 @@ input[type=text].ipt-md {
                             data-caption="Show Links"
                             v-model="cm.enabled_links"
                             @change="on_change_link_settings">
-                    </div>
-
-                    <div>
+                        <br>
+                        
                         <input type="checkbox" 
                             class="check"
                             data-role="switch" 
                             data-caption="Link Name"
                             v-model="cm.enabled_link_name"
                             @change="on_change_link_settings">
-                        <br>
-                        <input type="checkbox" 
-                            class="check"
-                            data-role="switch" 
-                            data-caption="Complex Links"
-                            v-model="cm.enabled_link_complex"
-                            @change="on_change_link_settings">
                     </div>
+
                     <div v-show="is_linking">
                         <button class="ribbon-button"
                             v-on:click="cancel_linking">
@@ -1172,6 +1165,7 @@ input[type=text].ipt-md {
                                                 v-bind:value="val">
                                                 {{ val }}
                                             </option>
+                                            <option value="">&nbsp;</option>
                                         </select>
                                     </div>
                                     <div v-else-if="attlist.vtype == 'text'">
@@ -1553,7 +1547,9 @@ if (isIE) {
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.62.2/addon/selection/active-line.min.js"></script>
 <!-- numjs -->
 <script src="https://cdn.jsdelivr.net/gh/nicolaspanel/numjs@0.15.1/dist/numjs.min.js"></script>
-
+<script src="https://unpkg.com/compromise"></script>
+<!-- <script src="https://unpkg.com/compromise-paragraphs"></script> -->
+<!-- <script src="https://unpkg.com/compromise-sentences"></script> -->
 <script>
 
 // The file helper 
@@ -1570,6 +1566,9 @@ if (isIE) {
 
 // The spaCy toolkit
 {% include 'js/spacy_toolkit.js' %}
+
+// The IAA Calculator
+{% include 'js/iaa_calculator.js' %}
 
 // The Vue APP
 {% include 'js/app_hotpot.js' %}

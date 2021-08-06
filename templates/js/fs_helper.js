@@ -19,12 +19,12 @@ async function fs_read_txt_file_handle(fh) {
     return ann;
 }
 
-async function fs_read_ann_file_handle(fh) {
+async function fs_read_ann_file_handle(fh, dtd) {
     const file = await fh.getFile();
     const text = await file.text();
 
     // create ann
-    var ann = ann_parser.parse(text);
+    var ann = ann_parser.parse(text, dtd);
 
     // bind the fh
     ann._fh = fh;

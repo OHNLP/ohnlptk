@@ -212,7 +212,10 @@ var app_hotpot = {
                     }
                     
                     // parse this ann fh
-                    app_hotpot.parse_ann_file_fh(fh);
+                    app_hotpot.parse_ann_file_fh(
+                        fh,
+                        app_hotpot.vpp.$data.dtd
+                    );
                 }
             });
         },
@@ -1223,7 +1226,10 @@ var app_hotpot = {
                         }
 
                         // should be a ann txt/xml file
-                        app_hotpot.parse_ann_file_fh(fh);
+                        app_hotpot.parse_ann_file_fh(
+                            fh,
+                            app_hotpot.vpp.$data.dtd
+                        );
 
                     } else {
                         // so item is a directory?
@@ -1300,9 +1306,9 @@ var app_hotpot = {
         });
     },
 
-    parse_ann_file_fh: function(fh) {
+    parse_ann_file_fh: function(fh, dtd) {
         // get the ann file
-        var p_ann = fs_read_ann_file_handle(fh);
+        var p_ann = fs_read_ann_file_handle(fh, dtd);
         p_ann.then(function(ann) {
             app_hotpot.add_ann(ann);
         });
