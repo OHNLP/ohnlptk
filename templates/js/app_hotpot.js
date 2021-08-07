@@ -651,6 +651,22 @@ var app_hotpot = {
         },
 
         /////////////////////////////////////////////////////////////////
+        // IAA Related
+        /////////////////////////////////////////////////////////////////
+        add_iaa_ann: function(ann, iaa_id) {
+            this.iaa_ann_list[iaa_id].anns.push(ann);
+        },
+
+        calc_iaa: function() {
+            var iaa_dict = iaa_calculator.evaluate_anns_on_dtd(
+                this.dtd,
+                this.iaa_ann_list[0].anns,
+                this.iaa_ann_list[1].anns
+            );
+            console.log('* iaa result:', iaa_dict);
+        },
+
+        /////////////////////////////////////////////////////////////////
         // Ruleset Related
         /////////////////////////////////////////////////////////////////
 
@@ -872,9 +888,9 @@ var app_hotpot = {
             }
         },
 
-        has_included_ann_file: function(fn) {
-            for (let i = 0; i < this.anns.length; i++) {
-                if (this.anns[i]._fh.name == fn) {
+        has_included: function(fn, anns) {
+            for (let i = 0; i < anns.length; i++) {
+                if (anns[i]._fh.name == fn) {
                     return true;
                 }
             }
@@ -882,14 +898,12 @@ var app_hotpot = {
             return false;
         },
 
-        has_included_txt_ann_file: function(fn) {
-            for (let i = 0; i < this.txt_anns.length; i++) {
-                if (this.txt_anns[i]._fh.name == fn) {
-                    return true;
-                }
-            }
+        has_included_ann_file: function(fn) {
+            return this.has_included(fn, this.anns);
+        },
 
-            return false;
+        has_included_txt_ann_file: function(fn) {
+            return this.has_included(fn, this.txt_anns);
         },
 
         has_unsaved_ann_file: function() {
@@ -1328,24 +1342,33 @@ var app_hotpot = {
                         // let item = items[i].webkitGetAsEntry();
                         let item = items[i].getAsFileSystemHandle();
                 
-                        item.then(function(fh) {
-                            if (fh.kind == 'file') {
-                                // check exists
-                                // if (app_hotpot.vpp.has_included_txt_ann_file(fh.name)) {
-                                //     // exists? skip this file
-                                //     return;
-                                // }
-        
-                                // // read the file
-                                // var p_txt_ann = fs_read_txt_file_handle(fh);
-                                // p_txt_ann.then(function(txt_ann) {
-                                //     app_hotpot.vpp.add_txt(txt_ann);
-                                // });
-                                
-                            } else {
-                                // what to do with a directory
+                        item.then((function(iaa_id) {
+                            return function(fh) {
+                                if (fh.kind == 'file') {
+                                    // check exists
+                                    if (app_hotpot.vpp.has_included(
+                                        fh.name, 
+                                        app_hotpot.vpp.$data.iaa_ann_list[iaa_id].anns)) {
+                                        // exists? skip this file
+                                        return;
+                                    }
+            
+                                    // read the file
+                                    var p_ann = fs_read_ann_file_handle(
+                                        fh,
+                                        app_hotpot.vpp.$data.dtd
+                                    );
+                                    p_ann.then((function(iaa_id) {
+                                        return function(ann) {
+                                            app_hotpot.vpp.add_iaa_ann(ann, iaa_id);
+                                        }
+                                    })(iaa_id));
+                                    
+                                } else {
+                                    // what to do with a directory
+                                }
                             }
-                        })
+                        })(iaa_id))
                         .catch(function(error) {
                             console.log('* error when drop txt', error);
                         });

@@ -945,13 +945,13 @@ input[type=text].ipt-md {
                             Load DTD file first<br>
                             in Annotation Tab
                         </div>
-                        <div v-else-if="iaa_ann_list[0].length == 0" class="zone-text">
+                        <div v-else-if="iaa_ann_list[0].anns.length == 0" class="zone-text">
                             Drop <b>Ann</b> File(s)<br>
                             Annotator <b>A</b>
                         </div>
                         <div v-else class="zone-text">
                             <b>Annotation A</b><br>
-                            {{ dtd.etags.length }} Files<br>
+                            {{ iaa_ann_list[0].anns.length }} Files<br>
                         </div>
                     </div>
 
@@ -963,13 +963,13 @@ input[type=text].ipt-md {
                             Load DTD file first<br>
                             in Annotation Tab
                         </div>
-                        <div v-else-if="iaa_ann_list[1].length == 0" class="zone-text">
+                        <div v-else-if="iaa_ann_list[1].anns.length == 0" class="zone-text">
                             Drop <b>Ann</b> File(s)<br>
                             Annotator <b>B</b>
                         </div>
                         <div v-else class="zone-text">
                             <b>Annotation B</b><br>
-                            {{ dtd.etags.length }} Files<br>
+                            {{ iaa_ann_list[1].anns.length }} Files<br>
                         </div>
                     </div>
 
@@ -982,6 +982,19 @@ input[type=text].ipt-md {
                     </button> -->
 
                     <span class="title">Annotation Files</span>
+                </div>
+
+                <div class="group">
+
+                    <button class="ribbon-button"
+                        v-on:click="calc_iaa">
+                        <span class="icon">
+                            <i class="fa fa-calculator"></i>
+                        </span>
+                        <span class="caption">Calculate All</span>
+                    </button>
+
+                    <span class="title">IAA</span>
                 </div>
 
             </div>

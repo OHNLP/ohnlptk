@@ -19,7 +19,10 @@ async function fs_read_txt_file_handle(fh) {
     return ann;
 }
 
-async function fs_read_ann_file_handle(fh, dtd) {
+async function fs_read_ann_file_handle(fh, dtd, enabled_sentences) {
+    if (typeof(enabled_sentences) == 'undefined') {
+        enabled_sentences = true;
+    }
     const file = await fh.getFile();
     const text = await file.text();
 
@@ -33,9 +36,14 @@ async function fs_read_ann_file_handle(fh, dtd) {
     ann._has_saved = true;
 
     // bind the sentences
-    var result = nlp_toolkit.sent_tokenize(ann.text);
-    ann._sentences = result.sentences;
-    ann._sentences_text = result.sentences_text;
+    if (enabled_sentences) {
+        var result = nlp_toolkit.sent_tokenize(ann.text);
+        ann._sentences = result.sentences;
+        ann._sentences_text = result.sentences_text;
+    } else {
+        ann._sentences = null;
+        ann._sentences_text = null;
+    }
 
     return ann;
 }
