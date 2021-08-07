@@ -20,7 +20,7 @@
  * the `_has_saved` is added outside
  */
 var ann_parser = {
-    
+
     parse: function(text, dtd) {
         var ann = this.xml2ann(text, dtd);
         return ann;

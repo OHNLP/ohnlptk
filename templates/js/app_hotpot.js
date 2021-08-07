@@ -43,8 +43,8 @@ var app_hotpot = {
 
         // for iaa comp
         iaa_ann_list: [
-            [], // for annotator A
-            []  // for annotator B
+            {anns: [], name: 'A'}, // for annotator A
+            {anns: [], name: 'B'}, // for annotator B
         ],
 
         // cm settings
@@ -1098,6 +1098,9 @@ var app_hotpot = {
         // bind drop zone for anns
         this.bind_dropzone_txt();
 
+        // bind drop zone for anns
+        this.bind_dropzone_iaa();
+
         // bind global click event
         this.bind_click_event();
 
@@ -1297,6 +1300,61 @@ var app_hotpot = {
             }
 
         }, false);
+    },
+
+    bind_dropzone_iaa: function() {
+        let dropzones = document.getElementsByClassName("dropzone-iaa");
+
+        for (let i = 0; i < dropzones.length; i++) {
+            var dropzone = dropzones[i];
+            var iaa_id = parseInt(dropzone.getAttribute('iaa_id'));
+
+            dropzone.addEventListener("dragover", function(event) {
+                event.preventDefault();
+            }, false);
+
+            dropzone.addEventListener("drop", (function(iaa_id) {
+                return function(event) {
+                    // stop the download event
+                    event.preventDefault();
+                    // first, we need to which dropzone triggers event
+    
+                    console.log('* drop something on iaa ' + iaa_id);
+                    // return;
+        
+                    let items = event.dataTransfer.items;
+        
+                    for (let i=0; i<items.length; i++) {
+                        // let item = items[i].webkitGetAsEntry();
+                        let item = items[i].getAsFileSystemHandle();
+                
+                        item.then(function(fh) {
+                            if (fh.kind == 'file') {
+                                // check exists
+                                // if (app_hotpot.vpp.has_included_txt_ann_file(fh.name)) {
+                                //     // exists? skip this file
+                                //     return;
+                                // }
+        
+                                // // read the file
+                                // var p_txt_ann = fs_read_txt_file_handle(fh);
+                                // p_txt_ann.then(function(txt_ann) {
+                                //     app_hotpot.vpp.add_txt(txt_ann);
+                                // });
+                                
+                            } else {
+                                // what to do with a directory
+                            }
+                        })
+                        .catch(function(error) {
+                            console.log('* error when drop txt', error);
+                        });
+                    }
+        
+                }
+            })(iaa_id), false);
+        }
+        
     },
 
     resize: function() {
