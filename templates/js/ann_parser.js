@@ -295,10 +295,10 @@ var ann_parser = {
             // oh, this is NOT a new text
             // just increase the count
             hint_dict[tag.tag].text_dict[text].count += 1;
-            if (hint_dict[tag.tag].text_dict[text].ann_fn_dict.hasOwnProperty(ann._fh.name)) {
-                hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] += 1;
+            if (hint_dict[tag.tag].text_dict[text].ann_fn_dict.hasOwnProperty(ann._filename)) {
+                hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._filename] += 1;
             } else {
-                hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] = 1;
+                hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._filename] = 1;
             }
 
         } else {
@@ -314,7 +314,7 @@ var ann_parser = {
             hint_dict[tag.tag].texts.push(text);
 
             // save this ann file name
-            hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._fh.name] = 1;
+            hint_dict[tag.tag].text_dict[text].ann_fn_dict[ann._filename] = 1;
         }
 
         return hint_dict;

@@ -46,7 +46,7 @@ var iaa_calculator = {
             // ok, let's create a new item here
             iaa_dict.ann[hashcode] = {
                 anns: [ann_a],
-                ann_result: {},
+                rst: {},
             }
         }
 
@@ -68,7 +68,7 @@ var iaa_calculator = {
             var ann_a = iaa_dict.ann[hashcode].anns[0];
 
             // now, time to evaluate
-            var ann_result = this.evaluate_ann_on_dtd(
+            var rst = this.evaluate_ann_on_dtd(
                 dtd,
                 ann_a,
                 ann_b,
@@ -76,7 +76,7 @@ var iaa_calculator = {
             );
 
             // save this result
-            iaa_dict.ann[hashcode].ann_result = ann_result;
+            iaa_dict.ann[hashcode].rst = rst;
         }
 
         // finally, calculate the result at all and tag levels
@@ -89,9 +89,9 @@ var iaa_calculator = {
                 if (Object.hasOwnProperty.call(iaa_dict.ann, hashcode)) {
                     const iaa = iaa_dict.ann[hashcode];
                     // add the result of this tag
-                    cm_tag.tp += iaa.ann_result.tag[tag_def.name].cm.tp;
-                    cm_tag.fp += iaa.ann_result.tag[tag_def.name].cm.fp;
-                    cm_tag.fn += iaa.ann_result.tag[tag_def.name].cm.fn;
+                    cm_tag.tp += iaa.rst.tag[tag_def.name].cm.tp;
+                    cm_tag.fp += iaa.rst.tag[tag_def.name].cm.fp;
+                    cm_tag.fn += iaa.rst.tag[tag_def.name].cm.fn;
                 }
             }
             // get the tag level result
@@ -223,9 +223,9 @@ var iaa_calculator = {
     },
 
     calc_p_r_f1: function(cm) {
-        var precision = cm.tp / (cm.tp + cm.fp);
-        var recall = cm.tp / (cm.tp + cm.fn);
-        var f1 = 2 * precision * recall / (precision + recall);
+        var precision = this.calc_precision(cm.tp, cm.fp);
+        var recall = this.calc_recall(cm.tp, cm.fn);
+        var f1 = this.calc_f1_by_pr(precision, recall);
 
         return {
             precision: precision,
@@ -233,6 +233,24 @@ var iaa_calculator = {
             f1: f1,
             cm: cm
         }
+    },
+
+    calc_precision: function(tp, fp) {
+        return tp / (tp + fp);
+    },
+
+    calc_recall: function(tp, fn) {
+        return tp / (tp + fn);
+    },
+
+    calc_f1: function(tp, fp, fn) {
+        var precision = this.calc_precision(tp, fp);
+        var recall = this.calc_recall(tp, fn);
+        return 2 * precision * recall / (precision + recall);
+    },
+
+    calc_f1_by_pr: function(precision, recall) {
+        return 2 * precision * recall / (precision + recall);
     },
 
     is_tag_in_list: function(tag, tag_list, match_mode) {

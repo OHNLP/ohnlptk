@@ -46,6 +46,11 @@ var app_hotpot = {
             {anns: [], name: 'A'}, // for annotator A
             {anns: [], name: 'B'}, // for annotator B
         ],
+        iaa_dict: null,
+        iaa_display_tag_name: '__all__',
+        iaa_display_hashcode: null,
+        iaa_display_tags_context: true,
+        iaa_display_tags_tp: false,
 
         // cm settings
         cm: {
@@ -121,7 +126,7 @@ var app_hotpot = {
             var xmlStr = ann_parser.xml2str(xmlDoc, false);
 
             // get the current file name
-            var fn = this.anns[this.ann_idx]._fh.name;
+            var fn = this.anns[this.ann_idx]._filename;
 
             // create a new name for suggestion
             var new_fn = 'copy_of_' + fn;
@@ -279,7 +284,7 @@ var app_hotpot = {
 
         fn2idx: function(fn) {
             for (let i = 0; i < this.anns.length; i++) {
-                if (this.anns[i]._fh.name == fn) {
+                if (this.anns[i]._filename == fn) {
                     return i;
                 }                
             }
@@ -575,7 +580,7 @@ var app_hotpot = {
                 const txt_ann = this.txt_anns[i];
                 
                 // create new filename
-                var fn = txt_ann._fh.name;
+                var fn = txt_ann._filename;
 
                 // get the xml string
                 var xml = ann_parser.ann2xml(txt_ann, this.dtd);
@@ -663,7 +668,20 @@ var app_hotpot = {
                 this.iaa_ann_list[0].anns,
                 this.iaa_ann_list[1].anns
             );
+            this.iaa_dict = iaa_dict;
             console.log('* iaa result:', iaa_dict);
+        },
+
+        get_rst: function(obj) {
+            if (this.iaa_display_tag_name == '__all__') {
+                return obj.all;
+            } else {
+                return obj.tag[this.iaa_display_tag_name];
+            }
+        },
+
+        on_change_iaa_settings: function(event) {
+            console.log('* changed attr in', event.target);
         },
 
         /////////////////////////////////////////////////////////////////
@@ -890,7 +908,7 @@ var app_hotpot = {
 
         has_included: function(fn, anns) {
             for (let i = 0; i < anns.length; i++) {
-                if (anns[i]._fh.name == fn) {
+                if (anns[i]._filename == fn) {
                     return true;
                 }
             }
@@ -969,6 +987,14 @@ var app_hotpot = {
                 }
             }
             return attlists;
+        },
+
+        to_fixed: function(v) {
+            return v.toFixed(2);
+        },
+
+        to_width: function(v) {
+            return v * 100;
         }
     },
 
@@ -1075,7 +1101,7 @@ var app_hotpot = {
         // check the schema first
         if (ann.dtd_name != this.vpp.$data.dtd.name) {
             console.log('* skip unmatched ann', ann);
-            app_hotpot.msg('Skipped unmatched file ' + ann._fh.name, 'warning');
+            app_hotpot.msg('Skipped unmatched file ' + ann._filename, 'warning');
             return;
         }
 
@@ -2146,7 +2172,6 @@ var app_hotpot = {
     },
 
     cm_sen_spans2range: function(spans, ann) {
-
         var span_pos_0 = parseInt(spans.split('~')[0]);
         var span_pos_1 = parseInt(spans.split('~')[1]);
 
