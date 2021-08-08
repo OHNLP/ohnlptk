@@ -582,8 +582,14 @@ input[type=text].ipt-md {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
+.iaa-bar-value {
+    font-size: 0.9em;
+}
 .iaa-bar-filename-box {
     width: 150px;
+}
+.iaa-file-cm-box {
+    font-size: 0.8em;
 }
 .iaa-tag-name {
     text-align: center;
@@ -1741,13 +1747,26 @@ input[type=text].ipt-md {
                                     B: {{ ann_rst.anns[1]._filename }}
                                 </div>
                             </div>
-                            <div class="iaa-bar-box d-flex flex-row flex-align-center flex-justify-start mr-1">
-                                <div v-bind:style="'width:' + to_width(get_rst(ann_rst.rst)['f1']) + 'px'"
-                                    class="iaa-bar">
-                                    &nbsp;
+                            <div class="d-flex flex-column">
+                                <div class="iaa-bar-box d-flex flex-row flex-align-center flex-justify-start mr-1">
+                                    <div v-bind:style="'width:' + to_width(get_rst(ann_rst.rst)['f1']) + 'px'"
+                                        class="iaa-bar">
+                                        &nbsp;
+                                    </div>
+                                    <div class="iaa-bar-value ml-1">
+                                        {{ to_fixed(get_rst(ann_rst.rst)['f1']) }}
+                                    </div>
                                 </div>
-                                <div class="ml-1">
-                                    {{ to_fixed(get_rst(ann_rst.rst)['f1']) }}
+                                <div class="iaa-file-cm-box">
+                                    <span class="mr-2">
+                                        TP: {{ get_rst(ann_rst.rst).cm.tp }}
+                                    </span>
+                                    <span class="mr-2">
+                                        FP: {{ get_rst(ann_rst.rst).cm.fp }}
+                                    </span>
+                                    <span class="mr-2">
+                                        FN: {{ get_rst(ann_rst.rst).cm.fn }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -1771,11 +1790,15 @@ input[type=text].ipt-md {
                         <div class="w-100 d-flex flex-row">
 
                             <div class="iaa-tag-detail-header iaa-tag-detail-a w-50">
-                                A: {{ iaa_dict.ann[iaa_display_hashcode].anns[0]._filename }}
+                                <i class="fa fa-user"></i>
+                                A 
+                                {{ iaa_dict.ann[iaa_display_hashcode].anns[0]._filename }}
                             </div>
 
                             <div class="iaa-tag-detail-header w-50">
-                                B: {{ iaa_dict.ann[iaa_display_hashcode].anns[1]._filename }}
+                                <i class="fa fa-user"></i>
+                                B
+                                {{ iaa_dict.ann[iaa_display_hashcode].anns[1]._filename }}
                             </div>
                             
                         </div>
@@ -1788,8 +1811,14 @@ input[type=text].ipt-md {
                                 <i class="fa fa-tag mr-1"
                                     v-bind:class="'fg-tag-' + tag_name">
                                 </i>
-                                <span>
+                                <span class="mr-2">
                                     {{ tag_name }}
+                                </span>
+                                <span class="mr-2">
+                                    TP: {{ tag_rst.cm.tp }}
+                                </span>
+                                <span>
+                                    FP + FN: {{ tag_rst.cm.fp + tag_rst.cm.fn }}
                                 </span>
                             </div>
 
