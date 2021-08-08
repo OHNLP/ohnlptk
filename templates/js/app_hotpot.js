@@ -51,6 +51,7 @@ var app_hotpot = {
         iaa_display_hashcode: null,
         iaa_display_tags_context: true,
         iaa_display_tags_tp: false,
+        force_module_update: Math.random(), // for updating the sub module
 
         // cm settings
         cm: {

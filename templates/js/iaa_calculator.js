@@ -290,7 +290,10 @@ var iaa_calculator = {
 
     spans2loc: function(spans) {
         var vs = spans.split('~');
-        return [vs[0], vs[1]];
+        return [
+            parseInt(vs[0]), 
+            parseInt(vs[1])
+        ];
     },
 
     is_overlapped: function(loc_a, loc_b) {
