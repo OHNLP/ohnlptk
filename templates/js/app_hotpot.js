@@ -17,6 +17,9 @@ var app_hotpot = {
         ann_idx: null,
         anns: [],
 
+        // for showing the tag by tag_name,
+        display_tag_name: '__all__',
+
         // for the hints of current ann
         hints: [],
 
