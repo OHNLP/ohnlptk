@@ -662,6 +662,17 @@ var app_hotpot = {
         /////////////////////////////////////////////////////////////////
         // IAA Related
         /////////////////////////////////////////////////////////////////
+        clear_iaa_all: function() {
+            // clear everything related to iaa
+            this.iaa_ann_list[0].anns = [];
+            this.iaa_ann_list[1].anns = [];
+
+            this.iaa_dict = null;
+
+            this.iaa_display_tag_name = '__all__';
+            this.iaa_display_hashcode = null;
+        },
+
         add_iaa_ann: function(ann, iaa_id) {
             this.iaa_ann_list[iaa_id].anns.push(ann);
         },

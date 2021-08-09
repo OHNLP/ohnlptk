@@ -1048,6 +1048,19 @@ input[type=text].ipt-md {
             <!-- the section for iaa -->
             <div class="section" id="section-1-6"
                 v-bind:class="{'active': section=='iaa'}">
+
+                <div class="group">
+                    <button class="ribbon-button"
+                        v-on:click="clear_iaa_all">
+                        <span class="icon">
+                            <i class="far fa-times-circle"></i>
+                        </span>
+                        <span class="caption">Clear All</span>
+                    </button>
+
+                    <span class="title">&nbsp;</span>
+                </div>
+
                 <div class="group">
 
                     <div id="dropzone_iaa_0" class="dropzone-iaa"
@@ -1087,14 +1100,6 @@ input[type=text].ipt-md {
                             in {{ iaa_ann_list[1].anns.length }} Files
                         </div>
                     </div>
-
-                    <!-- <button class="ribbon-button"
-                        v-on:click="open_dtd_file">
-                        <span class="icon">
-                            <i class="far fa-file"></i>
-                        </span>
-                        <span class="caption">Open DTD</span>
-                    </button> -->
 
                     <span class="title">Annotation Files</span>
                 </div>
