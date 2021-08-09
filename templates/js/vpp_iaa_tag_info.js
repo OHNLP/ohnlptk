@@ -46,14 +46,17 @@ Vue.component('iaa-tag-info', {
     },
 
     props: [
+        'cm',
         'tag',
         'ann',
         'dtd',
+        'iaa_display_tags_context',
         'force_module_update',
     ],
 
     template: `
 <div class="iaa-tag-detail-info w-100 d-flex flex-column" 
+    v-bind:class="'iaa-tag-detail-info-' + cm"
     :force_module_update="force_module_update">
     <div class="d-flex flex-row flex-wrap flex-align-end">
         <div class="mr-2">
@@ -76,7 +79,7 @@ Vue.component('iaa-tag-info', {
             <div class="iaa-tag-attlist-name">
                 &nbsp;{{ attlist.name }}:
             </div> 
-            
+
             <div>
                 &nbsp;{{ tag[attlist.name] }}
             </div>
@@ -84,7 +87,8 @@ Vue.component('iaa-tag-info', {
         </div>
     </div>
 
-    <div v-html="get_iaa_context_html(tag, ann)"
+    <div v-if="iaa_display_tags_context"
+        v-html="get_iaa_context_html(tag, ann)"
         class="iaa-tag-context mt-1">
     </div>  
 </div>   

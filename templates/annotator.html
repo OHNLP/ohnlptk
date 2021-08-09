@@ -500,6 +500,15 @@ input[type=text].ipt-md {
     border: 0;
     border: 1px solid #999999;
 }
+input[type=text].ipt-spinner-xs {
+    font-size: 1em;
+    line-height: 1em;
+    height: 1.4em;
+    padding: 2px 3px;
+    max-width: 80px;
+    display: inline;
+    border: 0;
+}
 .icon-fg-unsaved {
     color: #daaf5f;
 }
@@ -613,9 +622,18 @@ input[type=text].ipt-md {
     margin-bottom: 5px;
 }
 .iaa-tag-detail-info {
-    border: 1px solid #dfdfdf;
+    border: 1px;
     border-radius: 5px;
     padding: 5px;
+}
+.iaa-tag-detail-info-TP {
+    border: 1px solid #61a51d;
+}
+.iaa-tag-detail-info-FP {
+    border: 1px dotted #ff7878;
+}
+.iaa-tag-detail-info-FN {
+    border: 1px dotted #ff7878;
 }
 .iaa-tag-detail-a {
     margin-right: 5px;
@@ -881,6 +899,18 @@ input[type=text].ipt-md {
                             <span class="caption">Off</span>
                         </button>
                     </div>
+
+                    <div>
+
+                        <button class="ribbon-button" 
+                            v-on:click="show_about">
+                            <span class="icon">
+                                <i class="fa fa-check-double"></i>
+                            </span>
+                            <span class="caption">Accept All</span>
+                        </button>
+                        
+                    </div>
     
                     <span class="title">Hint Mode</span>
                 </div>
@@ -1105,6 +1135,43 @@ input[type=text].ipt-md {
                 </div>
 
                 <div class="group">
+                    <div class="mr-1">
+                        <input type="radio" name="match_mode" 
+                            value="overlap" 
+                            data-role="radio" 
+                            data-caption="<i class='fa fa-align-center'></i> Overlap" checked 
+                            v-model="iaa_match_mode"
+                            @change="on_change_iaa_settings">
+                        <br>
+                        <input type="radio" name="match_mode" 
+                            value="exact" 
+                            data-role="radio" 
+                            data-caption="<i class='fa fa-align-justify'></i> Exact" 
+                            v-model="iaa_match_mode"
+                            @change="on_change_iaa_settings">
+                    </div>
+                    
+                    <div v-if="iaa_match_mode == 'overlap'"
+                        class="p-1 ml-1 mr-1 border bd-gray border-radius">
+
+                        <div class="mt-1 mb-1">
+                            <i class="fa fa-percentage"></i>
+                            Overlap Ratio
+                        </div>
+
+                        <div>        
+                            <input id="iaa_form_overlap_ratio" 
+                                name="iaa_form_overlap_ratio" 
+                                style="width: 52px"
+                                type="text" class="ipt-md mr-1" 
+                                v-model.number="iaa_overlap_ratio">
+
+                            <button title="Reset the overlap ratio"
+                                v-on:click="iaa_overlap_ratio = iaa_overlap_ratio_default">
+                                <i class="fa fa-sync"></i>
+                            </button>
+                        </div>
+                    </div>
 
                     <button class="ribbon-button"
                         v-on:click="calc_iaa">
@@ -1830,25 +1897,58 @@ input[type=text].ipt-md {
                                 </span>
                             </div>
 
+                            <div v-if="iaa_display_tags_tp"
+                                class="iaa-tag-rsts-tp w-100">
+                                <!-- last, show the TP group -->
+                                <div v-for="tags_tp in tag_rst.cm.tags.tp"
+                                    class="iaa-tag-detail w-100 d-flex flex-row">
+                                    <div class="iaa-tag-detail-a w-50">
+                                        <iaa-tag-info
+                                            v-bind:cm="'TP'"
+                                            v-bind:tag="tags_tp[0]"
+                                            v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[0]"
+                                            v-bind:dtd="dtd"
+                                            v-bind:iaa_display_tags_context="iaa_display_tags_context"
+                                            v-bind:force_update="force_module_update"
+                                        ></iaa-tag-info>
+                                    </div>
+                                    <div class="iaa-tag-detail-b w-50">
+                                        <iaa-tag-info
+                                            v-bind:cm="'TP'"
+                                            v-bind:tag="tags_tp[1]"
+                                            v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[1]"
+                                            v-bind:dtd="dtd"
+                                            v-bind:iaa_display_tags_context="iaa_display_tags_context"
+                                            v-bind:force_update="force_module_update"
+                                        ></iaa-tag-info>
+                                    </div>
+                                </div>
+
+                            </div>                            
+
                             <div class="iaa-tag-rsts-fp w-100">
                                 <!-- first, show the FP group -->
                                 <div v-for="tags_fp in tag_rst.cm.tags.fp"
                                     class="iaa-tag-detail w-100 d-flex flex-row">
                                     <div class="iaa-tag-detail-a w-50">
                                         <iaa-tag-info
+                                            v-bind:cm="'FP'"
                                             v-bind:tag="tags_fp[0]"
                                             v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[0]"
                                             v-bind:dtd="dtd"
+                                            v-bind:iaa_display_tags_context="iaa_display_tags_context"
                                             v-bind:force_update="force_module_update"
                                         ></iaa-tag-info>
                                     </div>
 
                                     <div class="iaa-tag-detail-b w-50">
                                         <iaa-tag-info
+                                            v-bind:cm="'FP'"
                                             v-if="tags_fp[1] != null"
                                             v-bind:tag="tags_fp[1]"
                                             v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[1]"
                                             v-bind:dtd="dtd"
+                                            v-bind:iaa_display_tags_context="iaa_display_tags_context"
                                             v-bind:force_update="force_module_update"
                                         ></iaa-tag-info>
                                     </div>
@@ -1864,38 +1964,15 @@ input[type=text].ipt-md {
                                     </div>
                                     <div class="iaa-tag-detail-b w-50">
                                         <iaa-tag-info
+                                            v-bind:cm="'FN'"
                                             v-bind:tag="tags_fn[1]"
                                             v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[1]"
                                             v-bind:dtd="dtd"
+                                            v-bind:iaa_display_tags_context="iaa_display_tags_context"
                                             v-bind:force_update="force_module_update"
                                         ></iaa-tag-info>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div v-if="iaa_display_tags_tp"
-                                class="iaa-tag-rsts-tp w-100">
-                                <!-- last, show the TP group -->
-                                <div v-for="tags_tp in tag_rst.cm.tags.tp"
-                                    class="iaa-tag-detail w-100 d-flex flex-row">
-                                    <div class="iaa-tag-detail-a w-50">
-                                        <iaa-tag-info
-                                            v-bind:tag="tags_tp[0]"
-                                            v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[0]"
-                                            v-bind:dtd="dtd"
-                                            v-bind:force_update="force_module_update"
-                                        ></iaa-tag-info>
-                                    </div>
-                                    <div class="iaa-tag-detail-b w-50">
-                                        <iaa-tag-info
-                                            v-bind:tag="tags_tp[1]"
-                                            v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[1]"
-                                            v-bind:dtd="dtd"
-                                            v-bind:force_update="force_module_update"
-                                        ></iaa-tag-info>
-                                    </div>
-                                </div>
-
                             </div>
                             
                         </div>

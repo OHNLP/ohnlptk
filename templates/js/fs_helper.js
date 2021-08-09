@@ -13,6 +13,9 @@ async function fs_read_txt_file_handle(fh) {
     // bind the fh
     ann._fh = fh;
 
+    // bind the filename seperately
+    ann._filename = fh.name;
+
     // bind a status
     ann._has_saved = true;
 

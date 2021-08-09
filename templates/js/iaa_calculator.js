@@ -1,8 +1,11 @@
 var iaa_calculator = {
 
-    evaluate_anns_on_dtd: function(dtd, anns_a, anns_b, match_mode) {
+    evaluate_anns_on_dtd: function(dtd, anns_a, anns_b, match_mode, overlap_ratio) {
         if (typeof(match_mode) == 'undefined') {
             match_mode = 'overlap';
+        }
+        if (typeof(overlap_ratio) == 'undefined') {
+            overlap_ratio = 0.01;
         }
         /* we will build a dictionary for this task
         {
@@ -72,7 +75,8 @@ var iaa_calculator = {
                 dtd,
                 ann_a,
                 ann_b,
-                match_mode
+                match_mode,
+                overlap_ratio
             );
 
             // save this result
@@ -110,9 +114,12 @@ var iaa_calculator = {
         return iaa_dict;
     },
 
-    evaluate_ann_on_dtd: function(dtd, ann_a, ann_b, match_mode) {
+    evaluate_ann_on_dtd: function(dtd, ann_a, ann_b, match_mode, overlap_ratio) {
         if (typeof(match_mode)=='undefined') {
             match_mode = 'overlap';
+        }
+        if (typeof(overlap_ratio) == 'undefined') {
+            overlap_ratio = 0.01;
         }
 
         // check the text first
@@ -131,7 +138,7 @@ var iaa_calculator = {
         var cm_ann = { tp: 0, fp: 0, fn: 0 };
         for (let i = 0; i < dtd.etags.length; i++) {
             const tag_def = dtd.etags[i];
-            var r = this.evaluate_ann_on_tag(tag_def, ann_a, ann_b, match_mode);
+            var r = this.evaluate_ann_on_tag(tag_def, ann_a, ann_b, match_mode, overlap_ratio);
             result_ann.tag[tag_def.name] = r;
 
             // add the result of this tag
@@ -147,9 +154,12 @@ var iaa_calculator = {
         return result_ann;
     },
 
-    evaluate_ann_on_tag: function(tag_def, ann_a, ann_b, match_mode) {
+    evaluate_ann_on_tag: function(tag_def, ann_a, ann_b, match_mode, overlap_ratio) {
         if (typeof(match_mode)=='undefined') {
             match_mode = 'overlap';
+        }
+        if (typeof(overlap_ratio) == 'undefined') {
+            overlap_ratio = 0.01;
         }
 
         // check the text first
@@ -164,15 +174,18 @@ var iaa_calculator = {
         var tag_list_a = this.get_tag_list_by_tag(tag_def, ann_a);
         var tag_list_b = this.get_tag_list_by_tag(tag_def, ann_b);
 
-        var cm = this.calc_matching(tag_list_a, tag_list_b);
+        var cm = this.calc_matching(tag_list_a, tag_list_b, match_mode, overlap_ratio);
         var result = this.calc_p_r_f1(cm);
 
         return result;
     },
 
-    calc_matching: function(tag_list_a, tag_list_b, match_mode) {
+    calc_matching: function(tag_list_a, tag_list_b, match_mode, overlap_ratio) {
         if (typeof(match_mode)=='undefined') {
             match_mode = 'overlap';
+        }
+        if (typeof(overlap_ratio) == 'undefined') {
+            overlap_ratio = 0.01;
         }
         var cm = {
             tp: 0,
@@ -200,7 +213,8 @@ var iaa_calculator = {
             var is_match = this.is_tag_in_list(
                 tag_a, 
                 tag_list_b, 
-                match_mode
+                match_mode,
+                overlap_ratio
             );
 
             console.log('* a', tag_a.spans, is_match.is_in, 'b', is_match.tag_b);
@@ -227,6 +241,83 @@ var iaa_calculator = {
         cm.tags.fn = Object.values(tag_dict_b).map(tag => [null, tag]);
 
         return cm;
+    },
+
+    is_tag_in_list: function(tag, tag_list, match_mode, overlap_ratio) {
+        if (typeof(match_mode)=='undefined') {
+            match_mode = 'overlap';
+        }
+        if (typeof(overlap_ratio) == 'undefined') {
+            overlap_ratio = 0.01;
+        }
+        var spans = tag.spans;
+        var loc_a = this.spans2loc(spans);
+
+        // potential b
+        var p_tag_b = null;
+
+        for (let i = 0; i < tag_list.length; i++) {
+            const tag_b = tag_list[i];
+            var spans_b = tag_b.spans;
+
+            if (match_mode == 'overlap') {
+                // for overlap mode, check ranges of two spans
+                var loc_b = this.spans2loc(spans_b);
+                var is_olpd = this.is_overlapped(loc_a, loc_b, overlap_ratio);
+                if (is_olpd[0]) {
+                    return { 
+                        is_in: true,
+                        tag_b: tag_b
+                    };
+                }
+                if (is_olpd[1] > 0) {
+                    p_tag_b = tag_b;
+                }
+                
+            } else if (match_mode == 'exact') {
+
+                if (spans == spans_b) {
+                    return {
+                        is_in: true,
+                        tag_b: tag_b
+                    };
+                }
+            }
+        }
+
+        return {
+            is_in: false,
+            tag_b: p_tag_b
+        };
+    },
+
+    is_overlapped: function(loc_a, loc_b, overlap_ratio) {
+        if (typeof(overlap_ratio)=='undefined') {
+            overlap_ratio = 0.01;
+        }
+        
+        var s_a = new Set(new Array(loc_a[1] - loc_a[0] + 1).fill(loc_a[0]).map((e,i)=>e+i));
+        var s_b = new Set(new Array(loc_b[1] - loc_b[0] + 1).fill(loc_b[0]).map((e,i)=>e+i));
+
+        var s_inter = this.set_intersection(s_a, s_b);
+        var s_union = this.set_union(s_a, s_b);
+        var r = s_inter.size / s_union.size;
+
+        // console.log('* is overlapped', loc_a, '', loc_b, 'i:', s_inter.size, 'u:', s_union.size, 'r:', r);
+
+        if (r >= overlap_ratio) {
+            return [true, r];
+        } else {
+            return [false, r]
+        }
+    },
+
+    spans2loc: function(spans) {
+        var vs = spans.split('~');
+        return [
+            parseInt(vs[0]), 
+            parseInt(vs[1])
+        ];
     },
 
     calc_p_r_f1: function(cm) {
@@ -258,80 +349,6 @@ var iaa_calculator = {
 
     calc_f1_by_pr: function(precision, recall) {
         return 2 * precision * recall / (precision + recall);
-    },
-
-    is_tag_in_list: function(tag, tag_list, match_mode) {
-        if (typeof(match_mode)=='undefined') {
-            match_mode = 'overlap';
-        }
-        var spans = tag.spans;
-        var loc_a = this.spans2loc(spans);
-
-        // potential b
-        var p_tag_b = null;
-
-        for (let i = 0; i < tag_list.length; i++) {
-            const tag_b = tag_list[i];
-            var spans_b = tag_b.spans;
-
-            if (match_mode == 'overlap') {
-                // for overlap mode, check ranges of two spans
-                var loc_b = this.spans2loc(spans_b);
-                var is_olpd = this.is_overlapped(loc_a, loc_b);
-                if (is_olpd[0]) {
-                    return { 
-                        is_in: true,
-                        tag_b: tag_b
-                    };
-                }
-                if (is_olpd[1] > 0) {
-                    p_tag_b = tag_b;
-                }
-                
-            } else if (match_mode == 'exact') {
-
-                if (spans == spans_b) {
-                    return {
-                        is_in: true,
-                        tag_b: tag_b
-                    };
-                }
-            }
-        }
-
-        return {
-            is_in: false,
-            tag_b: p_tag_b
-        };
-    },
-
-    spans2loc: function(spans) {
-        var vs = spans.split('~');
-        return [
-            parseInt(vs[0]), 
-            parseInt(vs[1])
-        ];
-    },
-
-    is_overlapped: function(loc_a, loc_b, ratio) {
-        if (typeof(ratio)=='undefined') {
-            ratio = 0.5;
-        }
-        
-        var s_a = new Set(new Array(loc_a[1] - loc_a[0] + 1).fill(loc_a[0]).map((e,i)=>e+i));
-        var s_b = new Set(new Array(loc_b[1] - loc_b[0] + 1).fill(loc_b[0]).map((e,i)=>e+i));
-
-        var s_inter = this.set_intersection(s_a, s_b);
-        var s_union = this.set_union(s_a, s_b);
-        var r = s_inter.size / s_union.size;
-
-        // console.log('* is overlapped', loc_a, '', loc_b, 'i:', s_inter.size, 'u:', s_union.size, 'r:', r);
-
-        if (r >= ratio) {
-            return [true, r];
-        } else {
-            return [false, r]
-        }
     },
 
     get_tag_list_by_tag: function(tag_def, ann) {
