@@ -203,6 +203,8 @@ var iaa_calculator = {
                 match_mode
             );
 
+            console.log('* a', tag_a.spans, is_match.is_in, 'b', is_match.tag_b);
+
             if (is_match.is_in) {
                 cm.tp += 1;
                 cm.tags.tp.push([tag_a, is_match.tag_b]);
@@ -212,7 +214,12 @@ var iaa_calculator = {
 
             } else {
                 cm.fp += 1;
-                cm.tags.fp.push([tag_a, null])
+                cm.tags.fp.push([
+                    tag_a, 
+                    // usually, the tag_b is null,
+                    // but sometimes it is not
+                    is_match.tag_b
+                ])
             }
         }
 
@@ -259,17 +266,26 @@ var iaa_calculator = {
         }
         var spans = tag.spans;
         var loc_a = this.spans2loc(spans);
+
+        // potential b
+        var p_tag_b = null;
+
         for (let i = 0; i < tag_list.length; i++) {
-            var tag_b = tag_list[i];
+            const tag_b = tag_list[i];
             var spans_b = tag_b.spans;
+
             if (match_mode == 'overlap') {
                 // for overlap mode, check ranges of two spans
                 var loc_b = this.spans2loc(spans_b);
-                if (this.is_overlapped(loc_a, loc_b)) {
+                var is_olpd = this.is_overlapped(loc_a, loc_b);
+                if (is_olpd[0]) {
                     return { 
                         is_in: true,
                         tag_b: tag_b
                     };
+                }
+                if (is_olpd[1] > 0) {
+                    p_tag_b = tag_b;
                 }
                 
             } else if (match_mode == 'exact') {
@@ -282,9 +298,10 @@ var iaa_calculator = {
                 }
             }
         }
+
         return {
             is_in: false,
-            tag_b: null
+            tag_b: p_tag_b
         };
     },
 
@@ -296,14 +313,25 @@ var iaa_calculator = {
         ];
     },
 
-    is_overlapped: function(loc_a, loc_b) {
-        if (loc_a[0] >= loc_b[0] && loc_a[0] < loc_b[1]) {
-            return true;
+    is_overlapped: function(loc_a, loc_b, ratio) {
+        if (typeof(ratio)=='undefined') {
+            ratio = 0.5;
         }
-        if (loc_a[1] > loc_b[0] && loc_a[1] <= loc_b[1]) {
-            return true;
+        
+        var s_a = new Set(new Array(loc_a[1] - loc_a[0] + 1).fill(loc_a[0]).map((e,i)=>e+i));
+        var s_b = new Set(new Array(loc_b[1] - loc_b[0] + 1).fill(loc_b[0]).map((e,i)=>e+i));
+
+        var s_inter = this.set_intersection(s_a, s_b);
+        var s_union = this.set_union(s_a, s_b);
+        var r = s_inter.size / s_union.size;
+
+        // console.log('* is overlapped', loc_a, '', loc_b, 'i:', s_inter.size, 'u:', s_union.size, 'r:', r);
+
+        if (r >= ratio) {
+            return [true, r];
+        } else {
+            return [false, r]
         }
-        return false;
     },
 
     get_tag_list_by_tag: function(tag_def, ann) {
@@ -331,4 +359,22 @@ var iaa_calculator = {
         h2 = Math.imul(h2 ^ (h2>>>16), 2246822507) ^ Math.imul(h1 ^ (h1>>>13), 3266489909);
         return 4294967296 * (2097151 & h2) + (h1>>>0);
     },
+
+    set_union: function(setA, setB) {
+        let _union = new Set(setA)
+        for (let elem of setB) {
+            _union.add(elem)
+        }
+        return _union
+    },
+    
+    set_intersection: function(setA, setB) {
+        let _intersection = new Set()
+        for (let elem of setB) {
+            if (setA.has(elem)) {
+                _intersection.add(elem)
+            }
+        }
+        return _intersection
+    }
 };

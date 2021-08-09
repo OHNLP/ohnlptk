@@ -1830,26 +1830,32 @@ input[type=text].ipt-md {
                                 </span>
                             </div>
 
-                            <div class="w-100">
+                            <div class="iaa-tag-rsts-fp w-100">
                                 <!-- first, show the FP group -->
-                                <div v-for="tags_tp in tag_rst.cm.tags.fp"
+                                <div v-for="tags_fp in tag_rst.cm.tags.fp"
                                     class="iaa-tag-detail w-100 d-flex flex-row">
                                     <div class="iaa-tag-detail-a w-50">
                                         <iaa-tag-info
-                                            v-bind:tag="tags_tp[0]"
+                                            v-bind:tag="tags_fp[0]"
                                             v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[0]"
                                             v-bind:dtd="dtd"
                                             v-bind:force_update="force_module_update"
-                                        ></iaa-tag-info>                                     
+                                        ></iaa-tag-info>
                                     </div>
 
                                     <div class="iaa-tag-detail-b w-50">
-                                        &nbsp;
+                                        <iaa-tag-info
+                                            v-if="tags_fp[1] != null"
+                                            v-bind:tag="tags_fp[1]"
+                                            v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[1]"
+                                            v-bind:dtd="dtd"
+                                            v-bind:force_update="force_module_update"
+                                        ></iaa-tag-info>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="w-100">
+                            <div class="iaa-tag-rsts-fn w-100">
                                 <!-- second, show the FN group -->
                                 <div v-for="tags_fn in tag_rst.cm.tags.fn"
                                     class="iaa-tag-detail w-100 d-flex flex-row">
@@ -1868,7 +1874,7 @@ input[type=text].ipt-md {
                             </div>
 
                             <div v-if="iaa_display_tags_tp"
-                                class="w-100">
+                                class="iaa-tag-rsts-tp w-100">
                                 <!-- last, show the TP group -->
                                 <div v-for="tags_tp in tag_rst.cm.tags.tp"
                                     class="iaa-tag-detail w-100 d-flex flex-row">
@@ -2201,6 +2207,13 @@ var jarvis = {
         var json_text = JSON.stringify(obj, null, 4);
         var blob = new Blob([json_text], {type: "text/json;charset=utf-8"});
         saveAs(blob, fn);
+    },
+
+    save_vpp: function() {
+        this.save_json(
+            app_hotpot.vpp.$data,
+            'vpp_data_sample.json'
+        );
     }
 }
 
