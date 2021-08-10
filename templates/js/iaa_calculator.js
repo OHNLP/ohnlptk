@@ -27,48 +27,87 @@ var iaa_calculator = {
         var iaa_dict = {
             ann: {}, // for the file
             all: {},
-            tag: {}
+            tag: {},
+            stat: {
+                duplicates: [],
+                unmatched: [],
+                matched_hashcodes: []
+            },
         };
-        var stat = {
-            duplicates: [],
-            unmatched: [],
-        };
+
+        // this is just for checking dupliated ann
+        var ann_dict = {};
         
         // first, let's check all anns_a
         for (let i = 0; i < anns_a.length; i++) {
             const ann_a = anns_a[i];
             var hashcode = this.hash(ann_a.text);
 
-            if (iaa_dict.hasOwnProperty(hashcode)) {
+            if (ann_dict.hasOwnProperty(hashcode)) {
                 // what??? duplicated text in anns_a?
-                stat.duplicates.push(ann_a);
-                console.log('* found duplicated ann', ann_a);
+                console.log('* found duplicated ann a', ann_a);
+                iaa_dict.stat.duplicates.push({
+                    ann: ann_a,
+                    from: 'a'
+                });
                 continue;
             }
 
             // ok, let's create a new item here
-            iaa_dict.ann[hashcode] = {
-                anns: [ann_a],
-                rst: {},
-            }
+            ann_dict[hashcode] = [{
+                ann: ann_a,
+                from: 'a'
+            }];
         }
 
         // second, let's check all anns_b
         for (let i = 0; i < anns_b.length; i++) {
             const ann_b = anns_b[i];
             var hashcode = this.hash(ann_b.text);
-            
-            if (!iaa_dict.ann.hasOwnProperty(hashcode)) {
-                // what, this text is NOT in anns_a?
-                stat.unmatched.push(ann_b);
-                console.log('* found unmatched ann', ann_b);
+
+            if (ann_dict.hasOwnProperty(hashcode)) {
+                if (ann_dict[hashcode].length > 1) {
+                    // this is a dupliated ann
+                    iaa_dict.stat.duplicates.push({
+                        ann: ann_b,
+                        from: 'b'
+                    });
+                    console.log('* found duplicated ann b', ann_b);
+
+                    continue;
+                }
+            } else {
+                // which means this ann has no ann in a
+                ann_dict[hashcode] = [{
+                    ann: ann_b,
+                    from: 'b'
+                }];
+                iaa_dict.stat.unmatched.push({
+                    ann: ann_b,
+                    from: 'b'
+                });
+                console.log('* found unmatched ann b', ann_b);
                 continue;
             }
-            // let's save this ann_b
-            iaa_dict.ann[hashcode].anns.push(ann_b);
-
+            
             // OK, this ann_b could be matched with ann_a
-            var ann_a = iaa_dict.ann[hashcode].anns[0];
+            var ann_a = ann_dict[hashcode][0].ann;
+            iaa_dict.ann[hashcode] = {
+                anns: [
+                    ann_a,
+                    ann_b
+                ],
+                rst: {},
+            };
+
+            // save the hashcode
+            iaa_dict.stat.matched_hashcodes.push(hashcode);
+            
+            // let's save this ann_b
+            ann_dict[hashcode].push({ 
+                ann: ann_b,
+                from: 'b'
+            });
 
             // now, time to evaluate
             var rst = this.evaluate_ann_on_dtd(
@@ -81,6 +120,19 @@ var iaa_calculator = {
 
             // save this result
             iaa_dict.ann[hashcode].rst = rst;
+        }
+
+        // third, check if there is any unmatched from ann a
+        for (const hashcode in ann_dict) {
+            if (Object.hasOwnProperty.call(ann_dict, hashcode)) {
+                if (ann_dict[hashcode].length == 1 &&
+                    ann_dict[hashcode][0].from == 'a') {
+                    // which means ... this ann is not used for matching
+                    iaa_dict.stat.unmatched.push(ann_dict[hashcode][0]);
+
+                    console.log('* found unmatched ann a', ann_dict[hashcode][0].ann);
+                }
+            }
         }
 
         // finally, calculate the result at all and tag levels

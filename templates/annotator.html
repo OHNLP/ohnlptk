@@ -1763,10 +1763,13 @@ input[type=text].ipt-spinner-xs {
 
                         <div class="mt-3">
                             <p>
-                                Text Matched Files: <b>2</b>
+                                Text Matched Files: <b>{{ iaa_dict.stat.matched_hashcodes.length }}</b>
                             </p>
                             <p>
-                                Unmatched Files: <b>0</b>
+                                Duplicated Files: <b>{{ iaa_dict.stat.duplicates.length }}</b>
+                            </p>
+                            <p>
+                                Unmatched Files: <b>{{ iaa_dict.stat.unmatched.length }}</b>
                             </p>
                         </div>
                     </div>
@@ -2060,6 +2063,7 @@ input[type=text].ipt-spinner-xs {
 
     <!-- the context menu -->
     <div v-if="dtd != null"
+        style="display: none;"
         id="ctxmenu_sel">
         <!-- <li class="ui-widget-header"
             v-on:click="close_ctxmenu">Tags:</li> -->
@@ -2085,6 +2089,7 @@ input[type=text].ipt-spinner-xs {
 
     <!-- the tag click menu -->
     <div v-if="dtd != null"
+        style="display: none;"
         id="popmenu_tag">
         <li class="ui-widget-header"
             v-on:click="close_popmenu">

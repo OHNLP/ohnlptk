@@ -1,5 +1,5 @@
 {
-    "section": "annotation",
+    "section": "iaa",
     "dtd": {
         "id_prefixd": {
             "V": {
@@ -19720,6 +19720,479 @@
                     }
                 }
             },
+            "598660722492379": {
+                "anns": [
+                    {
+                        "text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no. 030M20A) for COVID-19 vaccination. The occurrence of additional non-serious events is detailed below.     Concurrent medical conditions included Epileptic seizure.    On 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form. On 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever). At the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.        The action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.   For mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded.",
+                        "dtd_name": "COVID_VAX_AE",
+                        "tags": [
+                            {
+                                "tag": "VAX",
+                                "spans": "191~198",
+                                "text": "Moderna",
+                                "id": "V0",
+                                "comment": ""
+                            },
+                            {
+                                "tag": "PYREXIA",
+                                "spans": "19~24",
+                                "text": "fever",
+                                "id": "P0",
+                                "tense": "past",
+                                "certainty": "past",
+                                "comment": ""
+                            },
+                            {
+                                "tag": "PYREXIA",
+                                "spans": "632~639",
+                                "text": "PYREXIA",
+                                "id": "P1",
+                                "tense": "past",
+                                "certainty": "past",
+                                "comment": ""
+                            }
+                        ],
+                        "_fh": {},
+                        "_filename": "A_Pyrexia_08.txt_hh.xml",
+                        "_has_saved": true,
+                        "_sentences": [
+                            {
+                                "text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no.",
+                                "spans": {
+                                    "start": 0,
+                                    "end": 227
+                                }
+                            },
+                            {
+                                "text": "030M20A) for COVID-19 vaccination.",
+                                "spans": {
+                                    "start": 228,
+                                    "end": 262
+                                }
+                            },
+                            {
+                                "text": "The occurrence of additional non-serious events is detailed below.",
+                                "spans": {
+                                    "start": 263,
+                                    "end": 329
+                                }
+                            },
+                            {
+                                "text": "Concurrent medical conditions included Epileptic seizure.",
+                                "spans": {
+                                    "start": 334,
+                                    "end": 391
+                                }
+                            },
+                            {
+                                "text": "On 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form.",
+                                "spans": {
+                                    "start": 395,
+                                    "end": 513
+                                }
+                            },
+                            {
+                                "text": "On 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever).",
+                                "spans": {
+                                    "start": 514,
+                                    "end": 648
+                                }
+                            },
+                            {
+                                "text": "At the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.",
+                                "spans": {
+                                    "start": 649,
+                                    "end": 744
+                                }
+                            },
+                            {
+                                "text": "The action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.",
+                                "spans": {
+                                    "start": 752,
+                                    "end": 833
+                                }
+                            },
+                            {
+                                "text": "For mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded.",
+                                "spans": {
+                                    "start": 836,
+                                    "end": 1140
+                                }
+                            }
+                        ],
+                        "_sentences_text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no.\n030M20A) for COVID-19 vaccination.\nThe occurrence of additional non-serious events is detailed below.\nConcurrent medical conditions included Epileptic seizure.\nOn 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form.\nOn 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever).\nAt the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.\nThe action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.\nFor mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded."
+                    },
+                    {
+                        "text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no. 030M20A) for COVID-19 vaccination. The occurrence of additional non-serious events is detailed below.     Concurrent medical conditions included Epileptic seizure.    On 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form. On 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever). At the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.        The action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.   For mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded.",
+                        "dtd_name": "COVID_VAX_AE",
+                        "tags": [
+                            {
+                                "tag": "VAX",
+                                "spans": "191~198",
+                                "text": "Moderna",
+                                "id": "V0",
+                                "comment": ""
+                            },
+                            {
+                                "tag": "OTHER_AE",
+                                "spans": "0~17",
+                                "text": "multiple seizures",
+                                "id": "O0",
+                                "comment": ""
+                            },
+                            {
+                                "tag": "PYREXIA",
+                                "spans": "19~24",
+                                "text": "fever",
+                                "id": "P0",
+                                "tense": "past",
+                                "certainty": "past",
+                                "comment": ""
+                            }
+                        ],
+                        "_fh": {},
+                        "_filename": "B_Pyrexia_08.txt_mm.xml",
+                        "_has_saved": true,
+                        "_sentences": [
+                            {
+                                "text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no.",
+                                "spans": {
+                                    "start": 0,
+                                    "end": 227
+                                }
+                            },
+                            {
+                                "text": "030M20A) for COVID-19 vaccination.",
+                                "spans": {
+                                    "start": 228,
+                                    "end": 262
+                                }
+                            },
+                            {
+                                "text": "The occurrence of additional non-serious events is detailed below.",
+                                "spans": {
+                                    "start": 263,
+                                    "end": 329
+                                }
+                            },
+                            {
+                                "text": "Concurrent medical conditions included Epileptic seizure.",
+                                "spans": {
+                                    "start": 334,
+                                    "end": 391
+                                }
+                            },
+                            {
+                                "text": "On 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form.",
+                                "spans": {
+                                    "start": 395,
+                                    "end": 513
+                                }
+                            },
+                            {
+                                "text": "On 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever).",
+                                "spans": {
+                                    "start": 514,
+                                    "end": 648
+                                }
+                            },
+                            {
+                                "text": "At the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.",
+                                "spans": {
+                                    "start": 649,
+                                    "end": 744
+                                }
+                            },
+                            {
+                                "text": "The action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.",
+                                "spans": {
+                                    "start": 752,
+                                    "end": 833
+                                }
+                            },
+                            {
+                                "text": "For mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded.",
+                                "spans": {
+                                    "start": 836,
+                                    "end": 1140
+                                }
+                            }
+                        ],
+                        "_sentences_text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no.\n030M20A) for COVID-19 vaccination.\nThe occurrence of additional non-serious events is detailed below.\nConcurrent medical conditions included Epileptic seizure.\nOn 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form.\nOn 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever).\nAt the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.\nThe action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.\nFor mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded."
+                    }
+                ],
+                "rst": {
+                    "all": {
+                        "precision": 0.6666666666666666,
+                        "recall": 0.6666666666666666,
+                        "f1": 0.6666666666666666,
+                        "cm": {
+                            "tp": 2,
+                            "fp": 1,
+                            "fn": 1
+                        }
+                    },
+                    "tag": {
+                        "VAX": {
+                            "precision": 1,
+                            "recall": 1,
+                            "f1": 1,
+                            "cm": {
+                                "tp": 1,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [
+                                        [
+                                            {
+                                                "tag": "VAX",
+                                                "spans": "191~198",
+                                                "text": "Moderna",
+                                                "id": "V0",
+                                                "comment": ""
+                                            },
+                                            {
+                                                "tag": "VAX",
+                                                "spans": "191~198",
+                                                "text": "Moderna",
+                                                "id": "V0",
+                                                "comment": ""
+                                            }
+                                        ]
+                                    ],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "PYREXIA": {
+                            "precision": 0.5,
+                            "recall": 1,
+                            "f1": 0.6666666666666666,
+                            "cm": {
+                                "tp": 1,
+                                "fp": 1,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [
+                                        [
+                                            {
+                                                "tag": "PYREXIA",
+                                                "spans": "19~24",
+                                                "text": "fever",
+                                                "id": "P0",
+                                                "tense": "past",
+                                                "certainty": "past",
+                                                "comment": ""
+                                            },
+                                            {
+                                                "tag": "PYREXIA",
+                                                "spans": "19~24",
+                                                "text": "fever",
+                                                "id": "P0",
+                                                "tense": "past",
+                                                "certainty": "past",
+                                                "comment": ""
+                                            }
+                                        ]
+                                    ],
+                                    "fp": [
+                                        [
+                                            {
+                                                "tag": "PYREXIA",
+                                                "spans": "632~639",
+                                                "text": "PYREXIA",
+                                                "id": "P1",
+                                                "tense": "past",
+                                                "certainty": "past",
+                                                "comment": ""
+                                            },
+                                            null
+                                        ]
+                                    ],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "CHILL": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "COUGH": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "FATIGUE": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "PAIN": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "HEADACHE": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "DIZZINESS": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "SORENESS": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "NAUSEA": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "DIARRHEA": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        },
+                        "OTHER_AE": {
+                            "precision": null,
+                            "recall": 0,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 1,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": [
+                                        [
+                                            null,
+                                            {
+                                                "tag": "OTHER_AE",
+                                                "spans": "0~17",
+                                                "text": "multiple seizures",
+                                                "id": "O0",
+                                                "comment": ""
+                                            }
+                                        ]
+                                    ]
+                                }
+                            }
+                        },
+                        "MEDICATION": {
+                            "precision": null,
+                            "recall": null,
+                            "f1": null,
+                            "cm": {
+                                "tp": 0,
+                                "fp": 0,
+                                "fn": 0,
+                                "tags": {
+                                    "tp": [],
+                                    "fp": [],
+                                    "fn": []
+                                }
+                            }
+                        }
+                    }
+                }
+            },
             "8202681260611356": {
                 "anns": [
                     {
@@ -23078,479 +23551,6 @@
                     }
                 }
             },
-            "598660722492379": {
-                "anns": [
-                    {
-                        "text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no. 030M20A) for COVID-19 vaccination. The occurrence of additional non-serious events is detailed below.     Concurrent medical conditions included Epileptic seizure.    On 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form. On 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever). At the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.        The action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.   For mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded.",
-                        "dtd_name": "COVID_VAX_AE",
-                        "tags": [
-                            {
-                                "tag": "VAX",
-                                "spans": "191~198",
-                                "text": "Moderna",
-                                "id": "V0",
-                                "comment": ""
-                            },
-                            {
-                                "tag": "PYREXIA",
-                                "spans": "19~24",
-                                "text": "fever",
-                                "id": "P0",
-                                "tense": "past",
-                                "certainty": "past",
-                                "comment": ""
-                            },
-                            {
-                                "tag": "PYREXIA",
-                                "spans": "632~639",
-                                "text": "PYREXIA",
-                                "id": "P1",
-                                "tense": "past",
-                                "certainty": "past",
-                                "comment": ""
-                            }
-                        ],
-                        "_fh": {},
-                        "_filename": "A_Pyrexia_08.txt_hh.xml",
-                        "_has_saved": true,
-                        "_sentences": [
-                            {
-                                "text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no.",
-                                "spans": {
-                                    "start": 0,
-                                    "end": 227
-                                }
-                            },
-                            {
-                                "text": "030M20A) for COVID-19 vaccination.",
-                                "spans": {
-                                    "start": 228,
-                                    "end": 262
-                                }
-                            },
-                            {
-                                "text": "The occurrence of additional non-serious events is detailed below.",
-                                "spans": {
-                                    "start": 263,
-                                    "end": 329
-                                }
-                            },
-                            {
-                                "text": "Concurrent medical conditions included Epileptic seizure.",
-                                "spans": {
-                                    "start": 334,
-                                    "end": 391
-                                }
-                            },
-                            {
-                                "text": "On 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form.",
-                                "spans": {
-                                    "start": 395,
-                                    "end": 513
-                                }
-                            },
-                            {
-                                "text": "On 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever).",
-                                "spans": {
-                                    "start": 514,
-                                    "end": 648
-                                }
-                            },
-                            {
-                                "text": "At the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.",
-                                "spans": {
-                                    "start": 649,
-                                    "end": 744
-                                }
-                            },
-                            {
-                                "text": "The action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.",
-                                "spans": {
-                                    "start": 752,
-                                    "end": 833
-                                }
-                            },
-                            {
-                                "text": "For mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded.",
-                                "spans": {
-                                    "start": 836,
-                                    "end": 1140
-                                }
-                            }
-                        ],
-                        "_sentences_text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no.\n030M20A) for COVID-19 vaccination.\nThe occurrence of additional non-serious events is detailed below.\nConcurrent medical conditions included Epileptic seizure.\nOn 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form.\nOn 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever).\nAt the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.\nThe action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.\nFor mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded."
-                    },
-                    {
-                        "text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no. 030M20A) for COVID-19 vaccination. The occurrence of additional non-serious events is detailed below.     Concurrent medical conditions included Epileptic seizure.    On 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form. On 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever). At the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.        The action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.   For mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded.",
-                        "dtd_name": "COVID_VAX_AE",
-                        "tags": [
-                            {
-                                "tag": "VAX",
-                                "spans": "191~198",
-                                "text": "Moderna",
-                                "id": "V0",
-                                "comment": ""
-                            },
-                            {
-                                "tag": "OTHER_AE",
-                                "spans": "0~17",
-                                "text": "multiple seizures",
-                                "id": "O0",
-                                "comment": ""
-                            },
-                            {
-                                "tag": "PYREXIA",
-                                "spans": "19~24",
-                                "text": "fever",
-                                "id": "P0",
-                                "tense": "past",
-                                "certainty": "past",
-                                "comment": ""
-                            }
-                        ],
-                        "_fh": {},
-                        "_filename": "B_Pyrexia_08.txt_mm.xml",
-                        "_has_saved": true,
-                        "_sentences": [
-                            {
-                                "text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no.",
-                                "spans": {
-                                    "start": 0,
-                                    "end": 227
-                                }
-                            },
-                            {
-                                "text": "030M20A) for COVID-19 vaccination.",
-                                "spans": {
-                                    "start": 228,
-                                    "end": 262
-                                }
-                            },
-                            {
-                                "text": "The occurrence of additional non-serious events is detailed below.",
-                                "spans": {
-                                    "start": 263,
-                                    "end": 329
-                                }
-                            },
-                            {
-                                "text": "Concurrent medical conditions included Epileptic seizure.",
-                                "spans": {
-                                    "start": 334,
-                                    "end": 391
-                                }
-                            },
-                            {
-                                "text": "On 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form.",
-                                "spans": {
-                                    "start": 395,
-                                    "end": 513
-                                }
-                            },
-                            {
-                                "text": "On 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever).",
-                                "spans": {
-                                    "start": 514,
-                                    "end": 648
-                                }
-                            },
-                            {
-                                "text": "At the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.",
-                                "spans": {
-                                    "start": 649,
-                                    "end": 744
-                                }
-                            },
-                            {
-                                "text": "The action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.",
-                                "spans": {
-                                    "start": 752,
-                                    "end": 833
-                                }
-                            },
-                            {
-                                "text": "For mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded.",
-                                "spans": {
-                                    "start": 836,
-                                    "end": 1140
-                                }
-                            }
-                        ],
-                        "_sentences_text": "multiple seizures; fever; This spontaneous case was reported by a pharmacist and describes the occurrence of SEIZURE (multiple seizures) in a 37-year-old male patient who received mRNA-1273 (Moderna COVID-19 Vaccine) (batch no.\n030M20A) for COVID-19 vaccination.\nThe occurrence of additional non-serious events is detailed below.\nConcurrent medical conditions included Epileptic seizure.\nOn 11-Mar-2021, the patient received first dose of mRNA-1273 (Moderna COVID-19 Vaccine) (unknown route) 1 dosage form.\nOn 15-Mar-2021, the patient experienced SEIZURE (multiple seizures) (seriousness criterion medically significant) and PYREXIA (fever).\nAt the time of the report, SEIZURE (multiple seizures) and PYREXIA (fever) outcome was unknown.\nThe action taken with mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown) was unknown.\nFor mRNA-1273 (Moderna COVID-19 Vaccine) (Unknown), the reporter did not provide any causality assessments.; Sender's Comments: Based on the current available information and temporal association between the use of the product and the start date of these events, a causal relationship cannot be excluded."
-                    }
-                ],
-                "rst": {
-                    "all": {
-                        "precision": 0.6666666666666666,
-                        "recall": 0.6666666666666666,
-                        "f1": 0.6666666666666666,
-                        "cm": {
-                            "tp": 2,
-                            "fp": 1,
-                            "fn": 1
-                        }
-                    },
-                    "tag": {
-                        "VAX": {
-                            "precision": 1,
-                            "recall": 1,
-                            "f1": 1,
-                            "cm": {
-                                "tp": 1,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [
-                                        [
-                                            {
-                                                "tag": "VAX",
-                                                "spans": "191~198",
-                                                "text": "Moderna",
-                                                "id": "V0",
-                                                "comment": ""
-                                            },
-                                            {
-                                                "tag": "VAX",
-                                                "spans": "191~198",
-                                                "text": "Moderna",
-                                                "id": "V0",
-                                                "comment": ""
-                                            }
-                                        ]
-                                    ],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "PYREXIA": {
-                            "precision": 0.5,
-                            "recall": 1,
-                            "f1": 0.6666666666666666,
-                            "cm": {
-                                "tp": 1,
-                                "fp": 1,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [
-                                        [
-                                            {
-                                                "tag": "PYREXIA",
-                                                "spans": "19~24",
-                                                "text": "fever",
-                                                "id": "P0",
-                                                "tense": "past",
-                                                "certainty": "past",
-                                                "comment": ""
-                                            },
-                                            {
-                                                "tag": "PYREXIA",
-                                                "spans": "19~24",
-                                                "text": "fever",
-                                                "id": "P0",
-                                                "tense": "past",
-                                                "certainty": "past",
-                                                "comment": ""
-                                            }
-                                        ]
-                                    ],
-                                    "fp": [
-                                        [
-                                            {
-                                                "tag": "PYREXIA",
-                                                "spans": "632~639",
-                                                "text": "PYREXIA",
-                                                "id": "P1",
-                                                "tense": "past",
-                                                "certainty": "past",
-                                                "comment": ""
-                                            },
-                                            null
-                                        ]
-                                    ],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "CHILL": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "COUGH": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "FATIGUE": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "PAIN": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "HEADACHE": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "DIZZINESS": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "SORENESS": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "NAUSEA": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "DIARRHEA": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        },
-                        "OTHER_AE": {
-                            "precision": null,
-                            "recall": 0,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 1,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": [
-                                        [
-                                            null,
-                                            {
-                                                "tag": "OTHER_AE",
-                                                "spans": "0~17",
-                                                "text": "multiple seizures",
-                                                "id": "O0",
-                                                "comment": ""
-                                            }
-                                        ]
-                                    ]
-                                }
-                            }
-                        },
-                        "MEDICATION": {
-                            "precision": null,
-                            "recall": null,
-                            "f1": null,
-                            "cm": {
-                                "tp": 0,
-                                "fp": 0,
-                                "fn": 0,
-                                "tags": {
-                                    "tp": [],
-                                    "fp": [],
-                                    "fn": []
-                                }
-                            }
-                        }
-                    }
-                }
-            },
             "6672132460866538": {
                 "anns": [
                     {
@@ -24251,6 +24251,27 @@
                     "fn": 8
                 }
             }
+        },
+        "stat": {
+            "duplicates": [],
+            "unmatched": [],
+            "matched_hashcodes": [
+                4573044139511229,
+                5700441356947516,
+                7243785374619488,
+                1536077572845809,
+                3632821086567290,
+                5336556756202351,
+                598660722492379,
+                8202681260611356,
+                5553388696023774,
+                3841837406952907,
+                1686091562846759,
+                1976594116208391,
+                8951720091075794,
+                868457685417475,
+                6672132460866538
+            ]
         }
     },
     "iaa_display_tag_name": "VAX",
