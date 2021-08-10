@@ -2245,6 +2245,10 @@ var jarvis = {
             app_hotpot.resize();
         });
 
+        var s = this.get_url_paramter('s');
+        if (s == 'yes') {
+            this.load_sample();
+        }
         // this.load_sample();
     },
 
@@ -2262,6 +2266,14 @@ var jarvis = {
             }, 
             'json'
         );
+    },
+
+
+    get_url_paramter: function(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     },
 
     msg: function(s, cls) {

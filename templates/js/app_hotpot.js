@@ -110,6 +110,10 @@ var app_hotpot = {
                 app_hotpot.vpp.callback_save_xml(fh);
             })
             .catch(function(error) {
+                app_hotpot.msg(
+                    'Saving xml failed. Try to use "Save As" instead.', 
+                    'bg-lightCrimson fg-white'
+                );
                 console.log('* error when save xml', error);
             });;
         },
