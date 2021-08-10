@@ -129,7 +129,7 @@ var ann_parser = {
                     console.log('* fixed missing', att.name);
                 }
             }
-            console.log('* add tag', tag);
+            // console.log('* add tag', tag);
 
             // then, put this new tag to the ann tags list
             ann.tags.push(tag);

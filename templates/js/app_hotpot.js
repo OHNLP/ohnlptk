@@ -1944,7 +1944,7 @@ var app_hotpot = {
 
     cm_clear_etag_marks: function() {
         var marks = this.codemirror.getAllMarks();
-        for (let i = marks.length - 1; i > 0; i--) {
+        for (let i = marks.length - 1; i >= 0; i--) {
             marks[i].clear();
         }
     },
@@ -2055,6 +2055,7 @@ var app_hotpot = {
      */
     cm_mark_hint_in_text: function(hint, ann) {
         var range = this.cm_spans2range(hint.spans, ann);
+        // console.log("* marking hint", hint, 'on', range);
         
         if (this.vpp.$data.cm.mark_mode == 'node') {
             var hint_tag_id_prefix = dtd_parser.get_id_prefix(
@@ -2255,7 +2256,7 @@ var app_hotpot = {
 
     cm_doc_range2spans: function(sel_loc, ann) {
         var full_text = ann.text;
-        console.log('* calc doc range2spans: ');
+        // console.log('* calc doc range2spans: ');
         console.log(sel_loc);
         var lines = full_text.split('\n');
         var span0 = 0;

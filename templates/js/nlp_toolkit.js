@@ -21,15 +21,43 @@ var nlp_toolkit = {
 
         // get all sentences and spans
         var sentences = [];
+
+        // for get the spans correctly
+        // and the value is the last appearance
+        var sentences_dict = {};
+
         // get all sentence trimed text
         var sentences_text = [];
 
         doc.sentences().forEach(function(d) {
             // get this sentence
             var sentence = d.text();
+            var spans_start = text.indexOf(sentence);
 
             // TODO fix the multiple same sentence bug
-            var spans_start = text.indexOf(sentence);
+            if (sentences_dict.hasOwnProperty(sentence)) {
+                // which means this is a duplicated 
+                var i = 1;
+                var cnt = 0;
+                while(true) {
+                    spans_start = text.indexOf(sentence, i);
+
+                    if (sentences_dict[sentence] == spans_start) {
+                        // which means this sentence appeared
+                        i += 1;
+                        cnt += 1;
+
+                    } else {
+                        // which means this span start is a new one
+                        sentences_dict[sentence] = spans_start;
+                        break;
+                    }
+                }
+
+            } else {
+                // ok, just add this new sentence
+                sentences_dict[sentence] = spans_start;
+            }
             var spans_end = spans_start + sentence.length;
 
             // sometimes the sentence has right blanks
