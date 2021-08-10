@@ -52,8 +52,8 @@ var app_hotpot = {
         iaa_dict: null,
         iaa_display_tag_name: '__all__',
         iaa_match_mode: 'overlap', // overlap / exact
-        iaa_overlap_ratio: 0.5,
-        iaa_overlap_ratio_default: 0.5,
+        iaa_overlap_ratio: 50,
+        iaa_overlap_ratio_default: 50,
         iaa_display_hashcode: null,
         iaa_display_tags_context: true,
         iaa_display_tags_tp: false,
@@ -715,7 +715,7 @@ var app_hotpot = {
                 this.iaa_ann_list[0].anns,
                 this.iaa_ann_list[1].anns,
                 this.iaa_match_mode,
-                this.iaa_overlap_ratio
+                this.iaa_overlap_ratio / 100
             );
             this.iaa_dict = iaa_dict;
             console.log('* iaa result:', iaa_dict);
@@ -1736,7 +1736,7 @@ var app_hotpot = {
         this.vpp.hint_dict = ann_parser.add_tag_to_hint_dict(
             ann, tag, this.vpp.hint_dict
         );
-        console.log('* updated hint_dict by tag', this.vpp.hint_dict, tag);
+        console.log('* updated hint_dict by a tag', this.vpp.hint_dict, tag);
     },
 
     /////////////////////////////////////////////////////////////////

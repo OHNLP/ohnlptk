@@ -1162,9 +1162,12 @@ input[type=text].ipt-spinner-xs {
                         <div>        
                             <input id="iaa_form_overlap_ratio" 
                                 name="iaa_form_overlap_ratio" 
-                                style="width: 52px"
-                                type="text" class="ipt-md mr-1" 
+                                style="width: 36px"
+                                type="text" class="ipt-md" 
                                 v-model.number="iaa_overlap_ratio">
+                            <span class="mr-1">
+                                %
+                            </span>
 
                             <button title="Reset the overlap ratio"
                                 v-on:click="iaa_overlap_ratio = iaa_overlap_ratio_default">
