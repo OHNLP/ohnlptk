@@ -27,6 +27,8 @@ var nlp_toolkit = {
         doc.sentences().forEach(function(d) {
             // get this sentence
             var sentence = d.text();
+
+            // TODO fix the multiple same sentence bug
             var spans_start = text.indexOf(sentence);
             var spans_end = spans_start + sentence.length;
 

@@ -363,6 +363,31 @@ var app_hotpot = {
             app_hotpot.cm_update_ltag_marks();
         },
 
+        accept_all_hints: function() {
+            if (this.hints.length == 0) {
+                app_hotpot.msg('No hints found');
+                return;
+            }
+
+            var msg = [
+                "There are " + this.hints.length + " hints found and not decided yet in current annotation:\n\n"
+            ];
+            for (let i = 0; i < this.hints.length; i++) {
+                msg.push((i+1) + ' | ' + this.hints[i].tag + ', ' + this.hints[i].spans + ' [' + this.hints[i].text + ']\n');
+            }
+            msg.push('\nAre you sure to accept all of them?');
+
+            msg = msg.join('');
+
+            var ret = window.confirm(msg);
+
+            if (ret) {
+                // do something here
+            } else {
+                return;
+            }
+        },
+
         get_hint: function(hint_id) {
             for (let i = 0; i < this.hints.length; i++) {
                 if (this.hints[i].id == hint_id) {
