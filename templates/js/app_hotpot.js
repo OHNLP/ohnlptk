@@ -773,7 +773,7 @@ var app_hotpot = {
                 return this.count_iaa_gs_notnull(this.iaa_gs_dict[ann_hashcode]);
             } else {
                 return this.count_iaa_gs_tag_notnull(
-                    iaa_gs_dict[ann_hashcode].rst[this.iaa_display_tag_name]
+                    this.iaa_gs_dict[ann_hashcode].rst[this.iaa_display_tag_name]
                 );
             }
         },

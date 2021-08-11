@@ -699,6 +699,9 @@ input[type=text].ipt-spinner-xs {
 .iaa-w-20 {
     width: 20% !important;
 }
+.iaa-op-50 {
+    opacity: 0.5;
+}
 /* for text display */
 .clr-red {
     color: red;
@@ -1947,24 +1950,30 @@ input[type=text].ipt-spinner-xs {
                                 </div>
                                 <div class="iaa-file-cm-box">
                                     <span class="mr-2">
-                                        AB: {{ get_rst(ann_rst.rst).cm.tp }}
+                                        <span class="iaa-op-50">AB: </span>
+                                        {{ get_rst(ann_rst.rst).cm.tp }}
                                     </span>
                                     <span class="mr-2">
-                                        A+: {{ get_rst(ann_rst.rst).cm.fp }}
+                                        <span class="iaa-op-50">A+: </span>
+                                        {{ get_rst(ann_rst.rst).cm.fp }}
                                     </span>
                                     <span class="mr-2">
-                                        B+: {{ get_rst(ann_rst.rst).cm.fn }}
+                                        <span class="iaa-op-50">B+: </span>
+                                        {{ get_rst(ann_rst.rst).cm.fn }}
                                     </span>
                                 </div>
                                 <div class="iaa-file-gs-box">
                                     <span class="mr-2">
-                                        <span v-if="iaa_display_tag_name == '__all__'">
-                                            OVERALL
-                                        </span>
-                                        <span v-else>
-                                            {{ iaa_display_tag_name }}
-                                        </span>
-                                        in GS: {{ count_gs_tags(ann_hashcode) }}
+                                        <span class="iaa-op-50">
+                                            <span v-if="iaa_display_tag_name == '__all__'">
+                                                OVERALL
+                                            </span>
+                                            <span v-else>
+                                                {{ iaa_display_tag_name }}
+                                            </span>
+                                            in GS:
+                                        </span> 
+                                        {{ count_gs_tags(ann_hashcode) }}
                                     </span>
                                 </div>
                             </div>

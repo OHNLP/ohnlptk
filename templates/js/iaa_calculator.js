@@ -1,5 +1,9 @@
 var iaa_calculator = {
 
+    set_tags_by_rst: function(ann_rst) {
+        
+    },
+
     get_default_gs_dict: function(dtd, iaa_dict) {
         // the core of gs is similar to the iaa_dict.ann
         // which is a hashcode based dictionary.
@@ -44,6 +48,9 @@ var iaa_calculator = {
 
                 // remove the _fh
                 delete gs_dict[hashcode].ann._fh;
+
+                // empty the existing tags
+                gs_dict[hashcode].ann.tags = [];
 
                 // add one more 
                 gs_dict[hashcode].ann._has_star = false;
