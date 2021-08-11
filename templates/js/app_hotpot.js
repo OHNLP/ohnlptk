@@ -391,7 +391,16 @@ var app_hotpot = {
             var ret = window.confirm(msg);
 
             if (ret) {
-                // do something here
+                // check all hints
+                for (let i = 0; i < this.hints.length; i++) {
+                    const hint_id = this.hints[i].id;
+                    this.add_tag_by_hint(hint_id, false);
+                }
+                // update the cm
+                app_hotpot.cm_update_marks();
+                // scroll the view
+                app_hotpot.scroll_annlist_to_bottom();
+
             } else {
                 return;
             }
@@ -406,7 +415,10 @@ var app_hotpot = {
             return null;
         },
 
-        add_tag_by_hint: function(hint_id, tag_name) {
+        add_tag_by_hint: function(hint_id, update_marks) {
+            if (typeof(update_marks)=='undefined') {
+                update_marks = true;
+            }
             // get the hint from list 
             var hint = this.get_hint(hint_id);
             if (hint == null) { 
@@ -414,6 +426,7 @@ var app_hotpot = {
                 app_hotpot.cm_update_marks();
                 return; 
             }
+            var tag_name = hint.tag;
 
             // createa new ann tag
             var _tag = {
@@ -438,12 +451,12 @@ var app_hotpot = {
                 tag
             );
 
-            // update the cm
-            app_hotpot.cm_update_marks();
-
-            // scroll the view
-            app_hotpot.scroll_annlist_to_bottom();
-
+            if (update_marks) {
+                // update the cm
+                app_hotpot.cm_update_marks();
+                // scroll the view
+                app_hotpot.scroll_annlist_to_bottom();
+            }
         },
 
         add_etag_by_ctxmenu: function(tag_def) {
@@ -2115,7 +2128,7 @@ var app_hotpot = {
                 this.vpp.$data.dtd
             );
             var markHTML = [
-                '<span class="mark-hint mark-hint-'+hint.tag+'" id="mark-id-'+hint.id+'" onclick="app_hotpot.vpp.add_tag_by_hint(\''+hint.id+'\', \''+hint.tag+'\')" title="Click to add this to tags">',
+                '<span class="mark-hint mark-hint-'+hint.tag+'" id="mark-id-'+hint.id+'" onclick="app_hotpot.vpp.add_tag_by_hint(\''+hint.id+'\')" title="Click to add this to tags">',
                 '<span class="mark-hint-info mark-tag-'+hint.tag+'">',
                     hint_tag_id_prefix,
                 '</span>',
