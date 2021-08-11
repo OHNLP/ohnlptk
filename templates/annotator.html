@@ -1920,15 +1920,17 @@ input[type=text].ipt-spinner-xs {
                                 <div class="iaa-bar-filename w-100">
                                     B: {{ ann_rst.anns[1]._filename }}
                                 </div>
-                                <div class="iaa-bar-filename w-100"
-                                    title="Set check"
-                                    v-on:click="iaa_gs_dict[iaa_display_hashcode].ann._has_star = !iaa_gs_dict[iaa_display_hashcode].ann._has_star">
-                                    <span v-if="iaa_gs_dict[ann_hashcode].ann._has_star">
-                                        <i class="fa fa-check-circle fg-emerald"></i>
+                                <div class="iaa-bar-filename w-100">
+                                    <span title="Set check"
+                                        v-on:click="iaa_gs_dict[iaa_display_hashcode].ann._has_star = !iaa_gs_dict[iaa_display_hashcode].ann._has_star">
+                                        <span v-if="iaa_gs_dict[ann_hashcode].ann._has_star">
+                                            <i class="fa fa-check-circle fg-emerald"></i>
+                                        </span>
+                                        <span v-else>
+                                            <i class="far fa-circle"></i>
+                                        </span>
                                     </span>
-                                    <span v-else>
-                                        <i class="far fa-circle"></i>
-                                    </span>
+                                    
                                     GS: {{ iaa_gs_dict[ann_hashcode].ann._filename }}
                                 </div>
                             </div>
