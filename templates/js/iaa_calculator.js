@@ -1,5 +1,82 @@
 var iaa_calculator = {
 
+    get_default_gs_dict: function(dtd, iaa_dict) {
+        // the core of gs is similar to the iaa_dict.ann
+        // which is a hashcode based dictionary.
+        // and the inner data is similar.
+        /*
+        {
+            hashcode: {
+                ann: ann_obj // but the tags are empty,
+                rst: {
+                    tag_name: {
+                        tp: [{tag: tag, from: 'a'}, ...],
+                        fp: [],
+                        fn: []
+                    }
+                }
+            }
+        }
+
+        the length of tp, fp, fn is exactly equal to the iaa_dict
+        */
+        var gs_dict = {};
+
+        for (const hashcode in iaa_dict.ann) {
+            if (Object.hasOwnProperty.call(iaa_dict.ann, hashcode)) {
+                const ann_rst = iaa_dict.ann[hashcode];
+                gs_dict[hashcode] = {
+                    // use the ann_a as defult
+                    ann: ann_rst.anns[0],
+                    rst: {}
+                }
+
+                for (const tag_name in ann_rst.rst.tag) {
+                    if (Object.hasOwnProperty.call(ann_rst.rst.tag, tag_name)) {
+                        const tag_rst = ann_rst.rst.tag[tag_name];
+                        gs_dict[hashcode].rst[tag_name] = {
+                            tp: [],
+                            fp: [],
+                            fn: []
+                        }
+
+                        // fill each in tp
+                        for (let i = 0; i < tag_rst.cm.tags.tp.length; i++) {
+                            const tags = tag_rst.cm.tags.tp[i];
+                            // use ann_a's result
+                            gs_dict[hashcode].rst[tag_name].tp.push({
+                                tag: tags[0],
+                                from: 'a'
+                            });
+                        }
+
+                        // fill each in fp
+                        for (let i = 0; i < tag_rst.cm.tags.fp.length; i++) {
+                            const tags = tag_rst.cm.tags.fp[i];
+                            // use ann_a's result
+                            gs_dict[hashcode].rst[tag_name].fp.push({
+                                tag: tags[0],
+                                from: 'a'
+                            });
+                        }
+                        
+                        // fill each in fn
+                        for (let i = 0; i < tag_rst.cm.tags.fn.length; i++) {
+                            const tags = tag_rst.cm.tags.fn[i];
+                            // use ann_b's result
+                            gs_dict[hashcode].rst[tag_name].fn.push({
+                                tag: tags[1],
+                                from: 'b'
+                            });
+                        }
+                    }
+                }
+            }
+        }
+
+        return gs_dict;
+    },
+
     evaluate_anns_on_dtd: function(dtd, anns_a, anns_b, match_mode, overlap_ratio) {
         if (typeof(match_mode) == 'undefined') {
             match_mode = 'overlap';
@@ -12,7 +89,7 @@ var iaa_calculator = {
             ann: {
                 text_hash: {
                     anns: [ann_a, ann_b],
-                    result_dict: {
+                    rst: {
                         tag_name: result
                     }
                 },

@@ -39,6 +39,10 @@ Vue.component('iaa-tag-info', {
 
             return html.join('');
         },
+
+        accept_tag: function() {
+
+        },
     },
 
     computed: {
@@ -47,7 +51,9 @@ Vue.component('iaa-tag-info', {
 
     props: [
         'cm',
+        'from',
         'tag',
+        'tag_idx',
         'ann',
         'dtd',
         'iaa_display_tags_context',
@@ -59,6 +65,14 @@ Vue.component('iaa-tag-info', {
     v-bind:class="'iaa-tag-detail-info-' + cm"
     :force_module_update="force_module_update">
     <div class="d-flex flex-row flex-wrap flex-align-end">
+
+        <div class="iaa-tag-detail-oper">
+            <button class="btn btn-xs"
+                :title="'Accept this [' + tag.text + '] in goldstandard'">
+                Accept This
+            </button>
+        </div>
+
         <div class="mr-2">
             <span class="mr-1"
                 v-bind:class="'mark-tag-' + tag.tag">

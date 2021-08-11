@@ -57,7 +57,12 @@ var app_hotpot = {
         iaa_display_hashcode: null,
         iaa_display_tags_context: true,
         iaa_display_tags_tp: false,
+        iaa_display_adj_panel: true,
+        iaa_display_adj_detail: false,
         force_module_update: Math.random(), // for updating the sub module
+
+        // for iaa adjudication
+        iaa_gs_dict: null,
 
         // cm settings
         cm: {
@@ -735,6 +740,16 @@ var app_hotpot = {
 
         on_change_iaa_settings: function(event) {
             console.log('* changed attr in', event.target);
+        },
+
+        make_default_adj: function() {
+            this.iaa_gs_dict = iaa_calculator.get_default_gs_dict(
+                this.dtd, this.iaa_dict
+            );
+        },
+
+        download_all_goldstandards: function() {
+
         },
 
         /////////////////////////////////////////////////////////////////

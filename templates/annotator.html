@@ -626,20 +626,40 @@ input[type=text].ipt-spinner-xs {
     border-radius: 5px;
     padding: 5px;
 }
-.iaa-tag-detail-info-TP {
+.iaa-tag-detail-info-tp {
     border: 1px solid #61a51d;
 }
-.iaa-tag-detail-info-FP {
+.iaa-tag-detail-info-fp {
     border: 1px dotted #ff7878;
 }
-.iaa-tag-detail-info-FN {
+.iaa-tag-detail-info-fn {
     border: 1px dotted #ff7878;
+}
+.iaa-tag-detail-info-gs {
+    border: 1px dotted #dfdfdf;
+}
+.iaa-tag-detail-info-text-gs {
+    margin-top: 14px;
 }
 .iaa-tag-detail-a {
     margin-right: 5px;
 }
 .iaa-tag-detail-b {
     margin-right: 5px;
+}
+.iaa-tag-detail-g {
+    border-left: 1px dotted #dfdfdf;
+    padding-left: 4px;
+}
+.iaa-tag-detail-oper {
+    display: none;
+    position: absolute;
+    top: -7px;
+    left: -6px;
+}
+.iaa-tag-detail-info:hover 
+.iaa-tag-detail-oper {
+    display: block;
 }
 .iaa-tag-attlist {
     border-bottom: 1px solid #aaaaaa;
@@ -649,6 +669,21 @@ input[type=text].ipt-spinner-xs {
 }
 .iaa-tag-context {
     font-size: 1.2em;
+}
+.iaa-w-100 {
+    width: 100% !important;
+}
+.iaa-w-80 {
+    width: 80% !important;
+}
+.iaa-w-50 {
+    width: 50% !important;
+}
+.iaa-w-40 {
+    width: 40% !important;
+}
+.iaa-w-20 {
+    width: 20% !important;
 }
 /* for text display */
 .clr-red {
@@ -1171,7 +1206,7 @@ input[type=text].ipt-spinner-xs {
 
                             <button title="Reset the overlap ratio"
                                 v-on:click="iaa_overlap_ratio = iaa_overlap_ratio_default">
-                                <i class="fa fa-sync"></i>
+                                <i class="fa fa-undo"></i>
                             </button>
                         </div>
                     </div>
@@ -1192,7 +1227,7 @@ input[type=text].ipt-spinner-xs {
                         <input type="checkbox" 
                             class="check"
                             data-role="switch" 
-                            data-caption="Show TP Tags"
+                            data-caption="Show Agreed Tags"
                             v-model="iaa_display_tags_tp"
                             @change="on_change_iaa_settings">
                         <br>
@@ -1206,6 +1241,53 @@ input[type=text].ipt-spinner-xs {
 
                     </div>
                     <span class="title">Tag Display</span>
+                </div>
+
+                
+                <div class="group">
+                    <div>
+                        <input type="checkbox" 
+                            class="check"
+                            data-role="switch" 
+                            data-caption="Adj. Panel"
+                            v-model="iaa_display_adj_panel"
+                            @change="on_change_iaa_settings">
+                        <br>
+
+                        <input type="checkbox" 
+                            class="check"
+                            data-role="switch" 
+                            data-caption="Tag Detail"
+                            v-model="iaa_display_adj_detail"
+                            @change="on_change_iaa_settings">
+
+                    </div>
+
+                    <div class="h-splitter-menu ml-2 mr-2">&nbsp;</div>
+
+                    <div>
+                        <button class="ribbon-button" 
+                            :disabled="dtd == null || iaa_dict == null"
+                            v-on:click="make_default_adj">
+                            <span class="icon">
+                                <i class="far fa-object-group"></i>
+                            </span>
+                            <span class="caption">Make G.S.</span>
+                        </button>
+                    </div>
+
+                    <div>
+                        <button class="ribbon-button" 
+                            :disabled="dtd == null"
+                            v-on:click="download_all_goldstandards">
+                            <span class="icon">
+                                <i class="fa fa-file-download"></i>
+                            </span>
+                            <span class="caption">Download All</span>
+                        </button>
+                    </div>
+                    
+                    <span class="title">Adjudication</span>
                 </div>
 
             </div>
@@ -1867,16 +1949,25 @@ input[type=text].ipt-spinner-xs {
                         class="box-body d-flex flex-column">
                         <div class="w-100 d-flex flex-row">
 
-                            <div class="iaa-tag-detail-header iaa-tag-detail-a w-50">
+                            <div class="iaa-tag-detail-header iaa-tag-detail-a"
+                                :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                 <i class="fa fa-user"></i>
                                 A 
                                 {{ iaa_dict.ann[iaa_display_hashcode].anns[0]._filename }}
                             </div>
 
-                            <div class="iaa-tag-detail-header w-50">
+                            <div class="iaa-tag-detail-header"
+                                :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                 <i class="fa fa-user"></i>
                                 B
                                 {{ iaa_dict.ann[iaa_display_hashcode].anns[1]._filename }}
+                            </div>
+
+                            <div v-if="iaa_display_adj_panel"
+                                class="iaa-tag-detail-header iaa-tag-detail-g iaa-w-20">
+                                <i class="far fa-handshake"></i>
+                                G 
+                                Gold Standard
                             </div>
                             
                         </div>
@@ -1885,48 +1976,83 @@ input[type=text].ipt-spinner-xs {
                             v-if="iaa_display_tag_name == '__all__' || iaa_display_tag_name == tag_name"
                             class="w-100 mb-2">
                                 
-                            <div class="iaa-tag-name">
-                                <i class="fa fa-tag mr-1"
-                                    v-bind:class="'fg-tag-' + tag_name">
-                                </i>
-                                <span class="mr-2">
-                                    {{ tag_name }}
-                                </span>
-                                <span class="mr-2">
-                                    TP: {{ tag_rst.cm.tp }}
-                                </span>
-                                <span class="mr-2">
-                                    FP: {{ tag_rst.cm.fp }}
-                                </span>
-                                <span class="mr-2">
-                                    FN: {{ tag_rst.cm.fn }}
-                                </span>
+                            <div class="iaa-tag-name d-flex flex-row">
+                                <div class="iaa-tag-name-ab mr-1"
+                                    :class="{'iaa-w-80': iaa_display_adj_panel, 'iaa-w-100': !iaa_display_adj_panel}">
+                                    <i class="fa fa-tag mr-1"
+                                        v-bind:class="'fg-tag-' + tag_name">
+                                    </i>
+                                    <span class="mr-2">
+                                        {{ tag_name }}
+                                    </span>
+                                    <span class="mr-2">
+                                        Agreed: {{ tag_rst.cm.tp }}
+                                    </span>
+                                    <span class="mr-2">
+                                        FP: {{ tag_rst.cm.fp }}
+                                    </span>
+                                    <span class="mr-2">
+                                        FN: {{ tag_rst.cm.fn }}
+                                    </span>
+                                </div>
+
+                                <div v-if="iaa_display_adj_panel"
+                                    class="iaa-tag-name-g iaa-tag-detail-g iaa-w-20">
+                                    <i class="fa fa-tag mr-1"
+                                        v-bind:class="'fg-tag-' + tag_name">
+                                    </i>
+                                    <span class="mr-2">
+                                        {{ tag_name }}
+                                    </span>
+                                    <span>
+                                        Total: X
+                                    </span>
+                                </div>
                             </div>
 
                             <div v-if="iaa_display_tags_tp"
                                 class="iaa-tag-rsts-tp w-100">
                                 <!-- last, show the TP group -->
-                                <div v-for="tags_tp in tag_rst.cm.tags.tp"
+                                <div v-for="tags_tp, tag_idx in tag_rst.cm.tags.tp"
                                     class="iaa-tag-detail w-100 d-flex flex-row">
-                                    <div class="iaa-tag-detail-a w-50">
+                                    <div class="iaa-tag-detail-a"
+                                        :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
-                                            v-bind:cm="'TP'"
+                                            v-bind:cm="'tp'"
+                                            v-bind:from="'a'"
                                             v-bind:tag="tags_tp[0]"
+                                            v-bind:tag_idx="tag_idx"
                                             v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[0]"
                                             v-bind:dtd="dtd"
                                             v-bind:iaa_display_tags_context="iaa_display_tags_context"
                                             v-bind:force_update="force_module_update"
                                         ></iaa-tag-info>
                                     </div>
-                                    <div class="iaa-tag-detail-b w-50">
+                                    <div class="iaa-tag-detail-b"
+                                        :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
-                                            v-bind:cm="'TP'"
+                                            v-bind:cm="'tp'"
+                                            v-bind:from="'b'"
                                             v-bind:tag="tags_tp[1]"
+                                            v-bind:tag_idx="tag_idx"
                                             v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[1]"
                                             v-bind:dtd="dtd"
                                             v-bind:iaa_display_tags_context="iaa_display_tags_context"
                                             v-bind:force_update="force_module_update"
                                         ></iaa-tag-info>
+                                    </div>
+                                    <div v-if="iaa_display_adj_panel && iaa_gs_dict != null"
+                                        class="iaa-tag-detail-g iaa-w-20">
+                                        
+                                        <iaa-tag-info-gs
+                                            v-bind:cm="'gs'"
+                                            v-bind:tag_obj="iaa_gs_dict[iaa_display_hashcode].rst[tag_name].tp[tag_idx]"
+                                            v-bind:tag_idx="tag_idx"
+                                            v-bind:ann="iaa_gs_dict[iaa_display_hashcode].ann"
+                                            v-bind:dtd="dtd"
+                                            v-bind:force_update="force_module_update"
+                                        ></iaa-tag-info-gs>
+
                                     </div>
                                 </div>
 
@@ -1934,12 +2060,15 @@ input[type=text].ipt-spinner-xs {
 
                             <div class="iaa-tag-rsts-fp w-100">
                                 <!-- first, show the FP group -->
-                                <div v-for="tags_fp in tag_rst.cm.tags.fp"
+                                <div v-for="tags_fp, tag_idx in tag_rst.cm.tags.fp"
                                     class="iaa-tag-detail w-100 d-flex flex-row">
-                                    <div class="iaa-tag-detail-a w-50">
+                                    <div class="iaa-tag-detail-a"
+                                        :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
-                                            v-bind:cm="'FP'"
+                                            v-bind:cm="'fp'"
+                                            v-bind:from="'a'"
                                             v-bind:tag="tags_fp[0]"
+                                            v-bind:tag_idx="tag_idx"
                                             v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[0]"
                                             v-bind:dtd="dtd"
                                             v-bind:iaa_display_tags_context="iaa_display_tags_context"
@@ -1947,36 +2076,67 @@ input[type=text].ipt-spinner-xs {
                                         ></iaa-tag-info>
                                     </div>
 
-                                    <div class="iaa-tag-detail-b w-50">
+                                    <div class="iaa-tag-detail-b"
+                                        :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
-                                            v-bind:cm="'FP'"
                                             v-if="tags_fp[1] != null"
+                                            v-bind:cm="'fp'"
+                                            v-bind:from="'b'"
                                             v-bind:tag="tags_fp[1]"
+                                            v-bind:tag_idx="tag_idx"
                                             v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[1]"
                                             v-bind:dtd="dtd"
                                             v-bind:iaa_display_tags_context="iaa_display_tags_context"
                                             v-bind:force_update="force_module_update"
                                         ></iaa-tag-info>
+                                    </div>
+
+                                    <div v-if="iaa_display_adj_panel && iaa_gs_dict != null"
+                                        class="iaa-tag-detail-g iaa-w-20">
+                                        <iaa-tag-info-gs
+                                            v-bind:cm="'gs'"
+                                            v-bind:tag_obj="iaa_gs_dict[iaa_display_hashcode].rst[tag_name].fp[tag_idx]"
+                                            v-bind:tag_idx="tag_idx"
+                                            v-bind:ann="iaa_gs_dict[iaa_display_hashcode].ann"
+                                            v-bind:dtd="dtd"
+                                            v-bind:force_update="force_module_update"
+                                        ></iaa-tag-info-gs>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="iaa-tag-rsts-fn w-100">
                                 <!-- second, show the FN group -->
-                                <div v-for="tags_fn in tag_rst.cm.tags.fn"
+                                <div v-for="tags_fn, tag_idx in tag_rst.cm.tags.fn"
                                     class="iaa-tag-detail w-100 d-flex flex-row">
-                                    <div class="iaa-tag-detail-a w-50">
+                                    <div class="iaa-tag-detail-a"
+                                        :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         &nbsp;
                                     </div>
-                                    <div class="iaa-tag-detail-b w-50">
+                                    <div class="iaa-tag-detail-b"
+                                        :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
-                                            v-bind:cm="'FN'"
+                                            v-bind:cm="'fn'"
+                                            v-bind:from="'b'"
                                             v-bind:tag="tags_fn[1]"
+                                            v-bind:tag_idx="tag_idx"
                                             v-bind:ann="iaa_dict.ann[iaa_display_hashcode].anns[1]"
                                             v-bind:dtd="dtd"
                                             v-bind:iaa_display_tags_context="iaa_display_tags_context"
                                             v-bind:force_update="force_module_update"
                                         ></iaa-tag-info>
+                                    </div>
+
+                                    <div v-if="iaa_display_adj_panel"
+                                        class="iaa-tag-detail-g iaa-w-20">
+                                        <iaa-tag-info-gs
+                                            v-bind:cm="'gs'"
+                                            v-bind:tag_obj="iaa_gs_dict[iaa_display_hashcode].rst[tag_name].fn[tag_idx]"
+                                            v-bind:tag_idx="tag_idx"
+                                            v-bind:ann="iaa_gs_dict[iaa_display_hashcode].ann"
+                                            v-bind:dtd="dtd"
+                                            v-bind:force_update="force_module_update"
+                                        ></iaa-tag-info-gs>
                                     </div>
                                 </div>
                             </div>
@@ -2225,6 +2385,9 @@ if (isIE) {
 
 // The Tag Info Vue Module
 {% include 'js/vpp_iaa_tag_info.js' %}
+
+// The Tag Info Vue Module for Gold Standard
+{% include 'js/vpp_iaa_tag_info_gs.js' %}
 
 var jarvis = {
     init: function() {
