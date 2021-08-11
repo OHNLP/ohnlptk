@@ -40,8 +40,9 @@ Vue.component('iaa-tag-info', {
             return html.join('');
         },
 
-        accept_tag: function() {
-
+        accept_tag: function(hashcode, tag_name, cm, tag_idx, from) {
+            // call app_hotpot directly
+            app_hotpot.vpp.accept_iaa_tag(hashcode, tag_name, cm, tag_idx, from);
         },
     },
 
@@ -51,6 +52,7 @@ Vue.component('iaa-tag-info', {
 
     props: [
         'cm',
+        'hashcode',
         'from',
         'tag',
         'tag_idx',
@@ -68,7 +70,8 @@ Vue.component('iaa-tag-info', {
 
         <div class="iaa-tag-detail-oper">
             <button class="btn btn-xs"
-                :title="'Accept this [' + tag.text + '] in goldstandard'">
+                :title="'Accept this [' + tag.text + '] in goldstandard'"
+                v-on:click="accept_tag(hashcode, tag.tag, cm, tag_idx, from)">
                 Accept This
             </button>
         </div>

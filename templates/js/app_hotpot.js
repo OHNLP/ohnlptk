@@ -752,6 +752,39 @@ var app_hotpot = {
 
         },
 
+        count_iaa_gs_tag_notnull: function(tag_rst) {
+            var cnt = 0;
+            for (const cm in tag_rst) {
+                if (Object.hasOwnProperty.call(tag_rst, cm)) {
+                    const tags = tag_rst[cm];
+                    
+                    for (let i = 0; i < tags.length; i++) {
+                        if (tags[i] != null) {
+                            cnt += 1;
+                        }
+                    }
+                }
+            }
+            return cnt;
+        },
+
+        accept_iaa_tag: function(hashcode, tag_name, cm, tag_idx, from) {
+            console.log('* accept', hashcode, tag_name, cm, tag_idx, from);
+            this.iaa_gs_dict[hashcode].rst[tag_name][cm][tag_idx] = {
+                tag: this.iaa_dict.ann[hashcode].rst.tag[tag_name].cm.tags[cm][tag_idx][
+                    {'a':0, 'b':1}[from]
+                ],
+                from: from
+            };
+            this.force_module_update = Math.random();
+        },
+
+        reject_iaa_tag: function(hashcode, tag_name, cm ,tag_idx) {
+            console.log('* reject', hashcode, tag_name, cm, tag_idx);
+            this.iaa_gs_dict[hashcode].rst[tag_name][cm][tag_idx] = null;
+            this.force_module_update = Math.random();
+        },
+
         /////////////////////////////////////////////////////////////////
         // Ruleset Related
         /////////////////////////////////////////////////////////////////

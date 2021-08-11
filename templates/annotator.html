@@ -2004,8 +2004,11 @@ input[type=text].ipt-spinner-xs {
                                     <span class="mr-2">
                                         {{ tag_name }}
                                     </span>
-                                    <span>
-                                        Total: X
+                                    <span v-if="iaa_gs_dict != null">
+                                        Total: {{ count_iaa_gs_tag_notnull(iaa_gs_dict[iaa_display_hashcode].rst[tag_name]) }}
+                                    </span>
+                                    <span v-else>
+                                        &nbsp;
                                     </span>
                                 </div>
                             </div>
@@ -2018,6 +2021,7 @@ input[type=text].ipt-spinner-xs {
                                     <div class="iaa-tag-detail-a"
                                         :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
+                                            v-bind:hashcode="iaa_display_hashcode"
                                             v-bind:cm="'tp'"
                                             v-bind:from="'a'"
                                             v-bind:tag="tags_tp[0]"
@@ -2031,6 +2035,7 @@ input[type=text].ipt-spinner-xs {
                                     <div class="iaa-tag-detail-b"
                                         :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
+                                            v-bind:hashcode="iaa_display_hashcode"
                                             v-bind:cm="'tp'"
                                             v-bind:from="'b'"
                                             v-bind:tag="tags_tp[1]"
@@ -2045,7 +2050,8 @@ input[type=text].ipt-spinner-xs {
                                         class="iaa-tag-detail-g iaa-w-20">
                                         
                                         <iaa-tag-info-gs
-                                            v-bind:cm="'gs'"
+                                            v-bind:hashcode="iaa_display_hashcode"
+                                            v-bind:cm="'tp'"
                                             v-bind:tag_obj="iaa_gs_dict[iaa_display_hashcode].rst[tag_name].tp[tag_idx]"
                                             v-bind:tag_idx="tag_idx"
                                             v-bind:ann="iaa_gs_dict[iaa_display_hashcode].ann"
@@ -2065,6 +2071,7 @@ input[type=text].ipt-spinner-xs {
                                     <div class="iaa-tag-detail-a"
                                         :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
+                                            v-bind:hashcode="iaa_display_hashcode"
                                             v-bind:cm="'fp'"
                                             v-bind:from="'a'"
                                             v-bind:tag="tags_fp[0]"
@@ -2080,6 +2087,7 @@ input[type=text].ipt-spinner-xs {
                                         :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
                                             v-if="tags_fp[1] != null"
+                                            v-bind:hashcode="iaa_display_hashcode"
                                             v-bind:cm="'fp'"
                                             v-bind:from="'b'"
                                             v-bind:tag="tags_fp[1]"
@@ -2094,7 +2102,8 @@ input[type=text].ipt-spinner-xs {
                                     <div v-if="iaa_display_adj_panel && iaa_gs_dict != null"
                                         class="iaa-tag-detail-g iaa-w-20">
                                         <iaa-tag-info-gs
-                                            v-bind:cm="'gs'"
+                                            v-bind:hashcode="iaa_display_hashcode"
+                                            v-bind:cm="'fp'"
                                             v-bind:tag_obj="iaa_gs_dict[iaa_display_hashcode].rst[tag_name].fp[tag_idx]"
                                             v-bind:tag_idx="tag_idx"
                                             v-bind:ann="iaa_gs_dict[iaa_display_hashcode].ann"
@@ -2116,6 +2125,7 @@ input[type=text].ipt-spinner-xs {
                                     <div class="iaa-tag-detail-b"
                                         :class="{'iaa-w-40': iaa_display_adj_panel, 'iaa-w-50': !iaa_display_adj_panel}">
                                         <iaa-tag-info
+                                            v-bind:hashcode="iaa_display_hashcode"
                                             v-bind:cm="'fn'"
                                             v-bind:from="'b'"
                                             v-bind:tag="tags_fn[1]"
@@ -2130,7 +2140,8 @@ input[type=text].ipt-spinner-xs {
                                     <div v-if="iaa_display_adj_panel"
                                         class="iaa-tag-detail-g iaa-w-20">
                                         <iaa-tag-info-gs
-                                            v-bind:cm="'gs'"
+                                            v-bind:hashcode="iaa_display_hashcode"
+                                            v-bind:cm="'fn'"
                                             v-bind:tag_obj="iaa_gs_dict[iaa_display_hashcode].rst[tag_name].fn[tag_idx]"
                                             v-bind:tag_idx="tag_idx"
                                             v-bind:ann="iaa_gs_dict[iaa_display_hashcode].ann"
