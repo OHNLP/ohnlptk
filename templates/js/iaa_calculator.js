@@ -22,14 +22,31 @@ var iaa_calculator = {
         */
         var gs_dict = {};
 
+        var cnt = 0;
         for (const hashcode in iaa_dict.ann) {
             if (Object.hasOwnProperty.call(iaa_dict.ann, hashcode)) {
-                const ann_rst = iaa_dict.ann[hashcode];
+                // deep copy a new object
+                const ann_rst = JSON.parse(JSON.stringify(iaa_dict.ann[hashcode]));
+                cnt += 1;
+
+                // rename the 
                 gs_dict[hashcode] = {
-                    // use the ann_a as defult
+                    // copy the ann_a as defult
                     ann: ann_rst.anns[0],
                     rst: {}
                 }
+                // rename the gs
+                var fn_gs = "GS_" + this.find_lcs(
+                    ann_rst.anns[0]._filename,
+                    ann_rst.anns[1]._filename
+                ) + '_' + cnt + '.xml';
+                gs_dict[hashcode].ann._filename = fn_gs;
+
+                // remove the _fh
+                delete gs_dict[hashcode].ann._fh;
+
+                // add one more 
+                gs_dict[hashcode].ann._has_star = false;
 
                 for (const tag_name in ann_rst.rst.tag) {
                     if (Object.hasOwnProperty.call(ann_rst.rst.tag, tag_name)) {
@@ -362,7 +379,14 @@ var iaa_calculator = {
                     // usually, the tag_b is null,
                     // but sometimes it is not
                     is_match.tag_b
-                ])
+                ]);
+
+                // in some cases, it's not match is due to low overlap ratio
+                // we need to remove this tag_b as well.
+                // but we may also want to keep both?
+                // if (is_match.tag_b != null) {
+                //     delete tag_dict_b[is_match.tag_b.spans];
+                // }
             }
         }
 
@@ -392,13 +416,18 @@ var iaa_calculator = {
             if (match_mode == 'overlap') {
                 // for overlap mode, check ranges of two spans
                 var loc_b = this.spans2loc(spans_b);
-                var is_olpd = this.is_overlapped(loc_a, loc_b, overlap_ratio);
+                var is_olpd = this.is_overlapped(
+                    loc_a, loc_b, 
+                    overlap_ratio
+                );
                 if (is_olpd[0]) {
                     return { 
                         is_in: true,
                         tag_b: tag_b
                     };
                 }
+                // in some cases, the overlapped ratio is low
+                // but still match, we need to check this case
                 if (is_olpd[1] > 0) {
                     p_tag_b = tag_b;
                 }
@@ -522,5 +551,42 @@ var iaa_calculator = {
             }
         }
         return _intersection
-    }
+    },
+
+    /**
+     * Find the longest common substring
+     * @param {string} str1 a string
+     * @param {string} str2 another string
+     * @returns longest common substring
+     */
+    find_lcs: function(str1, str2) {
+        let m = new Array(str1.length+1).fill(0).map(function() {
+            return new Array(str2.length+1).fill(0);
+        });
+        let max = 0;
+        let index = null;
+        for (let i = 0; i < str1.length; i++) {
+            
+            for (let j = 0; j < str2.length; j++) {
+                
+                if(str1.charAt(i) === str2.charAt(j)){
+                    if(i>0 && j>0 && m[i-1][j-1]>0) {
+                        m[i][j] = 1 + m[i-1][j-1];
+                    } else{
+                        m[i][j] = 1;
+                    }
+                    
+                    if(max < m[i][j]){
+                        max = m[i][j];
+                        index = i;
+                    }
+                } else {
+                    
+                }
+            }
+        }
+
+        return str1.substr(index-max + 1, max)
+    },
+    
 };

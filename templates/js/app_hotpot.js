@@ -741,6 +741,9 @@ var app_hotpot = {
             );
             this.iaa_dict = iaa_dict;
             console.log('* iaa result:', iaa_dict);
+
+            // and create
+            this.make_default_adj();
         },
 
         get_rst: function(obj) {
@@ -763,6 +766,27 @@ var app_hotpot = {
 
         download_all_goldstandards: function() {
 
+        },
+
+        count_gs_tags: function(ann_hashcode) {
+            if (this.iaa_display_tag_name == '__all__') {
+                return this.count_iaa_gs_notnull(this.iaa_gs_dict[ann_hashcode]);
+            } else {
+                return this.count_iaa_gs_tag_notnull(
+                    iaa_gs_dict[ann_hashcode].rst[this.iaa_display_tag_name]
+                );
+            }
+        },
+
+        count_iaa_gs_notnull: function(ann_rst) {
+            var cnt = 0;
+            for (const tag_name in ann_rst.rst) {
+                if (Object.hasOwnProperty.call(ann_rst.rst, tag_name)) {
+                    const tag_rst = ann_rst.rst[tag_name];
+                    cnt += this.count_iaa_gs_tag_notnull(tag_rst);
+                }
+            }
+            return cnt;
         },
 
         count_iaa_gs_tag_notnull: function(tag_rst) {

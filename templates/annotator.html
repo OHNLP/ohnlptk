@@ -593,11 +593,15 @@ input[type=text].ipt-spinner-xs {
 }
 .iaa-bar-value {
     font-size: 0.9em;
+    font-weight: bold;
 }
 .iaa-bar-filename-box {
     width: 150px;
 }
 .iaa-file-cm-box {
+    font-size: 0.8em;
+}
+.iaa-file-gs-box {
     font-size: 0.8em;
 }
 .iaa-tag-name {
@@ -620,6 +624,9 @@ input[type=text].ipt-spinner-xs {
     text-align: center;
     font-size: 1.1em;
     margin-bottom: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 .iaa-tag-detail-info {
     border: 1px;
@@ -647,9 +654,16 @@ input[type=text].ipt-spinner-xs {
 .iaa-tag-detail-b {
     margin-right: 5px;
 }
+.iaa-tag-detail-g-header {
+    cursor: pointer;
+}
 .iaa-tag-detail-g {
     border-left: 1px dotted #dfdfdf;
     padding-left: 4px;
+}
+.iaa-tag-detail-g:hover {
+    border-left-color: #999999;
+    background-color: rgb(253, 236, 205);
 }
 .iaa-tag-detail-oper {
     display: none;
@@ -1272,7 +1286,7 @@ input[type=text].ipt-spinner-xs {
                             <span class="icon">
                                 <i class="far fa-object-group"></i>
                             </span>
-                            <span class="caption">Make G.S.</span>
+                            <span class="caption">Reset G.S.</span>
                         </button>
                     </div>
 
@@ -1906,7 +1920,19 @@ input[type=text].ipt-spinner-xs {
                                 <div class="iaa-bar-filename w-100">
                                     B: {{ ann_rst.anns[1]._filename }}
                                 </div>
+                                <div class="iaa-bar-filename w-100"
+                                    title="Set check"
+                                    v-on:click="iaa_gs_dict[iaa_display_hashcode].ann._has_star = !iaa_gs_dict[iaa_display_hashcode].ann._has_star">
+                                    <span v-if="iaa_gs_dict[ann_hashcode].ann._has_star">
+                                        <i class="fa fa-check-circle fg-emerald"></i>
+                                    </span>
+                                    <span v-else>
+                                        <i class="far fa-circle"></i>
+                                    </span>
+                                    GS: {{ iaa_gs_dict[ann_hashcode].ann._filename }}
+                                </div>
                             </div>
+
                             <div class="d-flex flex-column">
                                 <div class="iaa-bar-box d-flex flex-row flex-align-center flex-justify-start mr-1">
                                     <div v-bind:style="'width:' + to_width(get_rst(ann_rst.rst)['f1']) + 'px'"
@@ -1919,13 +1945,24 @@ input[type=text].ipt-spinner-xs {
                                 </div>
                                 <div class="iaa-file-cm-box">
                                     <span class="mr-2">
-                                        TP: {{ get_rst(ann_rst.rst).cm.tp }}
+                                        AB: {{ get_rst(ann_rst.rst).cm.tp }}
                                     </span>
                                     <span class="mr-2">
-                                        FP: {{ get_rst(ann_rst.rst).cm.fp }}
+                                        A+: {{ get_rst(ann_rst.rst).cm.fp }}
                                     </span>
                                     <span class="mr-2">
-                                        FN: {{ get_rst(ann_rst.rst).cm.fn }}
+                                        B+: {{ get_rst(ann_rst.rst).cm.fn }}
+                                    </span>
+                                </div>
+                                <div class="iaa-file-gs-box">
+                                    <span class="mr-2">
+                                        <span v-if="iaa_display_tag_name == '__all__'">
+                                            OVERALL
+                                        </span>
+                                        <span v-else>
+                                            {{ iaa_display_tag_name }}
+                                        </span>
+                                        in GS: {{ count_gs_tags(ann_hashcode) }}
                                     </span>
                                 </div>
                             </div>
@@ -1964,10 +2001,19 @@ input[type=text].ipt-spinner-xs {
                             </div>
 
                             <div v-if="iaa_display_adj_panel"
-                                class="iaa-tag-detail-header iaa-tag-detail-g iaa-w-20">
-                                <i class="far fa-handshake"></i>
-                                G 
-                                Gold Standard
+                                v-on:click="iaa_gs_dict[iaa_display_hashcode].ann._has_star = !iaa_gs_dict[iaa_display_hashcode].ann._has_star"
+                                title="Set check"
+                                class="iaa-tag-detail-header iaa-tag-detail-g iaa-tag-detail-g-header iaa-w-20">
+                                <span v-if="iaa_gs_dict[iaa_display_hashcode].ann._has_star">
+                                    <i class="fa fa-check-circle fg-emerald"></i>
+                                </span>
+                                <span v-else>
+                                    <i class="far fa-circle"></i>
+                                </span>
+                                <span>
+                                    {{ iaa_gs_dict[iaa_display_hashcode].ann._filename }}
+                                </span>
+                                
                             </div>
                             
                         </div>
@@ -1986,13 +2032,13 @@ input[type=text].ipt-spinner-xs {
                                         {{ tag_name }}
                                     </span>
                                     <span class="mr-2">
-                                        Agreed: {{ tag_rst.cm.tp }}
+                                        AB: {{ tag_rst.cm.tp }}
                                     </span>
                                     <span class="mr-2">
-                                        FP: {{ tag_rst.cm.fp }}
+                                        A+: {{ tag_rst.cm.fp }}
                                     </span>
                                     <span class="mr-2">
-                                        FN: {{ tag_rst.cm.fn }}
+                                        B+: {{ tag_rst.cm.fn }}
                                     </span>
                                 </div>
 

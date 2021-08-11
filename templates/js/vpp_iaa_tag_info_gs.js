@@ -66,8 +66,7 @@ Vue.component('iaa-tag-info-gs', {
 </div>
 <div v-else
     class="iaa-tag-detail-info w-100 d-flex flex-column">
-
-    Not decided
+    Rejected or Not Decided
 </div>
 `
 });
