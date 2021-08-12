@@ -795,7 +795,8 @@ input[type=text].ipt-spinner-xs {
 
                 <div class="group">
 
-                    <div id="dropzone_dtd" class="dropzone">
+                    <div id="dropzone_dtd" class="dropzone"
+                        v-on:click="open_dtd_file">
                         <div v-if="dtd != null" class="zone-text">
                             <b>{{ dtd.name }}</b><br>
                             {{ dtd.etags.length }} Entity Tags<br>
@@ -806,13 +807,13 @@ input[type=text].ipt-spinner-xs {
                         </div>
                     </div>
 
-                    <button class="ribbon-button"
+                    <!-- <button class="ribbon-button"
                         v-on:click="open_dtd_file">
                         <span class="icon">
                             <i class="far fa-file"></i>
                         </span>
                         <span class="caption">Open DTD</span>
-                    </button>
+                    </button> -->
 
                     <span class="title">Schema DTD File (.dtd)</span>
                 </div>
@@ -820,6 +821,7 @@ input[type=text].ipt-spinner-xs {
                 <div v-show="dtd != null" class="group">
 
                     <div id="dropzone_ann" 
+                        v-on:click="open_ann_files"
                         v-bind:class="{'disabled-zone': dtd == null, 'dropzone': dtd != null}">
                         <div v-if="ann_idx != null" class="zone-text">
                             <b>{{ anns[ann_idx]._filename }}</b><br>
@@ -831,13 +833,13 @@ input[type=text].ipt-spinner-xs {
                         </div>
                     </div>
 
-                    <button class="ribbon-button"
+                    <!-- <button class="ribbon-button"
                         v-on:click="open_ann_files">
                         <span class="icon">
                             <i class="far fa-file-code"></i>
                         </span>
                         <span class="caption">Open XMLs</span>
-                    </button>
+                    </button> -->
 
                     <span class="title">Annotation File (.xml)</span>
                 </div>
@@ -861,7 +863,7 @@ input[type=text].ipt-spinner-xs {
                     </button>
                     <a id="downloadAnchorElem" style="display:none"></a>
 
-                    <span class="title">Download</span>
+                    <span class="title">Save</span>
                 </div>
 
                 <!-- <div class="group">

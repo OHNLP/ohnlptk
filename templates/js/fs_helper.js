@@ -3,12 +3,15 @@ async function fs_open_files(pickerOpts) {
     return fhs;
 }
 
-async function fs_read_txt_file_handle(fh) {
+async function fs_read_txt_file_handle(fh, dtd_name) {
+    if (typeof(dtd_name) == 'undefined') {
+        dtd_name = '';
+    }
     const file = await fh.getFile();
     const text = await file.text();
 
     // create ann
-    var ann = ann_parser.txt2ann('', text);
+    var ann = ann_parser.txt2ann(dtd_name, text);
 
     // bind the fh
     ann._fh = fh;

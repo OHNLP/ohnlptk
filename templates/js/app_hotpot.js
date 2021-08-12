@@ -1433,6 +1433,46 @@ var app_hotpot = {
                 // read this handle
                 item.then(function(fh) {
                     if (fh.kind == 'file') {
+                        // if drop a txt!
+                        if (app_hotpot.is_file_ext(fh.name, 'txt')) {
+                            // create a new file name
+                            var new_fn = new_fn = fh.name + '.xml';
+                            var i = 1;
+                            while (true) {
+                                if (app_hotpot.vpp.has_included_ann_file(new_fn)) {
+                                    new_fn = fh.name + '_' + i + '.xml';
+                                    i += 1;
+                                } else {
+                                    break;
+                                }
+                            }
+
+                            // create a empty ann
+                            var p_txt_ann = fs_read_txt_file_handle(
+                                fh, app_hotpot.vpp.$data.dtd.name
+                            );
+
+                            // load this ann
+                            p_txt_ann.then((function(new_fn){
+                                return function(txt_ann) {
+                                    // modify the txt_ann _fh
+                                    // we couldn't save to an txt
+                                    txt_ann._fh = null;
+
+                                    // update the _filename
+                                    txt_ann._filename = new_fn;
+
+                                    // show some message
+                                    app_hotpot.msg("Created a new annotation file " + new_fn);
+
+                                    // add this ann
+                                    app_hotpot.add_ann(txt_ann);
+                                }
+                            })(new_fn));
+
+                            return;
+                        }
+
                         // show something or 
                         // check if this file name exists
                         if (app_hotpot.vpp.has_included_ann_file(fh.name)) {
@@ -2583,6 +2623,16 @@ var app_hotpot = {
     /////////////////////////////////////////////////////////////////
     // Utils
     /////////////////////////////////////////////////////////////////
+    is_file_ext: function(filename, ext) {
+        var fn_lower = filename.toLocaleLowerCase();
+
+        if (fn_lower.endsWith("." + ext)) {
+            return true;
+        }
+
+        return false;
+    },
+
     toast: function(msg, cls, timeout) {
         if (typeof(cls) == 'undefined') {
             cls = '';
