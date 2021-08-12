@@ -776,8 +776,39 @@ var app_hotpot = {
             );
         },
 
-        download_all_goldstandards: function() {
+        get_gs_zipfile_folder_name: function() {
+            return this.dtd.name + '-goldstandards';
+        },
 
+        download_all_gs: function() {
+            // create an empty zip pack
+            var zip = new JSZip();
+            var folder_name = this.get_gs_zipfile_folder_name();
+
+            // add files to zip pack
+            for (const hashcode in this.iaa_gs_dict) {
+                if (Object.hasOwnProperty.call(this.iaa_gs_dict, hashcode)) {
+                    const ann_rst = this.iaa_gs_dict[hashcode];
+                    
+                    // change to an ann obj
+                    var ann = iaa_calculator.make_ann_by_rst(ann_rst, this.dtd);
+
+                    // get the xmlText
+                    var xml_doc = ann_parser.ann2xml(ann, this.dtd);
+                    var xml_text = ann_parser.xml2str(xml_doc);
+
+                    // put this xml in folder (virtually)
+                    var ffn = folder_name + '/' + ann._filename;
+                    
+                    // put this xml to zip
+                    zip.file(ffn, xml_text);
+                }
+            }
+
+            // create zip file
+            zip.generateAsync({ type: "blob" }).then(function (content) {
+                saveAs(content, app_hotpot.vpp.get_new_xmls_zipfile_folder_name() + '.zip');
+            });
         },
 
         count_gs_tags: function(ann_hashcode) {

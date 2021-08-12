@@ -1,7 +1,38 @@
 var iaa_calculator = {
+    
 
-    set_tags_by_rst: function(ann_rst) {
-        
+    make_ann_by_rst: function(ann_rst, dtd) {
+        var ann = JSON.parse(JSON.stringify(ann_rst.ann));
+
+        // clear the ann tags
+        ann.tags = [];
+
+        // check each cate
+        var cms = ['tp', 'fp', 'fn'];
+
+        for (const tag_name in ann_rst.rst) {
+            if (Object.hasOwnProperty.call(ann_rst.rst, tag_name)) {
+                const tag_rst = ann_rst.rst[tag_name];
+
+                for (let i = 0; i < cms.length; i++) {
+                    const cm = cms[i];
+                    
+                    for (let j = 0; j < tag_rst[cm].length; j++) {
+                        var tag = Object.assign({}, tag_rst[cm][j].tag);
+                        var tag_def = dtd.tag_dict[tag.tag];
+
+                        // get a new id for this tag
+                        var new_id = ann_parser.get_next_tag_id(ann, tag_def);
+
+                        // now, set this tag and put it into list
+                        tag.id = new_id;
+                        ann.tags.push(tag);
+                    }
+                }
+            }
+        }
+
+        return ann;
     },
 
     get_default_gs_dict: function(dtd, iaa_dict) {
