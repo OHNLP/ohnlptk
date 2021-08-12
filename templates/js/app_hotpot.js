@@ -2041,11 +2041,29 @@ var app_hotpot = {
     cm_clear_ltag_marks: function() {
         // first, check if there is a layer for the plots
         if ($('#cm_svg_plots').length == 0) {
-            $('.CodeMirror-sizer').prepend(
-                '<div class="CodeMirror-plots"><svg id="cm_svg_plots"></svg></div>'
-            );
+            $('.CodeMirror-sizer').prepend(`
+            <div class="CodeMirror-plots">
+            <svg id="cm_svg_plots">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
+                        markerWidth="6" markerHeight="6"
+                        orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" />
+                    </marker>
+                </defs>
+            </svg>
+            </div>
+        `);
         } else {
-            $('#cm_svg_plots').empty();
+            $('#cm_svg_plots').html(`
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5"
+                        markerWidth="6" markerHeight="6"
+                        orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" />
+                    </marker>
+                </defs>
+            `);
         }
     },
 
@@ -2500,7 +2518,7 @@ var app_hotpot = {
             // point, end
             [
                 (coords_b.l.left + coords_b.r.left)/2,
-                (coords_b.l.top + 4)
+                (coords_b.l.top + 3)
             ]
         ];
 
@@ -2526,6 +2544,7 @@ var app_hotpot = {
         svg_polyline.setAttribute('id', 'mark-link-line-id-' + ltag.id);
         svg_polyline.setAttribute('points', points);
         svg_polyline.setAttribute('class', "tag-polyline");
+        svg_polyline.setAttribute('marker-end', "url(#arrow)");
 
         $('#cm_svg_plots').append(
             svg_polyline
