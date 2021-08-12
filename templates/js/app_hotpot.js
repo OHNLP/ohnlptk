@@ -122,6 +122,9 @@ var app_hotpot = {
                 app_hotpot.toast('Successfully saved ' + ann._filename);
             })
             .catch(function(error) {
+                if (error.name == 'AbortError') {
+                    return;
+                }
                 app_hotpot.msg(
                     'Saving xml failed. Try to use "Save As" instead.', 
                     'bg-lightCrimson fg-white'

@@ -761,18 +761,18 @@ input[type=text].ipt-spinner-xs {
                     Annotation
                 </a>
             </li>
-            <li v-on:click="switch_mui('corpus')"
-                v-bind:class="{'active': section=='corpus'}">
-                <a href="#section-1-2">
-                    <i class="fa fa-cubes"></i>
-                    Corpus
-                </a>
-            </li>
             <li v-on:click="switch_mui('statistics')"
                 v-bind:class="{'active': section=='statistics'}">
                 <a href="#section-1-5">
                     <i class="fa fa-chart-bar"></i>
                     Statistics
+                </a>
+            </li>
+            <li v-on:click="switch_mui('corpus')"
+                v-bind:class="{'active': section=='corpus'}">
+                <a href="#section-1-2">
+                    <i class="fa fa-cubes"></i>
+                    Corpus
                 </a>
             </li>
             <li v-on:click="switch_mui('ruleset')"
@@ -1395,7 +1395,7 @@ input[type=text].ipt-spinner-xs {
                         <button class="btn-xs"
                             title="Remove all files"
                             v-on:click="remove_all_ann_files">
-                            <i class="fa fa-sign-out-alt"></i>
+                            <i class="far fa-trash-alt"></i>
                             All
                         </button>
                     </div>
@@ -1408,10 +1408,11 @@ input[type=text].ipt-spinner-xs {
                             v-show="idx == ann_idx || is_match_filename(ann._filename)"
                             v-bind:class="{'file-selected':idx == ann_idx}"
                             class="file-list-item">
-                            <div v-bind:title="ann._filename"
-                                class="d-flex flex-row flex-justify-between">
+                            <div class="d-flex flex-row flex-justify-between">
                                 <div class="file-list-item-name"
+                                    v-bind:title="ann._filename"
                                     v-bind:class="{'file-list-item-name-unsaved':!ann._has_saved}">
+
                                     <a href="javascript:void(0);"
                                         v-show="!ann._has_saved" 
                                         v-on:click="save_xml"
@@ -1419,21 +1420,23 @@ input[type=text].ipt-spinner-xs {
                                         class="icon-fg-unsaved mr-1">
                                         <i class="fa fa-save"></i>
                                     </a>
+                                    
                                     <span v-on:click="set_ann_idx(idx)">
                                         {{ ann._filename }}
                                     </span>
                                 </div>
 
                                 <div class="d-flex flex-row">
-                                    <div class="mr-2">
+                                    <div class="mr-2"
+                                        v-bind:title="ann.tags.length + ' tags'">
                                         {{ ann.tags.length }}
                                     </div>
 
-                                    <div>
+                                    <div v-bind:title="'Remove ' + ann._filename">
                                         <a v-on:click="remove_ann_file(idx)"
                                             class="btn btn-red btn-xs"
                                             href="javascript:void(0);">
-                                            <i class="fa fa-sign-out-alt"></i>
+                                            <i class="fa fa-minus-circle"></i>
                                         </a>
                                     </div>
                                 </div>
