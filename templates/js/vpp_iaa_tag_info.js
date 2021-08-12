@@ -76,7 +76,7 @@ Vue.component('iaa-tag-info', {
             </button>
         </div>
 
-        <div class="mr-2">
+        <div class="iaa-tag-detail-info-text-ab mr-2">
             <span class="mr-1"
                 v-bind:class="'mark-tag-' + tag.tag">
                 {{ tag.id }}

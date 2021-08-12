@@ -95,24 +95,31 @@ var app_hotpot = {
         /////////////////////////////////////////////////////////////////
 
         save_xml: function() {
-            // convert to xml
-            var xmlDoc = ann_parser.ann2xml(
-                this.anns[this.ann_idx],
-                this.dtd
-            );
-
-            // convert to text
-            var xmlStr = ann_parser.xml2str(xmlDoc, false);
-
-            // save it!
-            var p_rst = fs_write_ann_file(
-                this.anns[this.ann_idx]._fh,
-                xmlStr
-            );
-
-            p_rst.then(function(fh) {
-                // in fact, please make sure the file is saved correctly
-                app_hotpot.vpp.callback_save_xml(fh);
+            // before saving, need to check the _fh
+            var p_ann = null;
+            if (this.anns[this.ann_idx]._fh === null ||
+                typeof(this.anns[this.ann_idx]._fh.createWritable)==='undefined') {
+                // which means this ann's original file is not available
+                // or it is a txt-converted ann
+                // let's go to save as directly
+                p_ann = fs_save_new_ann_file(
+                    this.anns[this.ann_idx],
+                    this.dtd
+                );
+                
+            } else {
+                // normal save
+                var p_ann = fs_save_ann_file(
+                    this.anns[this.ann_idx],
+                    this.dtd
+                );
+            }
+            p_ann.then(function(ann) {
+                // usually it should be OK ...
+                // but it may change ...
+                // using the given ann to replace the current ann
+                app_hotpot.vpp.set_current_ann(ann);
+                app_hotpot.toast('Successfully saved ' + ann._filename);
             })
             .catch(function(error) {
                 app_hotpot.msg(
@@ -121,14 +128,6 @@ var app_hotpot = {
                 );
                 console.log('* error when save xml', error);
             });;
-        },
-
-        callback_save_xml: function(fh) {
-            // update the status
-            this.anns[this.ann_idx]._has_saved = true;
-
-            // show something
-            app_hotpot.toast('Successfully saved ' + fh.name);
         },
         
         save_as_xml: function() {
@@ -148,11 +147,13 @@ var app_hotpot = {
             var new_fn = 'copy_of_' + fn;
 
             // ask for new fh for this file
-            var p_fh = get_new_ann_file_handle(new_fn);
+            var p_fh = fs_get_new_ann_file_handle(new_fn);
 
             // when new fh is ready, save it
             p_fh.then((function(xmlStr){
                 return function(fh) {
+                    // first, update the fh
+                    
                     // save this xmlStr with the given fh
                     let p_done = fs_write_ann_file(
                         fh,
@@ -252,6 +253,14 @@ var app_hotpot = {
 
         update_tag_table: function(tag) {
             console.log('* update tag table', tag);
+        },
+
+        set_current_ann: function(ann) {
+            // replace the ann object
+            this.anns[this.ann_idx] = ann;
+
+            // reset the marks and others
+            this.set_ann_idx(this.ann_idx);
         },
 
         set_ann_idx: function(idx) {
@@ -1449,7 +1458,7 @@ var app_hotpot = {
 
                             // create a empty ann
                             var p_txt_ann = fs_read_txt_file_handle(
-                                fh, app_hotpot.vpp.$data.dtd.name
+                                fh, app_hotpot.vpp.$data.dtd.name, true
                             );
 
                             // load this ann

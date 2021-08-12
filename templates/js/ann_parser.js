@@ -26,7 +26,7 @@ var ann_parser = {
         return ann;
     },
 
-    txt2ann: function(dtd_name, txt) {
+    txt2ann: function(txt, dtd_name) {
         var ann = {
             text: txt,
             dtd_name: dtd_name,
