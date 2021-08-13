@@ -749,13 +749,13 @@ input[type=text].ipt-spinner-xs {
                     Annotation
                 </a>
             </li>
-            <li v-on:click="switch_mui('statistics')"
+            <!-- <li v-on:click="switch_mui('statistics')"
                 v-bind:class="{'active': section=='statistics'}">
                 <a href="#section-1-5">
                     <i class="fa fa-chart-bar"></i>
                     Statistics
                 </a>
-            </li>
+            </li> -->
             <li v-on:click="switch_mui('corpus')"
                 v-bind:class="{'active': section=='corpus'}">
                 <a href="#section-1-2">
@@ -1322,6 +1322,19 @@ input[type=text].ipt-spinner-xs {
                 <div class="group">
                     <button class="ribbon-button" 
                         :disabled="dtd == null"
+                        v-on:click="download_tabular_tsv">
+                        <span class="icon">
+                            <i class="far fa-file-excel"></i>
+                        </span>
+                        <span class="caption">Tab-separated (.tsv)</span>
+                    </button>
+
+                    <span class="title">Texts</span>
+                </div>
+
+                <div class="group">
+                    <button class="ribbon-button" 
+                        :disabled="dtd == null"
                         v-on:click="download_ruleset_medtagger_zip">
                         <span class="icon">
                             <i class="far fa-file-archive"></i>
@@ -1339,7 +1352,7 @@ input[type=text].ipt-spinner-xs {
                         </span>
                         <span class="caption">spaCy (.jsonl)</span>
                     </button>
-                    <span class="title">Download Ruleset</span>
+                    <span class="title">Ruleset</span>
                 </div>
             </div>
 
@@ -1507,7 +1520,9 @@ if (isIE) {
 <!-- compromise -->
 <script src="https://unpkg.com/compromise"></script>
 <!-- chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
+<!-- PapaParse -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js"></script>
 
 <script>
 

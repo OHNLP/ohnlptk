@@ -903,6 +903,39 @@ var app_hotpot = {
             return cnt;
         },
 
+        download_tabular_tsv: function() {
+            // convert the hint dict to a json obj
+            var json = [];
+
+            for (const tag_name in this.hint_dict) {
+                if (Object.hasOwnProperty.call(this.hint_dict, tag_name)) {
+                    const tag_dict = this.hint_dict[tag_name];
+                    
+                    for (const tag_text in tag_dict.text_dict) {
+                        if (Object.hasOwnProperty.call(tag_dict.text_dict, tag_text)) {
+                            const tag = tag_dict.text_dict[tag_text];
+                            
+                            json.push({
+                                tag: tag_name,
+                                text: tag_text,
+                                count: tag.count
+                            });
+                        }
+                    }
+                }
+            }
+
+            // then convert the json to csv
+            var csv = Papa.unparse(json, {
+                delimiter: '\t'
+            });
+
+            // download this csv
+            var blob = new Blob([csv], {type: "text/tsv;charset=utf-8"});
+            var fn = this.get_ruleset_base_name() + '.tsv';
+            saveAs(blob, fn);
+        },
+
         /////////////////////////////////////////////////////////////////
         // Menu Related
         /////////////////////////////////////////////////////////////////
