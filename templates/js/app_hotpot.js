@@ -2854,7 +2854,7 @@ var app_hotpot = {
                     classes: 'bg-gray', 
                     action: this.tour.annotation.complete
                 }, {
-                    text: 'Next',
+                    text: 'Next <i class="fa fa-arrow-right"></i>',
                     action: this.tour.annotation.next
                 }]
             });
@@ -2873,10 +2873,10 @@ var app_hotpot = {
                     classes: 'bg-gray', 
                     action: this.tour.annotation.complete
                 }, {
-                    text: 'Prev',
+                    text: '<i class="fa fa-arrow-left"></i> Prev',
                     action: this.tour.annotation.back
                 }, {
-                    text: 'Next',
+                    text: 'Next <i class="fa fa-arrow-right"></i>',
                     action: this.tour.annotation.next
                 }]
             });
@@ -2884,14 +2884,14 @@ var app_hotpot = {
             // add step for text
             this.tour.annotation.addStep({
                 id: 'example-step',
-                text: 'That\'s all to start a new annotation task!<br>If you are not sure how each function works, here is a sample dataset for you. You could play with this sample data freely to see how each function works during annotation.<br>Have fun! 😁',
+                text: 'That\'s all to start a new annotation task!<br>If you are not sure what each button does, here is a sample dataset for you to try. You could play with this sample data freely to see how each function works for annotation.<br>Have fun! 😁',
                 attachTo: {
                   element: '#btn_annotation_load_sample',
                   on: 'left'
                 },
                 classes: '',
                 buttons: [{
-                    text: 'Prev',
+                    text: '<i class="fa fa-arrow-left"></i> Prev',
                     action: this.tour.annotation.back
                 }, {
                     text: 'Close',
