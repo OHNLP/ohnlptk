@@ -794,7 +794,7 @@ input[type=text].ipt-spinner-xs {
                             {{ dtd.ltags.length }} Link Tags
                         </div>
                         <div v-else>
-                            Drop <b>Schema</b> File Here
+                            Drop a <b>Schema</b> File Here
                         </div>
                     </div>
 
@@ -996,7 +996,8 @@ input[type=text].ipt-spinner-xs {
 
                 <div class="group">
 
-                    <button class="ribbon-button" 
+                    <button id="btn_annotation_load_sample"
+                        class="ribbon-button" 
                         title="Load a sample dataset"
                         v-on:click="load_sample_ds">
                         <span class="icon">
@@ -1538,7 +1539,10 @@ if (isIE) {
 <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> -->
 <!-- PapaParse -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js"></script>
-
+<!-- Shepherd -->
+<script src="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/js/shepherd.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@8.3.1/dist/css/shepherd.css">
+<!-- <script src="https://cdn.jsdelivr.net/npm/shepherd.js@5.0.1/dist/js/shepherd.js"></script> -->
 <script>
 
 // The file helper 
@@ -1595,9 +1599,16 @@ var jarvis = {
             app_hotpot.resize();
         });
 
+        // get some settings here
         var show_sample = this.get_url_paramter('ss');
         if (show_sample == 'yes') {
             app_hotpot.vpp.load_sample_ds();
+        }
+
+        // show the tour?
+        var show_tour = this.get_url_paramter('st');
+        if (show_tour == 'yes') {
+            setTimeout('app_hotpot.start_tour_annotation();', 550);
         }
     },
 

@@ -2,6 +2,11 @@ var app_hotpot = {
     // metro app toast
     metro_toast: Metro.toast.create,
 
+    // for tour
+    tour: {
+        annotation: null,
+    },
+
     // vue app
     vpp: null,
     vpp_id: '#app_hotpot',
@@ -174,11 +179,8 @@ var app_hotpot = {
             });
         },
 
-        save_as_json: function() {
-        },
-
         show_about: function() {
-            window.alert('Happy Annotating!');
+            app_hotpot.start_tour_annotation();
         },
 
         load_sample_ds: function() {
@@ -2827,5 +2829,78 @@ var app_hotpot = {
         bg.setAttribute("class", 'tag-linktext-bg ' + cls);
 
         elem.parentNode.insertBefore(bg, elem);
+    },
+
+    start_tour_annotation: function() {
+        if (this.tour.annotation == null) {
+            this.tour.annotation = new Shepherd.Tour({
+                defaultStepOptions: {
+                    classes: '',
+                    scrollTo: true
+                }
+            });
+
+            // add step for dtd
+            this.tour.annotation.addStep({
+                id: 'example-step',
+                text: 'Welcome! 🎉 🎉 🎉  This tool is very easy to use!<br>First, we could drop a schema (.dtd) file here.<br>The schema file defines all of the concepts you want to annotate in the documents.',
+                attachTo: {
+                  element: '#dropzone_dtd',
+                  on: 'right'
+                },
+                classes: '',
+                buttons: [{
+                    text: 'Close',
+                    classes: 'bg-gray', 
+                    action: this.tour.annotation.complete
+                }, {
+                    text: 'Next',
+                    action: this.tour.annotation.next
+                }]
+            });
+
+            // add step for text
+            this.tour.annotation.addStep({
+                id: 'example-step',
+                text: 'Second, you need to drop some annotation files here.<br>You could drop raw text files (.txt) to start and add more anytime. Our tool will automatically convert the text files to xml format when saving. Then, next time you could drop those saved xml files here directly.',
+                attachTo: {
+                  element: '#dropzone_ann',
+                  on: 'right'
+                },
+                classes: '',
+                buttons: [{
+                    text: 'Close',
+                    classes: 'bg-gray', 
+                    action: this.tour.annotation.complete
+                }, {
+                    text: 'Prev',
+                    action: this.tour.annotation.back
+                }, {
+                    text: 'Next',
+                    action: this.tour.annotation.next
+                }]
+            });
+
+            // add step for text
+            this.tour.annotation.addStep({
+                id: 'example-step',
+                text: 'That\'s all to start a new annotation task!<br>If you are not sure how each function works, here is a sample dataset for you. You could play with this sample data freely to see how each function works during annotation.<br>Have fun! 😁',
+                attachTo: {
+                  element: '#btn_annotation_load_sample',
+                  on: 'left'
+                },
+                classes: '',
+                buttons: [{
+                    text: 'Prev',
+                    action: this.tour.annotation.back
+                }, {
+                    text: 'Close',
+                    classes: 'bg-gray', 
+                    action: this.tour.annotation.complete
+                }]
+            });
+        }
+
+        this.tour.annotation.start();
     }
 };
