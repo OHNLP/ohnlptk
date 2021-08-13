@@ -111,18 +111,23 @@ var ann_parser = {
                 // put this value into tag
                 tag[attr] = value;
             }
-
-            // one more step, sometimes the attr in XML doesn't contain
-            // what defined int dtd, so we need to give a value
-            for (let k = 0; k < dtd.tag_dict[tag_name].attlists.length; k++) {
-                const att = dtd.tag_dict[tag_name].attlists[k];
-                if (tag.hasOwnProperty(att.name)) {
-                    // ok, that's what it should be
-                } else {
-                    // also ok, that's what it actually is sometimes
-                    tag[att.name] = att.default_value;
-                    console.log('* fixed missing', att.name);
-                }
+            // one more step, need to check whether this tag belongs to dtd
+            // if not, skip the next step
+            if (dtd.tag_dict.hasOwnProperty(tag_name)) {
+                // one more step, sometimes the attr in XML doesn't contain
+                // what defined int dtd, so we need to give a value
+                for (let k = 0; k < dtd.tag_dict[tag_name].attlists.length; k++) {
+                    const att = dtd.tag_dict[tag_name].attlists[k];
+                    if (tag.hasOwnProperty(att.name)) {
+                        // ok, that's what it should be
+                    } else {
+                        // also ok, that's what it actually is sometimes
+                        tag[att.name] = att.default_value;
+                        console.log('* fixed missing', att.name);
+                    }
+                }   
+            } else {
+                console.log('* undefined [' + tag_name + '] in dtd');
             }
             // console.log('* add tag', tag);
 
