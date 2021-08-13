@@ -40,12 +40,6 @@ def dt_builder():
     return render_template('dt_builder.html')
 
 
-@app.route('/annotator')
-@app.route('/annotator.html')
-def annotator():
-    return render_template('annotator.html')
-
-
 @app.route('/test_ie_editor')
 @app.route('/test_ie_editor.html')
 def test_ie_editor():
@@ -77,45 +71,6 @@ def build():
                 )
 
     print('* done building static pages')
-
-
-def build_annotator(path):
-    '''
-    Build the static annotator
-    '''
-    import shutil
-
-    # create the folder
-    pathlib.Path(
-        os.path.join(path, 'static', 'data')
-    ).mkdir(
-        parents=True,
-        exist_ok=True
-    )
-
-    # copy the sample data
-    path_src = os.path.join(
-        pathlib.Path(__file__).parent.absolute(),
-        'docs', 'static', 'data',
-        'vpp_data_sample.json'
-    )
-    path_dst = os.path.join(
-        path, 'static', 'data', 
-        'vpp_data_sample.json'
-    )
-    shutil.copy(path_src, path_dst, )
-
-    # download the page
-    with app.test_client() as client:
-        with app.app_context():
-            make_page(
-                client, 
-                "/annotator", 
-                path,
-                "index.html"
-            )
-
-    print('* done building static annotator')
 
 
 def build_test():
@@ -168,7 +123,7 @@ if __name__=='__main__':
 
     # add paramters
     parser.add_argument("--mode", type=str, 
-        choices=['build', 'build_ann', 'build_test', 'run'], default='run',
+        choices=['build', 'build_test', 'run'], default='run',
         help="Which mode?")
     parser.add_argument("--path", type=str, 
         help="Which path for the output?")
@@ -182,9 +137,6 @@ if __name__=='__main__':
 
     elif args.mode == 'build':
         build()
-
-    elif args.mode == 'build_ann':
-        build_annotator(args.path)
 
     elif args.mode == 'build_test':
         build_test()
