@@ -181,6 +181,23 @@ var app_hotpot = {
             window.alert('Happy Annotating!');
         },
 
+        load_sample_ds: function() {
+            $.get(
+                './static/data/vpp_data_sample.json', 
+                {
+                    rnd: Math.random()
+                }, 
+                function(data) {
+                    Object.assign(app_hotpot.vpp.$data, data);
+                    app_hotpot.set_dtd(
+                        app_hotpot.vpp.$data.dtd
+                    );
+                    app_hotpot.vpp.set_ann_idx(0);
+                }, 
+                'json'
+            );
+        },
+
         open_dtd_file: function() {
             // the settings for dtd file
             var pickerOpts = {

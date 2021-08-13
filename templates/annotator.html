@@ -993,6 +993,15 @@ input[type=text].ipt-spinner-xs {
                 <div class="group">
 
                     <button class="ribbon-button" 
+                        title="Load a sample dataset"
+                        v-on:click="load_sample_ds">
+                        <span class="icon">
+                            <i class="far fa-edit"></i>
+                        </span>
+                        <span class="caption">Sample</span>
+                    </button>
+
+                    <button class="ribbon-button" 
                         v-on:click="show_about">
                         <span class="icon">
                             <i class="fa fa-info"></i>
@@ -1088,7 +1097,7 @@ input[type=text].ipt-spinner-xs {
             </div>
 
             <!-- the section for adju operations -->
-            <div class="section" id="section-1-3"
+            <!-- <div class="section" id="section-1-3"
                 v-bind:class="{'active': section=='adjudication'}">
                 <div v-if="dtd != null" 
                     class="group">
@@ -1118,7 +1127,7 @@ input[type=text].ipt-spinner-xs {
 
                     <span class="title">Link Tags</span>
                 </div>
-            </div>
+            </div> -->
 
             <!-- the section for iaa -->
             <div class="section" id="section-1-6"
@@ -1575,29 +1584,11 @@ var jarvis = {
             app_hotpot.resize();
         });
 
-        var s = this.get_url_paramter('s');
-        if (s == 'yes') {
-            this.load_sample();
+        var show_sample = this.get_url_paramter('ss');
+        if (show_sample == 'yes') {
+            app_hotpot.vpp.load_sample_ds();
         }
-        // this.load_sample();
     },
-
-    load_sample: function() {
-        $.get(
-            '/static/data/vpp_data_sample.json', 
-            {
-                rnd: Math.random()
-            }, 
-            function(data) {
-                Object.assign(app_hotpot.vpp.$data, data);
-                app_hotpot.set_dtd(
-                    app_hotpot.vpp.$data.dtd
-                );
-            }, 
-            'json'
-        );
-    },
-
 
     get_url_paramter: function(name) {
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
