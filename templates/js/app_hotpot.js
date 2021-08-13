@@ -178,7 +178,7 @@ var app_hotpot = {
         },
 
         show_about: function() {
-
+            window.alert('Happy Annotating!');
         },
 
         open_dtd_file: function() {
