@@ -2323,7 +2323,7 @@ var app_hotpot = {
                     className: 'mark-hint mark-hint-' + hint.tag,
                     attributes: {
                         hint_id: hint.id,
-                        onclick: ''
+                        onclick: 'app_hotpot.vpp.add_tag_by_hint(\''+hint.id+'\')'
                     }
                 }
             );
