@@ -21,11 +21,6 @@
  */
 var ann_parser = {
 
-    parse: function(text, dtd) {
-        var ann = this.xml2ann(text, dtd);
-        return ann;
-    },
-
     txt2ann: function(txt, dtd_name) {
         var ann = {
             text: txt,

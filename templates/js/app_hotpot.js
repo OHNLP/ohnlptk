@@ -1347,6 +1347,22 @@ var app_hotpot = {
         this.vpp.$forceUpdate();
     },
 
+    clear_ann_all: function() {
+        this.txt_anns = [];
+        this.txt_xmls = [];
+
+        this.anns = [];
+        this.ann_idx = null;
+
+        this.hint_dict = {};
+    },
+
+    reset_vpp: function() {
+        this.dtd = null;
+        this.clear_ann_all();
+        this.clear_iaa_all();
+    },
+
     add_ann: function(ann, is_switch_to_this_ann) {
         // check the schema first
         if (ann.dtd_name != this.vpp.$data.dtd.name) {
@@ -1678,7 +1694,10 @@ var app_hotpot = {
                                         return function(ann) {
                                             app_hotpot.vpp.add_iaa_ann(ann, iaa_id);
                                         }
-                                    })(iaa_id));
+                                    })(iaa_id)).catch(function(error) {
+                                        app_hotpot.msg("Couldn't read ann, " + error.name);
+                                        console.error(error);
+                                    });
                                     
                                 } else {
                                     // what to do with a directory
@@ -1724,6 +1743,9 @@ var app_hotpot = {
         var p_ann = fs_read_ann_file_handle(fh, dtd);
         p_ann.then(function(ann) {
             app_hotpot.add_ann(ann);
+        }).catch(function(error) {
+            app_hotpot.msg("Couldn't read ann, " + error.name);
+            console.error(error);
         });
     },
 
@@ -2497,7 +2519,7 @@ var app_hotpot = {
     cm_doc_range2spans: function(sel_loc, ann) {
         var full_text = ann.text;
         // console.log('* calc doc range2spans: ');
-        console.log(sel_loc);
+        // console.log(sel_loc);
         var lines = full_text.split('\n');
         var span0 = 0;
         for (let i = 0; i < sel_loc.anchor.line; i++) {
@@ -2509,7 +2531,7 @@ var app_hotpot = {
             span1 += lines[i].length + 1;
         }
         span1 += sel_loc.head.ch;
-        console.log('* span0: ' + span0 + ', span1: ' + span1);
+        // console.log('* span0: ' + span0 + ', span1: ' + span1);
 
         if (span0 <= span1) {
             return span0 + '~' + span1;
@@ -2520,7 +2542,7 @@ var app_hotpot = {
 
     cm_doc_spans2range: function(spans, ann) {
         var full_text = ann.text;
-        console.log('* calc doc spans2range: ');
+        // console.log('* calc doc spans2range: ');
         var span_pos_0 = parseInt(spans.split('~')[0]);
         var span_pos_1 = parseInt(spans.split('~')[1]);
 

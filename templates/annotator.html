@@ -809,7 +809,7 @@ input[type=text].ipt-spinner-xs {
                     <span class="title">Schema DTD File (.dtd)</span>
                 </div>
 
-                <div v-show="dtd != null" class="group">
+                <div class="group">
 
                     <div id="dropzone_ann" 
                         v-on:click="open_ann_files"
@@ -819,8 +819,12 @@ input[type=text].ipt-spinner-xs {
                             {{ anns[ann_idx].text.length }} chars<br>
                             {{ anns[ann_idx].tags.length }} tags
                         </div>
-                        <div v-else>
+                        <div v-else-if="dtd != null">
                             Drop <b>Annotation</b> File(s) Here
+                        </div>
+                        <div v-else>
+                            <i class="fa fa-arrow-left"></i>
+                            Load schema file first
                         </div>
                     </div>
 
@@ -1494,6 +1498,7 @@ input[type=text].ipt-spinner-xs {
 <script>
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
 var isCHROME = false;
+var isFILE_API_OK = typeof(window.showOpenFilePicker) == 'function';
 var CHROME_VERSION = null;
 var CHROME_VERSION_MAJOR = null;
 if (isIE) {
@@ -1502,6 +1507,7 @@ if (isIE) {
     let user_agent = navigator.userAgent.toLowerCase();
     let mgs = user_agent.match(/chrome\/([\d\.]+)/);
     if (mgs == null) {
+
     } else {
         isCHROME = true;
         CHROME_VERSION = mgs[1];
@@ -1573,6 +1579,11 @@ var jarvis = {
         if (!isCHROME) { 
             this.ssmsg('Please use the latest Google Chrome browser');
             return 0; 
+        }
+
+        if (!isFILE_API_OK) {
+            this.ssmsg('Latest Google Chrome and HTTPS are required');
+            return 0;
         }
 
         app_hotpot.init();

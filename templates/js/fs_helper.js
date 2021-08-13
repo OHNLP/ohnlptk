@@ -46,7 +46,7 @@ async function fs_read_ann_file_handle(fh, dtd, enabled_sentences) {
     const text = await file.text();
 
     // create ann
-    var ann = ann_parser.parse(text, dtd);
+    var ann = ann_parser.xml2ann(text, dtd);
 
     // bind the fh
     ann._fh = fh;
