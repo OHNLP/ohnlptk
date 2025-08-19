@@ -1,4 +1,6 @@
-# OHNLP TK
+# OHNLP 
+
+This is a repository containing the demonstration website for OHNLP Toolkit functions originally intended for the N3C. This repository is no longer being maintained. 
 
 The homepage link: <https://ohnlp.github.io/ohnlptk/>
 
